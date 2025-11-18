@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings, ChevronRight, MoreHorizontal } from 'lucide-react';
+import { ChevronRight, MoreHorizontal } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface LandingScreenProps {
@@ -18,15 +18,6 @@ const LandingScreen: React.FC<LandingScreenProps> = ({ onBeetleClick }) => {
         title="Extras"
       >
         <MoreHorizontal className="h-5 w-5" />
-      </button>
-      
-      {/* Decision Toolkit Button */}
-      <button
-        onClick={() => navigate('/decision-toolkit')}
-        className="absolute top-6 right-6 bg-white/20 hover:bg-white/30 text-foreground rounded-xl p-2 transition-colors duration-300"
-        title="Decision Making Toolkit"
-      >
-        <Settings className="h-5 w-5" />
       </button>
       
       {/* Main Content */}
