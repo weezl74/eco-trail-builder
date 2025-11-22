@@ -1,6 +1,4 @@
-import React, { useEffect, useRef } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import React from 'react';
 
 interface BusinessLocationMapProps {
   businessName: string;
@@ -8,62 +6,26 @@ interface BusinessLocationMapProps {
   longitude: number;
 }
 
-// Business locations in Caerphilly for markers
-const businessLocations = [
-  { name: 'Caerphilly Town Centre', lat: 51.5775, lng: -3.2186 },
-  { name: 'Caerphilly Castle Area', lat: 51.5778, lng: -3.2178 },
-  { name: 'Van Road Business', lat: 51.5830, lng: -3.2280 },
-  { name: 'Bedwas', lat: 51.5889, lng: -3.2089 },
-  { name: 'Trethomas', lat: 51.5925, lng: -3.2089 },
-];
-
 export const BusinessLocationMap: React.FC<BusinessLocationMapProps> = ({
   businessName,
   latitude,
   longitude
 }) => {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-
-  useEffect(() => {
-    if (!mapContainer.current) return;
-
-    // Replace with your Mapbox token
-    mapboxgl.accessToken = 'pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbTN1azJyYncwOGszMmxzYzY2NHB0bzJyIn0.JWU8n8UOPmLirRkP0pWeRA';
-    
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/streets-v12',
-      center: [-3.22, 51.65], // Center on Caerphilly County Borough
-      zoom: 10.5, // Zoom out to show entire borough
-    });
-
-    // Add navigation controls
-    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-    // Add marker for the main business
-    new mapboxgl.Marker({ color: '#f97316' })
-      .setLngLat([longitude, latitude])
-      .setPopup(new mapboxgl.Popup().setHTML(`<strong>${businessName}</strong>`))
-      .addTo(map.current);
-
-    // Add markers for other businesses in the community
-    businessLocations.forEach(location => {
-      new mapboxgl.Marker({ color: '#8b5cf6', scale: 0.8 })
-        .setLngLat([location.lng, location.lat])
-        .setPopup(new mapboxgl.Popup().setHTML(`<strong>${location.name}</strong>`))
-        .addTo(map.current!);
-    });
-
-    // Cleanup
-    return () => {
-      map.current?.remove();
-    };
-  }, [businessName, latitude, longitude]);
-
+  // Caerphilly County Borough coordinates
+  const caerphillyLat = 51.65;
+  const caerphillyLng = -3.22;
+  
   return (
     <div className="w-full h-full rounded-lg overflow-hidden">
-      <div ref={mapContainer} className="w-full h-full" />
+      <iframe
+        width="100%"
+        height="100%"
+        style={{ border: 0 }}
+        loading="lazy"
+        allowFullScreen
+        referrerPolicy="no-referrer-when-downgrade"
+        src={`https://www.google.com/maps/embed/v1/view?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&center=${caerphillyLat},${caerphillyLng}&zoom=11&maptype=roadmap`}
+      />
     </div>
   );
 };
