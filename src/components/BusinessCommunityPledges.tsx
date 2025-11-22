@@ -2,8 +2,9 @@ import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { BusinessAvatar } from '@/components/BusinessAvatar';
-import { MapPin, Target, Heart } from 'lucide-react';
+import { MapPin, Target, Heart, Calculator } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 interface Business {
   id: string;
@@ -420,7 +421,17 @@ export const BusinessCommunityPledges: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">Business Community</h1>
-          <p className="text-cyan-400 text-lg">Climate pledges from local businesses</p>
+          <p className="text-cyan-400 text-lg mb-4">Climate pledges from local businesses</p>
+          
+          {/* Carbon Calculator CTA */}
+          <Button 
+            onClick={() => navigate('/carbon-report')}
+            className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white font-bold"
+            size="lg"
+          >
+            <Calculator className="w-5 h-5 mr-2" />
+            Calculate Your Carbon Footprint
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
