@@ -58,10 +58,10 @@ export const BusinessProfile: React.FC<BusinessProfileProps> = ({ business }) =>
         </Card>
       )}
 
-      {/* Map and Metrics Row */}
+      {/* Map and Stats Layout */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        {/* Map */}
-        <Card className="md:col-span-2 p-0 overflow-hidden h-[300px] bg-card border-2 border-border rounded-2xl">
+        {/* Map - Takes 2 columns */}
+        <Card className="md:col-span-2 p-0 overflow-hidden h-[400px] bg-card border-2 border-border rounded-2xl">
           <BusinessLocationMap 
             businessName={business.business_name}
             latitude={business.latitude || 51.5775}
@@ -69,55 +69,57 @@ export const BusinessProfile: React.FC<BusinessProfileProps> = ({ business }) =>
           />
         </Card>
 
-        {/* Metrics Card */}
-        <Card className="p-6 bg-card border-2 border-border rounded-2xl">
-          <div className="space-y-4">
-            <div>
-              <p className="text-sm text-muted-foreground mb-1">Rating</p>
-              <div className="flex gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <div 
-                    key={i} 
-                    className={`w-6 h-6 ${i < rating ? 'bg-primary' : 'bg-muted'} transition-colors`}
-                    style={{ clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)' }}
-                  />
-                ))}
+        {/* Side Column with 2 Cards Stacked */}
+        <div className="flex flex-col gap-4">
+          {/* Metrics Card */}
+          <Card className="p-6 bg-card border-2 border-border rounded-2xl flex-1">
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Rating</p>
+                <div className="flex gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <div 
+                      key={i} 
+                      className={`w-6 h-6 ${i < rating ? 'bg-primary' : 'bg-muted'} transition-colors`}
+                      style={{ clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)' }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Score</p>
+                <p className="text-2xl font-bold text-primary">{total} CO₂e | KG</p>
+              </div>
+
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Savings</p>
+                <p className="text-lg font-semibold text-foreground">£{costSavings} - £{costSavings * 10}</p>
               </div>
             </div>
+          </Card>
 
-            <div>
-              <p className="text-sm text-muted-foreground mb-1">Score</p>
-              <p className="text-2xl font-bold text-primary">{total} CO₂e | KG</p>
+          {/* Community Ranking Card */}
+          <Card className="p-6 bg-card border-2 border-primary/20 rounded-2xl flex-1">
+            <div className="text-center">
+              <p className="text-4xl font-bold text-primary mb-2">#{communityRanking}</p>
+              <p className="text-sm text-muted-foreground">Community</p>
+              <p className="text-sm text-muted-foreground">Ranking</p>
             </div>
+          </Card>
 
-            <div>
-              <p className="text-sm text-muted-foreground mb-1">Savings</p>
-              <p className="text-lg font-semibold text-foreground">£{costSavings} - £{costSavings * 10}</p>
+          {/* Community Growth Card */}
+          <Card className="p-6 bg-card border-2 border-primary/20 rounded-2xl flex-1">
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <ArrowUp className="w-6 h-6 text-green-600" />
+                <p className="text-4xl font-bold text-primary">{communityGrowth}</p>
+              </div>
+              <p className="text-sm text-muted-foreground">Community</p>
+              <p className="text-sm text-muted-foreground">Growth</p>
             </div>
-          </div>
-        </Card>
-      </div>
-
-      {/* Community Stats Row */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        <Card className="p-6 bg-card border-2 border-primary/20 rounded-2xl">
-          <div className="text-center">
-            <p className="text-5xl font-bold text-primary mb-2">#{communityRanking}</p>
-            <p className="text-sm text-muted-foreground">Community</p>
-            <p className="text-sm text-muted-foreground">Ranking</p>
-          </div>
-        </Card>
-
-        <Card className="p-6 bg-card border-2 border-primary/20 rounded-2xl">
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <ArrowUp className="w-8 h-8 text-green-600" />
-              <p className="text-5xl font-bold text-primary">{communityGrowth}</p>
-            </div>
-            <p className="text-sm text-muted-foreground">Community</p>
-            <p className="text-sm text-muted-foreground">Growth</p>
-          </div>
-        </Card>
+          </Card>
+        </div>
       </div>
 
       {/* Carbon Savings Estimate */}

@@ -34,8 +34,8 @@ export const BusinessLocationMap: React.FC<BusinessLocationMapProps> = ({
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v12',
-      center: [longitude, latitude],
-      zoom: 12,
+      center: [-3.22, 51.65], // Center on Caerphilly County Borough
+      zoom: 10.5, // Zoom out to show entire borough
     });
 
     // Add navigation controls
