@@ -430,8 +430,12 @@ export const BusinessCommunityPledges: React.FC = () => {
             return (
               <Card 
                 key={business.id} 
-                className="bg-zinc-900 border-zinc-800 hover:border-cyan-500/50 transition-all cursor-pointer"
+                className="bg-zinc-900 border-zinc-800 hover:border-cyan-500/50 transition-all cursor-pointer touch-manipulation active:scale-[0.98]"
                 onClick={() => handleBusinessClick(business.id)}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  handleBusinessClick(business.id);
+                }}
               >
                 <div className="p-6">
                   {/* Header */}
