@@ -59,7 +59,7 @@ export const BusinessProfile: React.FC<BusinessProfileProps> = ({ business }) =>
       )}
 
       {/* Compact Layout - Map and All Cards */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         {/* Map - Smaller size */}
         <Card className="p-0 overflow-hidden h-[220px] md:h-[260px] bg-card border-2 border-border rounded-2xl">
           <BusinessLocationMap 

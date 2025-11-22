@@ -29,7 +29,7 @@ export const BusinessLocationMap: React.FC<BusinessLocationMapProps> = ({
       <iframe
         width="100%"
         height="100%"
-        style={{ border: 0 }}
+        style={{ border: 0, transform: 'scale(1.8)', transformOrigin: '50% 40%' }}
         loading="lazy"
         allowFullScreen
         referrerPolicy="no-referrer-when-downgrade"
