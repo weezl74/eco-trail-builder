@@ -13,6 +13,7 @@ interface UserProgressProps {
   renewablesOwned: number;
   userMode: 'resident' | 'business';
   totalCostSavings?: number;
+  waterSaved?: number;
 }
 
 const UserProgress: React.FC<UserProgressProps> = ({
@@ -22,7 +23,8 @@ const UserProgress: React.FC<UserProgressProps> = ({
   sprintsCompleted,
   renewablesOwned,
   userMode,
-  totalCostSavings = 0
+  totalCostSavings = 0,
+  waterSaved = 0
 }) => {
   const [showAllPledges, setShowAllPledges] = useState(false);
   // Calculate various metrics
@@ -61,7 +63,7 @@ const UserProgress: React.FC<UserProgressProps> = ({
         <CardContent className="p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Impact Summary</h3>
           
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6">
             <div className="text-center">
               <div className="text-2xl font-bold text-green-600 mb-1">
                 {Math.round(footprintReduction)}%
@@ -94,7 +96,14 @@ const UserProgress: React.FC<UserProgressProps> = ({
               <div className="text-2xl font-bold text-yellow-600 mb-1">
                 £{totalCostSavings.toLocaleString()}
               </div>
-              <div className="text-xs text-gray-600">Annual Savings</div>
+              <div className="text-xs text-gray-600">Money Saved</div>
+            </div>
+            
+            <div className="text-center">
+              <div className="text-2xl font-bold text-cyan-600 mb-1">
+                {waterSaved.toLocaleString()}L
+              </div>
+              <div className="text-xs text-gray-600">Water Saved</div>
             </div>
           </div>
 
