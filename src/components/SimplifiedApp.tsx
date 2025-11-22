@@ -21,13 +21,14 @@ type UserMode = 'resident' | 'business';
 
 interface SimplifiedAppProps {
   onBackToLanding?: () => void;
+  initialMode?: UserMode;
 }
 
-const SimplifiedApp = ({ onBackToLanding }: SimplifiedAppProps) => {
+const SimplifiedApp = ({ onBackToLanding, initialMode = 'resident' }: SimplifiedAppProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('calculator');
-  const [mode, setMode] = useState<UserMode>('resident');
+  const [mode, setMode] = useState<UserMode>(initialMode);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [businessData, setBusinessData] = useState<any>(null);
   const [activeSprint, setActiveSprint] = useState<any>(null);
