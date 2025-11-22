@@ -1,25 +1,13 @@
 import React from 'react';
-import { ChevronRight, MoreHorizontal } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { ChevronRight } from 'lucide-react';
 
 interface LandingScreenProps {
   onBeetleClick?: () => void;
 }
 
 const LandingScreen: React.FC<LandingScreenProps> = ({ onBeetleClick }) => {
-  const navigate = useNavigate();
-  
   return (
     <div className="min-h-screen bg-background flex flex-col justify-center items-center relative pb-20">
-      {/* Extras Button */}
-      <button
-        onClick={() => navigate('/learning-assessment')}
-        className="absolute top-6 left-6 bg-white/20 hover:bg-white/30 text-foreground rounded-xl p-2 transition-colors duration-300"
-        title="Extras"
-      >
-        <MoreHorizontal className="h-5 w-5" />
-      </button>
-      
       {/* Main Content */}
       <div className="flex-1 flex items-center justify-center px-4">
         <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-roboto font-normal text-foreground text-center">

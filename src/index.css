@@ -9,7 +9,7 @@ All colors MUST be HSL.
 @layer base {
   :root {
     /* Carbon Trust inspired design system */
-    --background: 31 95% 54%; /* WFG Orange background */
+    --background: 34 91% 54%; /* #F4971D - WFG Orange background */
     --foreground: 0 0% 10%;
 
     --card: 0 0% 98%; /* White cards */
@@ -50,7 +50,7 @@ All colors MUST be HSL.
     --caerphilly-yellow: 51 100% 51%; /* Yellow from logo */
 
     /* Wellbeing of Future Generations Colors - using exact hex values from image */
-    --wfg-orange: 31 95% 54%; /* #f4971d - Resilient */
+    --wfg-orange: 34 91% 54%; /* #F4971D - Resilient */
     --wfg-purple: 273 59% 35%; /* #7e519c - Cohesive Communities */
     --wfg-blue: 204 52% 53%; /* #418ecd - Globally Responsible */
     --wfg-green: 57 82% 36%; /* #b8b10e - Prosperous */
