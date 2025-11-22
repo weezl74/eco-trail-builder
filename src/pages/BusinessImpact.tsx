@@ -1,13 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { BusinessProfile } from '@/components/BusinessProfile';
 import { caerphillyBusinesses } from '@/components/BusinessCommunityPledges';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import BottomNavigation from '@/components/BottomNavigation';
 
 const BusinessImpactPage: React.FC = () => {
   const { businessId } = useParams<{ businessId: string }>();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('community');
+  const [mode, setMode] = useState<'resident' | 'business'>('business');
+
+  const handleTabChange = (tab: string) => {
+    if (tab === 'community') {
+      navigate('/business-community');
+    } else {
+      // Navigate back to main app for other tabs
+      navigate('/');
+    }
+  };
 
   const business = caerphillyBusinesses.find(b => b.id === businessId);
 
@@ -42,31 +54,39 @@ const BusinessImpactPage: React.FC = () => {
   const coords = locationCoordinates[business.location] || { lat: 51.5775, lng: -3.2186 };
 
   return (
-    <div className="min-h-screen bg-black pb-20">
-      <div className="p-4">
-        <Button 
-          onClick={() => navigate('/business-community')} 
-          variant="ghost"
-          className="text-cyan-400 hover:text-cyan-300 mb-4"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Community
-        </Button>
+    <>
+      <div className="min-h-screen bg-black pb-20">
+        <div className="p-4">
+          <Button 
+            onClick={() => navigate('/business-community')} 
+            variant="ghost"
+            className="text-cyan-400 hover:text-cyan-300 mb-4"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Community
+          </Button>
+        </div>
+        
+        <BusinessProfile
+          business={{
+            business_name: business.business_name,
+            waste_footprint: business.waste_footprint,
+            travel_footprint: business.travel_footprint,
+            energy_footprint: business.energy_footprint,
+            latitude: coords.lat,
+            longitude: coords.lng,
+            climate_goals: business.climate_goals,
+            pen_portrait: business.pen_portrait
+          }}
+        />
       </div>
-      
-      <BusinessProfile
-        business={{
-          business_name: business.business_name,
-          waste_footprint: business.waste_footprint,
-          travel_footprint: business.travel_footprint,
-          energy_footprint: business.energy_footprint,
-          latitude: coords.lat,
-          longitude: coords.lng,
-          climate_goals: business.climate_goals,
-          pen_portrait: business.pen_portrait
-        }}
+      <BottomNavigation
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        mode={mode}
+        onModeChange={setMode}
       />
-    </div>
+    </>
   );
 };
 

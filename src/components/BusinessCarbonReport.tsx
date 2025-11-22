@@ -296,31 +296,31 @@ export const BusinessCarbonReport: React.FC<BusinessCarbonReportProps> = ({
             </div>
 
             {/* Navigation */}
-            <div className="flex gap-4 mt-8 pt-6 border-t border-zinc-800">
-              <Button
-                onClick={handleBack}
-                disabled={currentCategoryIndex === 0}
-                variant="outline"
-                className="border-zinc-700 text-white"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
-              </Button>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-8 pt-6 border-t border-zinc-800">
+              <div className="flex gap-3 sm:flex-1">
+                <Button
+                  onClick={handleBack}
+                  disabled={currentCategoryIndex === 0}
+                  variant="outline"
+                  className="border-zinc-700 text-white flex-1 sm:flex-none"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back
+                </Button>
 
-              <Button
-                onClick={handleSkipCategory}
-                variant="ghost"
-                className="text-zinc-400"
-              >
-                <XCircle className="w-4 h-4 mr-2" />
-                Skip Category
-              </Button>
-
-              <div className="flex-1" />
+                <Button
+                  onClick={handleSkipCategory}
+                  variant="ghost"
+                  className="text-zinc-400 flex-1 sm:flex-none"
+                >
+                  <XCircle className="w-4 h-4 mr-2" />
+                  Skip
+                </Button>
+              </div>
 
               <Button
                 onClick={handleNext}
-                className="bg-cyan-500 hover:bg-cyan-600 text-black"
+                className="bg-cyan-500 hover:bg-cyan-600 text-black w-full sm:w-auto"
               >
                 {currentCategoryIndex < categories.length - 1 ? (
                   <>
@@ -328,7 +328,7 @@ export const BusinessCarbonReport: React.FC<BusinessCarbonReportProps> = ({
                   </>
                 ) : (
                   <>
-                    Calculate Results <CheckCircle2 className="w-4 h-4 ml-2" />
+                    Calculate <CheckCircle2 className="w-4 h-4 ml-2" />
                   </>
                 )}
               </Button>
@@ -419,7 +419,7 @@ export const BusinessCarbonReport: React.FC<BusinessCarbonReportProps> = ({
           )}
 
           {/* Actions */}
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <Button
               onClick={() => {
                 setStep('mode-select');
