@@ -3,7 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { BusinessAvatar } from '@/components/BusinessAvatar';
 import { MapPin, Target, TrendingUp } from 'lucide-react';
-
+import { useNavigate } from 'react-router-dom';
 interface Business {
   id: string;
   business_name: string;
@@ -152,6 +152,12 @@ const caerphillyBusinesses: Business[] = [
 ];
 
 export const BusinessProfilesGallery: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleBusinessClick = (businessId: string) => {
+    navigate(`/business/${businessId}`);
+  };
+
   return (
     <div className="bg-black min-h-screen p-4 pb-20">
       <div className="max-w-7xl mx-auto">
@@ -165,7 +171,15 @@ export const BusinessProfilesGallery: React.FC = () => {
             const totalFootprint = business.waste_footprint + business.travel_footprint + business.energy_footprint;
             
             return (
-              <Card key={business.id} className="bg-zinc-900 border-zinc-800 hover:border-cyan-500/50 transition-all">
+              <Card
+                key={business.id}
+                className="bg-zinc-900 border-zinc-800 hover:border-cyan-500/50 transition-all cursor-pointer touch-manipulation active:scale-[0.98]"
+                onClick={() => handleBusinessClick(business.id)}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  handleBusinessClick(business.id);
+                }}
+              >
                 <div className="p-6">
                   {/* Header */}
                   <div className="flex items-start justify-between mb-4">
