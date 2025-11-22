@@ -58,10 +58,10 @@ export const BusinessProfile: React.FC<BusinessProfileProps> = ({ business }) =>
         </Card>
       )}
 
-      {/* Map and Stats Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        {/* Map - Takes 2 columns */}
-        <Card className="md:col-span-2 p-0 overflow-hidden h-[400px] bg-card border-2 border-border rounded-2xl">
+      {/* Compact Layout - Map and All Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        {/* Map - Smaller size */}
+        <Card className="p-0 overflow-hidden h-[280px] bg-card border-2 border-border rounded-2xl">
           <BusinessLocationMap 
             businessName={business.business_name}
             latitude={business.latitude || 51.5775}
@@ -69,18 +69,18 @@ export const BusinessProfile: React.FC<BusinessProfileProps> = ({ business }) =>
           />
         </Card>
 
-        {/* Side Column with 2 Cards Stacked */}
-        <div className="flex flex-col gap-4">
+        {/* All Stats Cards in Grid */}
+        <div className="grid grid-cols-2 gap-4">
           {/* Metrics Card */}
-          <Card className="p-6 bg-card border-2 border-border rounded-2xl flex-1">
-            <div className="space-y-4">
+          <Card className="p-4 bg-card border-2 border-border rounded-2xl col-span-2">
+            <div className="grid grid-cols-3 gap-4">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Rating</p>
+                <p className="text-xs text-muted-foreground mb-1">Rating</p>
                 <div className="flex gap-1">
                   {[...Array(5)].map((_, i) => (
                     <div 
                       key={i} 
-                      className={`w-6 h-6 ${i < rating ? 'bg-primary' : 'bg-muted'} transition-colors`}
+                      className={`w-4 h-4 ${i < rating ? 'bg-primary' : 'bg-muted'} transition-colors`}
                       style={{ clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)' }}
                     />
                   ))}
@@ -88,35 +88,35 @@ export const BusinessProfile: React.FC<BusinessProfileProps> = ({ business }) =>
               </div>
 
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Score</p>
-                <p className="text-2xl font-bold text-primary">{total} CO₂e | KG</p>
+                <p className="text-xs text-muted-foreground mb-1">Score</p>
+                <p className="text-lg font-bold text-primary">{total} CO₂e</p>
               </div>
 
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Savings</p>
-                <p className="text-lg font-semibold text-foreground">£{costSavings} - £{costSavings * 10}</p>
+                <p className="text-xs text-muted-foreground mb-1">Savings</p>
+                <p className="text-sm font-semibold text-foreground">£{costSavings}-{costSavings * 10}</p>
               </div>
             </div>
           </Card>
 
           {/* Community Ranking Card */}
-          <Card className="p-6 bg-card border-2 border-primary/20 rounded-2xl flex-1">
+          <Card className="p-4 bg-card border-2 border-primary/20 rounded-2xl">
             <div className="text-center">
-              <p className="text-4xl font-bold text-primary mb-2">#{communityRanking}</p>
-              <p className="text-sm text-muted-foreground">Community</p>
-              <p className="text-sm text-muted-foreground">Ranking</p>
+              <p className="text-3xl font-bold text-primary mb-1">#{communityRanking}</p>
+              <p className="text-xs text-muted-foreground">Community</p>
+              <p className="text-xs text-muted-foreground">Ranking</p>
             </div>
           </Card>
 
           {/* Community Growth Card */}
-          <Card className="p-6 bg-card border-2 border-primary/20 rounded-2xl flex-1">
+          <Card className="p-4 bg-card border-2 border-primary/20 rounded-2xl">
             <div className="text-center">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <ArrowUp className="w-6 h-6 text-green-600" />
-                <p className="text-4xl font-bold text-primary">{communityGrowth}</p>
+              <div className="flex items-center justify-center gap-1 mb-1">
+                <ArrowUp className="w-5 h-5 text-green-600" />
+                <p className="text-3xl font-bold text-primary">{communityGrowth}</p>
               </div>
-              <p className="text-sm text-muted-foreground">Community</p>
-              <p className="text-sm text-muted-foreground">Growth</p>
+              <p className="text-xs text-muted-foreground">Community</p>
+              <p className="text-xs text-muted-foreground">Growth</p>
             </div>
           </Card>
         </div>
