@@ -6,13 +6,13 @@ interface BusinessLocationMapProps {
   longitude: number;
 }
 
-// Business locations in Caerphilly for markers
+// Approximate positions for key locations within Caerphilly County Borough
 const businessLocations = [
-  { name: 'Caerphilly Town Centre', lat: 51.5775, lng: -3.2186 },
-  { name: 'Caerphilly Castle Area', lat: 51.5778, lng: -3.2178 },
-  { name: 'Van Road Business', lat: 51.5830, lng: -3.2280 },
-  { name: 'Bedwas', lat: 51.5889, lng: -3.2089 },
-  { name: 'Trethomas', lat: 51.5925, lng: -3.2089 },
+  { name: 'Caerphilly Town Centre', x: 48, y: 52 },
+  { name: 'Caerphilly Castle Area', x: 50, y: 50 },
+  { name: 'Van Road Business', x: 53, y: 48 },
+  { name: 'Bedwas', x: 56, y: 55 },
+  { name: 'Trethomas', x: 58, y: 57 },
 ];
 
 export const BusinessLocationMap: React.FC<BusinessLocationMapProps> = ({
@@ -24,16 +24,8 @@ export const BusinessLocationMap: React.FC<BusinessLocationMapProps> = ({
   const caerphillyLat = 51.65;
   const caerphillyLng = -3.22;
   
-  // Build markers string for Google Maps
-  const markers = businessLocations
-    .map(loc => `markers=color:purple%7Csize:small%7C${loc.lat},${loc.lng}`)
-    .join('&');
-  
-  // Add main business marker
-  const mainMarker = `markers=color:orange%7Clabel:B%7C${latitude},${longitude}`;
-  
   return (
-    <div className="w-full h-full rounded-lg overflow-hidden">
+    <div className="relative w-full h-full rounded-lg overflow-hidden">
       <iframe
         width="100%"
         height="100%"
@@ -41,8 +33,20 @@ export const BusinessLocationMap: React.FC<BusinessLocationMapProps> = ({
         loading="lazy"
         allowFullScreen
         referrerPolicy="no-referrer-when-downgrade"
-        src={`https://www.google.com/maps/embed/v1/view?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&center=${caerphillyLat},${caerphillyLng}&zoom=11&maptype=roadmap`}
+        src={`https://www.google.com/maps/embed?pb=!1m12!1m3!1d79613.57439346557!2d-3.30!3d51.65!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1`}
+        title={businessName}
       />
+
+      {/* Overlay pins to indicate key locations */}
+      <div className="absolute inset-0 pointer-events-none">
+        {businessLocations.map((location) => (
+          <div
+            key={location.name}
+            className="absolute -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-primary shadow-soft border border-card"
+            style={{ left: `${location.x}%`, top: `${location.y}%` }}
+          />
+        ))}
+      </div>
     </div>
   );
 };
