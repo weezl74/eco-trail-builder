@@ -58,7 +58,7 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
             {swatches.map((c) => (
               <button
                 key={c}
-                onClick={() => setColor(c)}
+                onClick={() => saveColor(c)}
                 className={`w-full aspect-square rounded-full border-2 ${color === c ? 'border-white' : 'border-transparent'}`}
                 style={{ backgroundColor: c }}
               />
