@@ -17,9 +17,10 @@ import AccountCard from './AccountCard';
 
 interface SimplifiedAppProps {
   onBackToLanding?: () => void;
+  language?: 'en' | 'cy';
 }
 
-const SimplifiedApp = ({ onBackToLanding }: SimplifiedAppProps) => {
+const SimplifiedApp = ({ onBackToLanding, language = 'en' }: SimplifiedAppProps) => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('calculator');
   const [userProfile, setUserProfile] = useState<any>(null);
