@@ -139,12 +139,18 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
-  body {
-    @apply bg-background text-foreground font-roboto;
+  html, body {
+    @apply bg-background text-foreground;
+    font-family: 'Roboto Slab', serif !important;
+    font-weight: 700;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-roboto font-bold;
+  body * {
+    font-family: 'Roboto Slab', serif !important;
+  }
+
+  h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, select, label, li, div {
+    font-weight: 700;
   }
 }
 
