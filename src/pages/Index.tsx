@@ -11,15 +11,35 @@ type Stage = "landing" | "language" | "auth" | "login" | "register" | "app";
 
 const Index = () => {
   const [stage, setStage] = useState<Stage>("landing");
-  const [language, setLanguage] = useState<"en" | "cy">("en");
-  const { user } = useAuth();
+  const [language, setLanguage] = useState<"en" | "cy">(() => {
+    try {
+      return (localStorage.getItem("app_language") as "en" | "cy") || "en";
+    } catch {
+      return "en";
+    }
+  });
+  const { user, loading } = useAuth();
+  const [bootChecked, setBootChecked] = useState(false);
 
-  // If authenticated and past landing, go to app
+  // On first mount, if a valid session exists, skip straight to the app
+  useEffect(() => {
+    if (loading) return;
+    if (!bootChecked) {
+      if (user) setStage("app");
+      setBootChecked(true);
+    }
+  }, [loading, user, bootChecked]);
+
+  // After login/register success, advance to app
   useEffect(() => {
     if (user && (stage === "login" || stage === "register" || stage === "auth")) {
       setStage("app");
     }
   }, [user, stage]);
+
+  if (loading && !bootChecked) {
+    return <div className="min-h-screen bg-[#f5a623]" />;
+  }
 
   if (stage === "app") {
     return (
