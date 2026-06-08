@@ -67,7 +67,7 @@ const SimplifiedApp = ({ onBackToLanding, language = 'en' }: SimplifiedAppProps)
           </div>
         );
       case 'community':
-        return <CommunityScreen />;
+        return <CommunityScreen userPoints={totalPoints} />;
       case 'account':
         return (
           <AccountScreen

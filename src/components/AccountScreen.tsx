@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ArrowRight, Sparkles, Share2 } from 'lucide-react';
 import AccountCard from './AccountCard';
+import SheepAvatarScreen from './screens/SheepAvatarScreen';
 import { supabase } from '@/integrations/supabase/client';
+
 
 interface AccountScreenProps {
   name: string;
@@ -39,6 +41,8 @@ const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title
 const AccountScreen: React.FC<AccountScreenProps> = ({
   name, memberSince, totalPoints, currentFootprint, badges = [], rewards = [], onLogOut,
 }) => {
+  const [editingAvatar, setEditingAvatar] = useState(false);
+
   const handleLogOut = async () => {
     await supabase.auth.signOut();
     onLogOut?.();
@@ -49,6 +53,11 @@ const AccountScreen: React.FC<AccountScreenProps> = ({
     await supabase.auth.signOut();
     onLogOut?.();
   };
+
+  if (editingAvatar) {
+    return <SheepAvatarScreen onBack={() => setEditingAvatar(false)} />;
+  }
+
 
   return (
     <div className="min-h-screen bg-[#f5a623] pb-24 px-4 pt-6">
@@ -75,7 +84,7 @@ const AccountScreen: React.FC<AccountScreenProps> = ({
       </div>
 
       <Section title="Account">
-        <Row label="Edit Carbon Card" />
+        <Row label="Edit Carbon Card" onClick={() => setEditingAvatar(true)} />
         <Row label="Account Information" />
         <Row label="Privacy Settings" />
         <Row label="Change Password" />
