@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Home, Bug } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 import BottomNavigation from './BottomNavigation';
 import WasteCalculator from './WasteCalculator';
 import UserProgress from './UserProgress';
@@ -14,70 +13,31 @@ import RenewableShop from './RenewableShop';
 import TreePlanting from './TreePlanting';
 import KnowledgeBase from './KnowledgeBase';
 import SprintChallenges from './SprintChallenges';
-import { BusinessProfile } from './BusinessProfile';
-import { BusinessProfilesGallery } from './BusinessProfilesGallery';
-
-type UserMode = 'resident' | 'business';
+import AccountCard from './AccountCard';
 
 interface SimplifiedAppProps {
   onBackToLanding?: () => void;
-  initialMode?: UserMode;
 }
 
-const SimplifiedApp = ({ onBackToLanding, initialMode = 'resident' }: SimplifiedAppProps) => {
+const SimplifiedApp = ({ onBackToLanding }: SimplifiedAppProps) => {
   const { user } = useAuth();
-  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('calculator');
-  const [mode, setMode] = useState<UserMode>(initialMode);
   const [userProfile, setUserProfile] = useState<any>(null);
-  const [businessData, setBusinessData] = useState<any>(null);
-  const [activeSprint, setActiveSprint] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
-  // When mode changes, reset to calculator tab to show appropriate landing
-  const handleModeChange = (newMode: UserMode) => {
-    console.log('Mode changing to:', newMode);
-    setMode(newMode);
-    setActiveTab('calculator');
-    console.log('Active tab set to calculator');
-  };
-
-  // Debug: Log current state
   useEffect(() => {
-    console.log('Current mode:', mode, 'Active tab:', activeTab);
-  }, [mode, activeTab]);
-
-  useEffect(() => {
-    if (user) {
-      loadUserData();
-    }
+    if (user) loadUserData();
   }, [user]);
 
   const loadUserData = async () => {
     if (!user) return;
-    
     try {
       const { data: profile } = await supabase
         .from('profiles')
         .select('*')
         .eq('user_id', user.id)
         .single();
-      
-      if (profile) {
-        setUserProfile(profile);
-      }
-
-      // Load business data if exists
-      const { data: business } = await supabase
-        .from('businesses')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-      
-      if (business) {
-        setBusinessData(business);
-      }
-      
+      if (profile) setUserProfile(profile);
       setLoading(false);
     } catch (error) {
       console.error('Error loading user data:', error);
@@ -96,83 +56,59 @@ const SimplifiedApp = ({ onBackToLanding, initialMode = 'resident' }: Simplified
     );
   }
 
+  const totalPoints = userProfile?.total_points || 0;
+  const currentFootprint = userProfile?.current_footprint || 0;
+
+  const PageHeader = ({ title }: { title: string }) => (
+    <div className="flex items-center justify-between mb-6">
+      <h1 className="text-3xl font-roboto text-foreground">{title}</h1>
+      <button
+        onClick={onBackToLanding}
+        className="p-2 rounded-xl bg-card hover:bg-card/90 transition-colors"
+      >
+        <Home className="h-6 w-6 text-foreground" />
+      </button>
+    </div>
+  );
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'calculator':
-        if (mode === 'business') {
-          return <BusinessProfile 
-            business={{
-              business_name: businessData?.business_name || 'My Business',
-              waste_footprint: businessData?.waste_footprint || 280,
-              travel_footprint: businessData?.travel_footprint || 420,
-              energy_footprint: businessData?.energy_footprint || 350,
-              latitude: businessData?.latitude || 51.5775,
-              longitude: businessData?.longitude || -3.2186,
-              climate_goals: businessData?.climate_goals || 'Net Zero by 2030',
-              pen_portrait: 'A forward-thinking business committed to sustainable practices and community engagement.'
-            }}
-          />;
-        }
         return (
           <div className="min-h-screen bg-background pb-20">
-            <WasteCalculator mode={mode} onModeChange={handleModeChange} />
+            <WasteCalculator />
           </div>
         );
       case 'dashboard':
         return (
           <div className="min-h-screen bg-background pb-20">
             <div className="p-4">
-              <div className="flex items-center justify-between mb-6">
-                <h1 className="text-3xl font-roboto text-foreground">Dashboard</h1>
-                <button
-                  onClick={onBackToLanding}
-                  className="p-2 rounded-xl bg-card hover:bg-card/90 transition-colors"
-                >
-                  <Home className="h-6 w-6 text-foreground" />
-                </button>
-              </div>
+              <PageHeader title="Dashboard" />
               <div className="space-y-6">
                 <div className="bg-card rounded-2xl p-4">
-                  <UserProgress 
-                    currentFootprint={userProfile?.current_footprint || 0}
-                    totalPoints={userProfile?.total_points || 0}
+                  <UserProgress
+                    currentFootprint={currentFootprint}
+                    totalPoints={totalPoints}
                     pledgesCompleted={0}
                     sprintsCompleted={0}
                     renewablesOwned={0}
-                    userMode={mode}
+                    userMode="resident"
                   />
                 </div>
                 <div className="bg-card rounded-2xl p-4">
-                  <AvatarSystem 
-                    totalPoints={userProfile?.total_points || 0}
-                    userRenewables={0}
-                    pledgesCompleted={0}
-                  />
+                  <AvatarSystem totalPoints={totalPoints} userRenewables={0} pledgesCompleted={0} />
                 </div>
                 <div className="bg-card rounded-2xl p-4">
-                  <CaerphillyMap 
-                    userRenewables={[]}
-                    totalPoints={userProfile?.total_points || 0}
-                    currentFootprint={userProfile?.current_footprint || 0}
-                  />
+                  <CaerphillyMap userRenewables={[]} totalPoints={totalPoints} currentFootprint={currentFootprint} />
                 </div>
                 <div className="bg-card rounded-2xl p-4">
-                  <RenewableShop 
-                    totalPoints={userProfile?.total_points || 0}
-                    userRenewables={[]}
-                    onPurchase={() => {}}
-                  />
+                  <RenewableShop totalPoints={totalPoints} userRenewables={[]} onPurchase={() => {}} />
                 </div>
                 <div className="bg-card rounded-2xl p-4">
-                  <TreePlanting 
-                    totalPoints={userProfile?.total_points || 0}
+                  <TreePlanting
+                    totalPoints={totalPoints}
                     onPointsUpdate={(newPoints) => {
-                      if (userProfile) {
-                        setUserProfile({
-                          ...userProfile,
-                          total_points: newPoints
-                        });
-                      }
+                      if (userProfile) setUserProfile({ ...userProfile, total_points: newPoints });
                     }}
                   />
                 </div>
@@ -184,15 +120,7 @@ const SimplifiedApp = ({ onBackToLanding, initialMode = 'resident' }: Simplified
         return (
           <div className="min-h-screen bg-background pb-20">
             <div className="p-4">
-              <div className="flex items-center justify-between mb-6">
-                <h1 className="text-3xl font-roboto text-foreground">Leaderboard</h1>
-                <button
-                  onClick={onBackToLanding}
-                  className="p-2 rounded-xl bg-card hover:bg-card/90 transition-colors"
-                >
-                  <Home className="h-6 w-6 text-foreground" />
-                </button>
-              </div>
+              <PageHeader title="Leaderboard" />
               <div className="bg-card rounded-2xl p-4">
                 <Leaderboard />
               </div>
@@ -203,15 +131,7 @@ const SimplifiedApp = ({ onBackToLanding, initialMode = 'resident' }: Simplified
         return (
           <div className="min-h-screen bg-background pb-20">
             <div className="p-4">
-              <div className="flex items-center justify-between mb-6">
-                <h1 className="text-3xl font-roboto text-foreground">Sprint Challenges</h1>
-                <button
-                  onClick={onBackToLanding}
-                  className="p-2 rounded-xl bg-card hover:bg-card/90 transition-colors"
-                >
-                  <Home className="h-6 w-6 text-foreground" />
-                </button>
-              </div>
+              <PageHeader title="Sprint Challenges" />
               <div className="bg-card rounded-2xl p-4">
                 <SprintChallenges />
               </div>
@@ -221,51 +141,50 @@ const SimplifiedApp = ({ onBackToLanding, initialMode = 'resident' }: Simplified
       case 'community':
         return (
           <div className="min-h-screen bg-background pb-20">
-            {mode === 'business' ? (
-              <BusinessProfilesGallery />
-            ) : (
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-6">
-                  <h1 className="text-3xl font-roboto text-foreground">Community</h1>
-                  <button
-                    onClick={onBackToLanding}
-                    className="p-2 rounded-xl bg-card hover:bg-card/90 transition-colors"
-                  >
-                    <Home className="h-6 w-6 text-foreground" />
-                  </button>
+            <div className="p-4">
+              <PageHeader title="Community" />
+              <div className="bg-card rounded-2xl p-4">
+                <div className="flex items-center mb-4">
+                  <Bug className="h-8 w-8 mr-3 text-wfg-yellow" />
+                  <h2 className="text-xl font-roboto">Community Buzz</h2>
                 </div>
-                <div className="bg-card rounded-2xl p-4">
-                  <div className="flex items-center mb-4">
-                    <Bug className="h-8 w-8 mr-3 text-wfg-yellow" />
-                    <h2 className="text-xl font-roboto">Community Buzz</h2>
-                  </div>
-                  <CommunityStories />
-                </div>
+                <CommunityStories />
               </div>
-            )}
+              <div className="bg-card rounded-2xl p-4 mt-4">
+                <KnowledgeBase userProfile={userProfile} setUserProfile={setUserProfile} />
+              </div>
+            </div>
           </div>
         );
-      case 'knowledge':
+      case 'account':
         return (
           <div className="min-h-screen bg-background pb-20">
             <div className="p-4">
-              <div className="flex items-center justify-between mb-6">
-                <h1 className="text-3xl font-roboto text-foreground">Knowledge & Quizzes</h1>
-                <button
-                  onClick={onBackToLanding}
-                  className="p-2 rounded-xl bg-card hover:bg-card/90 transition-colors"
-                >
-                  <Home className="h-6 w-6 text-foreground" />
-                </button>
-              </div>
-              <div className="bg-card rounded-2xl p-4">
-                <div className="flex items-center mb-4">
-                  <Bug className="h-8 w-8 mr-3 text-wfg-orange" />
-                  <h2 className="text-xl font-roboto">Learn & Earn Points</h2>
-                </div>
-                <KnowledgeBase 
-                  userProfile={userProfile}
-                  setUserProfile={setUserProfile}
+              <PageHeader title="My Account" />
+              <div className="bg-card rounded-2xl p-5">
+                <AccountCard
+                  name={userProfile?.display_name || user?.email?.split('@')[0] || 'Green Member'}
+                  memberSince={
+                    userProfile?.created_at
+                      ? new Date(userProfile.created_at).getFullYear().toString()
+                      : '2026'
+                  }
+                  totalPoints={totalPoints}
+                  currentFootprint={currentFootprint}
+                  badges={
+                    totalPoints > 0
+                      ? [
+                          { id: 'starter', label: 'First Step' },
+                          ...(totalPoints >= 100 ? [{ id: 'p100', label: '100 Points' }] : []),
+                          ...(totalPoints >= 500 ? [{ id: 'p500', label: 'Eco Champion' }] : []),
+                        ]
+                      : []
+                  }
+                  rewards={
+                    totalPoints >= 200
+                      ? [{ id: 'r1', label: '10% off local cafés', value: 'Unlocked' }]
+                      : []
+                  }
                 />
               </div>
             </div>
@@ -283,12 +202,7 @@ const SimplifiedApp = ({ onBackToLanding, initialMode = 'resident' }: Simplified
   return (
     <>
       {renderTabContent()}
-      <BottomNavigation 
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        mode={mode}
-        onModeChange={handleModeChange}
-      />
+      <BottomNavigation activeTab={activeTab} onTabChange={setActiveTab} />
     </>
   );
 };
