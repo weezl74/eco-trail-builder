@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Mail, Gift, Calendar, Shirt } from 'lucide-react';
 import welcomeSheep from '@/assets/welcome-sheep.jpg.asset.json';
+import SheepAvatarScreen from './screens/SheepAvatarScreen';
 
 interface HomeScreenProps {
   money?: number;
@@ -9,6 +10,12 @@ interface HomeScreenProps {
 }
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ money = 515, co2 = 1417, water = 0 }) => {
+  const [showAvatar, setShowAvatar] = useState(false);
+
+  if (showAvatar) {
+    return <SheepAvatarScreen onBack={() => setShowAvatar(false)} />;
+  }
+
   return (
     <div className="min-h-screen bg-black pb-24 flex flex-col">
       {/* Pill of icons */}
@@ -17,7 +24,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ money = 515, co2 = 1417, water 
           <Mail className="h-7 w-7 text-white" strokeWidth={2.5} />
           <Gift className="h-7 w-7 text-white" strokeWidth={2.5} />
           <Calendar className="h-7 w-7 text-white" strokeWidth={2.5} />
-          <Shirt className="h-7 w-7 text-white" strokeWidth={2.5} />
+          <button onClick={() => setShowAvatar(true)} aria-label="Customise sheep">
+            <Shirt className="h-7 w-7 text-white" strokeWidth={2.5} />
+          </button>
         </div>
       </div>
 
