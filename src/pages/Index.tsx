@@ -1,15 +1,25 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import LandingScreen from "@/components/LandingScreen";
 import LanguageSelect from "@/components/LanguageSelect";
 import AuthChoice from "@/components/AuthChoice";
+import LoginForm from "@/components/LoginForm";
 import RegisterForm, { RegistrationDetails } from "@/components/RegisterForm";
 import SimplifiedApp from "@/components/SimplifiedApp";
+import { useAuth } from "@/hooks/useAuth";
 
-type Stage = "landing" | "language" | "auth" | "register" | "app";
+type Stage = "landing" | "language" | "auth" | "login" | "register" | "app";
 
 const Index = () => {
   const [stage, setStage] = useState<Stage>("landing");
   const [language, setLanguage] = useState<"en" | "cy">("en");
+  const { user } = useAuth();
+
+  // If authenticated and past landing, go to app
+  useEffect(() => {
+    if (user && (stage === "login" || stage === "register" || stage === "auth")) {
+      setStage("app");
+    }
+  }, [user, stage]);
 
   if (stage === "app") {
     return (
@@ -33,13 +43,14 @@ const Index = () => {
     );
   }
 
+  if (stage === "login") {
+    return <LoginForm onSuccess={() => setStage("app")} />;
+  }
+
   if (stage === "auth") {
     return (
       <AuthChoice
-        onSelect={(choice) => {
-          if (choice === "register") setStage("register");
-          else setStage("app");
-        }}
+        onSelect={(choice) => setStage(choice === "register" ? "register" : "login")}
       />
     );
   }
@@ -49,9 +60,7 @@ const Index = () => {
       <LanguageSelect
         onSelect={(lang) => {
           setLanguage(lang);
-          try {
-            localStorage.setItem("app_language", lang);
-          } catch {}
+          try { localStorage.setItem("app_language", lang); } catch {}
           setStage("auth");
         }}
       />
