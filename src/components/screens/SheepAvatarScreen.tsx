@@ -8,7 +8,15 @@ const swatches = [
 
 const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const [customising, setCustomising] = useState(false);
-  const [color, setColor] = useState('#f8efd9');
+  const [color, setColor] = useState<string>(() => {
+    if (typeof window === 'undefined') return '#f8efd9';
+    return localStorage.getItem('sheep_avatar_color') || '#f8efd9';
+  });
+
+  const saveColor = (c: string) => {
+    setColor(c);
+    try { localStorage.setItem('sheep_avatar_color', c); } catch {}
+  };
 
   return (
     <div className="min-h-screen bg-[#f5a623] pb-24 px-4 pt-4 flex flex-col">
@@ -50,7 +58,7 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
             {swatches.map((c) => (
               <button
                 key={c}
-                onClick={() => setColor(c)}
+                onClick={() => saveColor(c)}
                 className={`w-full aspect-square rounded-full border-2 ${color === c ? 'border-white' : 'border-transparent'}`}
                 style={{ backgroundColor: c }}
               />
