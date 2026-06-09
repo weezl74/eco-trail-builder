@@ -3,6 +3,8 @@ import QuizzesScreen from './screens/QuizzesScreen';
 import PledgesScreen from './screens/PledgesScreen';
 import ShopLocalScreen from './screens/ShopLocalScreen';
 import SprintsScreen from './screens/SprintsScreen';
+import MegaPledgesScreen from './screens/MegaPledgesScreen';
+import CommunityPledgesScreen from './screens/CommunityPledgesScreen';
 
 const tiles = [
   { id: 'quizzes', label: 'Quizzes' },
@@ -20,6 +22,8 @@ const ChallengesScreen: React.FC<{ onSelect?: (id: string) => void }> = () => {
   if (view === 'pledges') return <PledgesScreen onBack={() => setView(null)} />;
   if (view === 'shop-local') return <ShopLocalScreen onBack={() => setView(null)} />;
   if (view === 'sprints') return <SprintsScreen onBack={() => setView(null)} />;
+  if (view === 'mega-pledges') return <MegaPledgesScreen onBack={() => setView(null)} />;
+  if (view === 'community-pledges') return <CommunityPledgesScreen onBack={() => setView(null)} />;
 
   return (
     <div className="min-h-screen bg-[#f5a623] pb-24 px-4 pt-8">
