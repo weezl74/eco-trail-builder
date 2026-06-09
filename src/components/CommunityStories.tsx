@@ -72,11 +72,11 @@ export default function CommunityStories() {
       // Then get profiles for each story
       const storiesWithProfiles = await Promise.all(
         (storiesData || []).map(async (story) => {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('username, avatar_level')
-            .eq('user_id', story.user_id)
-            .maybeSingle();
+          const { data: profileRows } = await supabase
+            .rpc('get_public_profile', { _user_id: story.user_id });
+          const profile = profileRows?.[0]
+            ? { username: profileRows[0].username, avatar_level: profileRows[0].avatar_level }
+            : null;
 
           const { data: kudosData } = await supabase
             .from('story_kudos')
