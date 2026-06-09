@@ -255,7 +255,30 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_profiles: {
+        Row: {
+          avatar_level: number | null
+          display_name: string | null
+          total_points: number | null
+          user_id: string | null
+          username: string | null
+        }
+        Insert: {
+          avatar_level?: number | null
+          display_name?: string | null
+          total_points?: number | null
+          user_id?: string | null
+          username?: string | null
+        }
+        Update: {
+          avatar_level?: number | null
+          display_name?: string | null
+          total_points?: number | null
+          user_id?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
