@@ -22,7 +22,23 @@ const AccountCard: React.FC<AccountCardProps> = ({
   rewards = [],
 }) => {
   const [flipped, setFlipped] = useState(false);
+  const [stampsEarned, setStampsEarned] = useState(2);
+  const [scanOpen, setScanOpen] = useState(false);
+  const [scanning, setScanning] = useState(false);
   const { toast } = useToast();
+
+  const handleSimulateScan = () => {
+    setScanning(true);
+    setTimeout(() => {
+      setScanning(false);
+      setStampsEarned((n) => Math.min(10, n + 1));
+      setScanOpen(false);
+      toast({
+        title: 'Visit verified! 🎉',
+        description: 'Stamp added to your #WalkMyWarmUp card.',
+      });
+    }, 1400);
+  };
 
   const shareText = `I've earned ${totalPoints} green points and reduced my footprint to ${currentFootprint.toFixed(1)}t CO₂e on the Caerphilly climate app! 🌱`;
   const shareUrl = typeof window !== 'undefined' ? window.location.origin : '';
