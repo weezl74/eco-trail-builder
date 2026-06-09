@@ -16,6 +16,7 @@ interface SimplifiedAppProps {
 const SimplifiedApp = ({ onBackToLanding, language = 'en' }: SimplifiedAppProps) => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
+  const [challengesInitialView, setChallengesInitialView] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
 
   useEffect(() => {
