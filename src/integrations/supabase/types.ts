@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      pledges: {
+        Row: {
+          category: string | null
+          co2_saved: number | null
+          created_at: string
+          description: string | null
+          id: number
+          key: string | null
+          money_saved: number | null
+          reward: string | null
+          sub_category: string | null
+          tag: string | null
+          title: string
+          updated_at: string
+          user_group: string | null
+          water_saved: number | null
+          wool_points: number | null
+        }
+        Insert: {
+          category?: string | null
+          co2_saved?: number | null
+          created_at?: string
+          description?: string | null
+          id: number
+          key?: string | null
+          money_saved?: number | null
+          reward?: string | null
+          sub_category?: string | null
+          tag?: string | null
+          title: string
+          updated_at?: string
+          user_group?: string | null
+          water_saved?: number | null
+          wool_points?: number | null
+        }
+        Update: {
+          category?: string | null
+          co2_saved?: number | null
+          created_at?: string
+          description?: string | null
+          id?: number
+          key?: string | null
+          money_saved?: number | null
+          reward?: string | null
+          sub_category?: string | null
+          tag?: string | null
+          title?: string
+          updated_at?: string
+          user_group?: string | null
+          water_saved?: number | null
+          wool_points?: number | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           address: string | null

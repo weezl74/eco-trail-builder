@@ -1,56 +1,62 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useSavings } from '@/hooks/useSavings';
+import { supabase } from '@/integrations/supabase/client';
 
 type Tab = 'all' | 'activated' | 'progress' | 'groups';
 
-const pledges = [
-  {
-    id: 'fryer',
-    title: 'Super Fryer!',
-    description: 'Use an air fryer instead of an oven for daily single meals',
-    points: 100,
-    savings: 50,
-    carbon: 394,
-    tag: 'electricity / gas',
-  },
-  {
-    id: 'one-degree',
-    title: 'The Power of One Degree',
-    description: 'Turn down the thermostat by 1°C',
-    points: 100,
-    savings: 90,
-    carbon: 310,
-    tag: 'electricity / gas',
-  },
-  {
-    id: 'slow-cooker',
-    title: 'Cooking Powerhouse',
-    description: 'Use a slow cooker instead of an oven for daily single meals',
-    points: 100,
-    savings: 40,
-    carbon: 280,
-    tag: 'electricity / gas',
-  },
-];
+type Pledge = {
+  id: number;
+  title: string;
+  description: string | null;
+  co2_saved: number | null;
+  money_saved: number | null;
+  water_saved: number | null;
+  wool_points: number | null;
+  tag: string | null;
+  key: string;
+  category: string | null;
+};
 
 const PledgesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const [tab, setTab] = useState<Tab>('all');
+  const [pledges, setPledges] = useState<Pledge[]>([]);
+  const [loading, setLoading] = useState(true);
   const { pledged, addPledge } = useSavings();
   const activated = pledged.reduce<Record<string, boolean>>((acc, id) => { acc[id] = true; return acc; }, {});
 
-  const activate = (p: typeof pledges[number]) => {
-    if (activated[p.id]) return;
-    addPledge(p.id, { money: p.savings, co2: p.carbon, water: 0 });
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const { data, error } = await supabase
+        .from('pledges')
+        .select('id,title,description,co2_saved,money_saved,water_saved,wool_points,tag,key,category')
+        .eq('user_group', 'resident')
+        .order('id', { ascending: true });
+      if (!mounted) return;
+      if (error) console.error('Failed to load pledges', error);
+      setPledges((data ?? []) as Pledge[]);
+      setLoading(false);
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  const activate = (p: Pledge) => {
+    if (activated[p.key]) return;
+    addPledge(p.key, {
+      money: Number(p.money_saved ?? 0),
+      co2: Number(p.co2_saved ?? 0),
+      water: Number(p.water_saved ?? 0),
+    });
   };
 
   const visible = pledges.filter((p) => {
-    if (tab === 'activated' || tab === 'progress') return activated[p.id];
+    if (tab === 'activated' || tab === 'progress') return activated[p.key];
     return true;
   });
 
   return (
-    <div className="min-h-screen bg-[#f5a623] pb-24 px-4 pt-4">
+    <div className="min-h-screen bg-[#F4971D] pb-24 px-4 pt-4">
       {onBack && (
         <button onClick={onBack} className="mb-2 text-black flex items-center gap-1 font-serif font-bold">
           <ArrowLeft className="h-5 w-5" /> Back
@@ -80,44 +86,58 @@ const PledgesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
         </button>
       </div>
 
-      <div className="space-y-4">
-        {visible.map((p) => (
-          <div key={p.id} className="bg-[#1f1f1f] rounded-2xl p-5 text-white">
-            <h3 className="font-serif font-bold text-2xl text-center">{p.title}</h3>
-            <p className="text-center mt-1 font-serif">{p.description}</p>
+      {loading ? (
+        <p className="text-center text-black font-serif font-bold py-10">Loading pledges…</p>
+      ) : (
+        <div className="space-y-4">
+          {visible.map((p) => (
+            <div key={p.id} className="bg-[#1f1f1f] rounded-2xl p-5 text-white">
+              <h3 className="font-serif font-bold text-2xl text-center">{p.title}</h3>
+              <p className="text-center mt-1 font-serif">{p.description}</p>
 
-            <div className="flex justify-center mt-4">
-              <button
-                onClick={() => activate(p)}
-                disabled={!!activated[p.id]}
-                className={`px-6 py-2 rounded-lg font-serif font-bold ${activated[p.id] ? 'bg-[#555]' : 'bg-[#f5a623] text-black'}`}
-              >
-                {activated[p.id] ? 'Activated' : 'Activate'}
-              </button>
-            </div>
-
-            <div className="border border-white/40 rounded-xl mt-4 p-3 grid grid-cols-2 gap-2 text-sm font-serif">
-              <div className="border-r border-white/40 pr-2">
-                <p className="text-center font-bold mb-1">App Rewards</p>
-                <p className="flex items-center gap-2">🟢 Wool Points: {p.points}</p>
+              <div className="flex justify-center mt-4">
+                <button
+                  onClick={() => activate(p)}
+                  disabled={!!activated[p.key]}
+                  className={`px-6 py-2 rounded-lg font-serif font-bold ${activated[p.key] ? 'bg-[#555]' : 'bg-[#F4971D] text-black'}`}
+                >
+                  {activated[p.key] ? 'Activated' : 'Activate'}
+                </button>
               </div>
-              <div className="pl-2">
-                <p className="text-center font-bold mb-1">Global Change</p>
-                <p className="text-center text-xs opacity-80">(Estimated Values)</p>
-                <p className="flex items-center gap-2 mt-1"><span className="text-yellow-400 text-lg">£</span> Savings £{p.savings}</p>
-                <p className="flex items-center gap-2 mt-1"><span className="text-red-400 text-xs font-mono">CO₂e</span> Carbon Saved {p.carbon} kg CO₂</p>
-              </div>
-            </div>
 
-            <span className="inline-block mt-3 bg-blue-500 text-white text-xs font-serif rounded-md px-3 py-1">
-              {p.tag}
-            </span>
-          </div>
-        ))}
-        {visible.length === 0 && (
-          <p className="text-center text-black font-serif font-bold py-10">Nothing here yet.</p>
-        )}
-      </div>
+              <div className="border border-white/40 rounded-xl mt-4 p-3 grid grid-cols-2 gap-2 text-sm font-serif">
+                <div className="border-r border-white/40 pr-2">
+                  <p className="text-center font-bold mb-1">App Rewards</p>
+                  <p className="flex items-center gap-2">🟢 Wool Points: {p.wool_points ?? 0}</p>
+                </div>
+                <div className="pl-2">
+                  <p className="text-center font-bold mb-1">Global Change</p>
+                  <p className="text-center text-xs opacity-80">(Estimated Values)</p>
+                  <p className="flex items-center gap-2 mt-1"><span className="text-yellow-400 text-lg">£</span> Savings £{p.money_saved ?? 0}</p>
+                  <p className="flex items-center gap-2 mt-1"><span className="text-red-400 text-xs font-mono">CO₂e</span> Carbon Saved {p.co2_saved ?? 0} kg CO₂</p>
+                  {Number(p.water_saved ?? 0) > 0 && (
+                    <p className="flex items-center gap-2 mt-1"><span className="text-blue-300 text-xs font-mono">H₂O</span> Water Saved {p.water_saved} L</p>
+                  )}
+                </div>
+              </div>
+
+              {p.category && (
+                <span className="inline-block mt-3 mr-2 bg-blue-500 text-white text-xs font-serif rounded-md px-3 py-1">
+                  {p.category}
+                </span>
+              )}
+              {p.tag && (
+                <span className="inline-block mt-3 bg-purple-500 text-white text-xs font-serif rounded-md px-3 py-1">
+                  {p.tag}
+                </span>
+              )}
+            </div>
+          ))}
+          {visible.length === 0 && (
+            <p className="text-center text-black font-serif font-bold py-10">Nothing here yet.</p>
+          )}
+        </div>
+      )}
     </div>
   );
 };
