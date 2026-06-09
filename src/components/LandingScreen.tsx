@@ -1,20 +1,29 @@
 import React from 'react';
-import welcomeImage from '@/assets/welcome-sheep.jpg.asset.json';
+import dayBg from '@/assets/svg/welcome-day.svg.asset.json';
+import sunsetBg from '@/assets/svg/welcome-sunset.svg.asset.json';
+import nightBg from '@/assets/svg/welcome-night.svg.asset.json';
 
 interface LandingScreenProps {
   onBeetleClick?: () => void;
 }
 
+const pickBackground = () => {
+  const h = new Date().getHours();
+  if (h >= 6 && h < 17) return dayBg.url;
+  if (h >= 17 && h < 20) return sunsetBg.url;
+  return nightBg.url;
+};
+
 const LandingScreen: React.FC<LandingScreenProps> = ({ onBeetleClick }) => {
+  const bg = pickBackground();
   return (
     <div className="min-h-screen w-full relative overflow-hidden bg-[#3a2418]">
       <img
-        src={welcomeImage.url}
+        src={bg}
         alt="Welcome - Tap to Start"
         className="absolute inset-0 w-full h-full object-cover object-center select-none pointer-events-none"
         draggable={false}
       />
-      {/* Tap to Start button overlay - positioned over the "Welcome / Tap to Start" text */}
       <button
         onClick={onBeetleClick}
         aria-label="Tap to Start"
