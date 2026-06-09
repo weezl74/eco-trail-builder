@@ -81,15 +81,15 @@ const AccountCard: React.FC<AccountCardProps> = ({
           {/* BACK */}
           <div className="absolute inset-0 backface-hidden rotate-y-180 rounded-2xl shadow-xl text-white overflow-hidden"
                style={{ background: 'linear-gradient(135deg, hsl(220 91% 15%), hsl(142 85% 25%))' }}>
-            <div className="p-3 h-full flex flex-col">
+            <div className="p-2.5 h-full flex flex-col gap-1">
               <div className="text-center">
-                <p className="font-roboto font-bold text-sm tracking-wider">#WalkMyWarmUp</p>
-                <p className="text-[9px] opacity-80 leading-tight mt-0.5">
-                  93% of gym users drive ≤1 mile, then warm up the same distance on a machine. Walk, run, cycle or bus there instead — collect a stamp each visit.
+                <p className="font-roboto font-bold text-[11px] tracking-wider leading-none">#WalkMyWarmUp</p>
+                <p className="text-[8px] opacity-80 leading-tight mt-0.5">
+                  93% of gym users drive ≤1 mile, then warm up the same on a machine. Walk, cycle or bus instead — earn a stamp each visit.
                 </p>
               </div>
 
-              <div className="grid grid-cols-5 gap-1 mt-2 flex-1">
+              <div className="grid grid-cols-10 gap-1 flex-1 min-h-0 items-center">
                 {Array.from({ length: 10 }).map((_, i) => {
                   const stamped = i < 2;
                   const isReward = i === 9;
@@ -105,26 +105,22 @@ const AccountCard: React.FC<AccountCardProps> = ({
                       }`}
                     >
                       {stamped ? (
-                        <span className="text-[9px] font-roboto font-bold leading-none text-center transform -rotate-12">
-                          ✓
-                          <br />
-                          GYM
+                        <span className="text-[7px] font-roboto font-bold leading-none text-center transform -rotate-12">
+                          ✓<br />GYM
                         </span>
                       ) : isReward ? (
-                        <span className="text-[8px] font-roboto font-bold leading-none text-center text-yellow-200">
-                          FAMILY
-                          <br />
-                          SWIM
+                        <span className="text-[6px] font-roboto font-bold leading-none text-center text-yellow-200">
+                          FREE<br />SWIM
                         </span>
                       ) : (
-                        <span className="text-[10px] opacity-50">{i + 1}</span>
+                        <span className="text-[8px] opacity-50">{i + 1}</span>
                       )}
                     </div>
                   );
                 })}
               </div>
 
-              <p className="text-center text-[9px] opacity-70 mt-1">Stamp 10 = free family swim 🏊</p>
+              <p className="text-center text-[8px] opacity-70 leading-none">Stamp 10 = free family swim 🏊</p>
             </div>
           </div>
         </div>
