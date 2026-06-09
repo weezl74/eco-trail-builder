@@ -258,7 +258,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_leaderboard: {
+        Args: { _limit?: number }
+        Returns: {
+          avatar_level: number
+          display_name: string
+          total_points: number
+          user_id: string
+          username: string
+        }[]
+      }
+      get_public_profile: {
+        Args: { _user_id: string }
+        Returns: {
+          avatar_level: number
+          display_name: string
+          total_points: number
+          user_id: string
+          username: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

@@ -25,11 +25,7 @@ export default function Leaderboard() {
 
   const fetchLeaderboard = async () => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('user_id, username, total_points, avatar_level')
-        .order('total_points', { ascending: false })
-        .limit(50);
+      const { data, error } = await supabase.rpc('get_leaderboard', { _limit: 50 });
 
       if (error) throw error;
 

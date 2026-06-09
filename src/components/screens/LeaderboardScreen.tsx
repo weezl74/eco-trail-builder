@@ -24,11 +24,7 @@ const LeaderboardScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase
-        .from('profiles')
-        .select('username, total_points')
-        .order('total_points', { ascending: false })
-        .limit(20);
+      const { data } = await supabase.rpc('get_leaderboard', { _limit: 20 });
       if (data && data.length > 0) {
         setRows(data.map((d: any) => ({ name: d.username || 'User', points: d.total_points ?? 0 })));
       }
