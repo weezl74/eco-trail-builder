@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { Award, Leaf, Trophy, Share2, Twitter, Facebook, Link as LinkIcon, Sparkles, Gift, QrCode, ScanLine, MapPin } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { Award, Leaf, Trophy, Share2, Sparkles, Gift, QrCode, ScanLine, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
+import { toPng } from 'html-to-image';
 
 interface AccountCardProps {
   name: string;
@@ -25,6 +26,9 @@ const AccountCard: React.FC<AccountCardProps> = ({
   const [stampsEarned, setStampsEarned] = useState(2);
   const [scanOpen, setScanOpen] = useState(false);
   const [scanning, setScanning] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const frontRef = useRef<HTMLDivElement>(null);
+  const backRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   const handleSimulateScan = () => {
@@ -41,20 +45,32 @@ const AccountCard: React.FC<AccountCardProps> = ({
   };
 
   const shareText = `I've earned ${totalPoints} green points and reduced my footprint to ${currentFootprint.toFixed(1)}t CO₂e on the Caerphilly climate app! 🌱`;
-  const shareUrl = typeof window !== 'undefined' ? window.location.origin : '';
 
-  const handleShare = async (platform: 'twitter' | 'facebook' | 'copy' | 'native') => {
-    if (platform === 'twitter') {
-      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, '_blank');
-    } else if (platform === 'facebook') {
-      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`, '_blank');
-    } else if (platform === 'copy') {
-      await navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
-      toast({ title: 'Copied!', description: 'Share text copied to clipboard.' });
-    } else if (platform === 'native' && (navigator as any).share) {
-      try {
-        await (navigator as any).share({ title: 'My Green Card', text: shareText, url: shareUrl });
-      } catch {}
+  const handleShareCard = async () => {
+    const target = flipped ? backRef.current : frontRef.current;
+    if (!target) return;
+    setSharing(true);
+    try {
+      const dataUrl = await toPng(target, { cacheBust: true, pixelRatio: 2 });
+      const blob = await (await fetch(dataUrl)).blob();
+      const file = new File([blob], 'green-member-card.png', { type: 'image/png' });
+      const nav = navigator as any;
+      if (nav.canShare && nav.canShare({ files: [file] }) && nav.share) {
+        await nav.share({ files: [file], title: 'My Green Member Card', text: shareText });
+      } else {
+        // Fallback: download the image
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = 'green-member-card.png';
+        a.click();
+        toast({ title: 'Card image saved', description: 'Sharing not supported on this device — image downloaded instead.' });
+      }
+    } catch (err: any) {
+      if (err?.name !== 'AbortError') {
+        toast({ title: 'Could not share card', description: err?.message ?? 'Unknown error', variant: 'destructive' });
+      }
+    } finally {
+      setSharing(false);
     }
   };
 
@@ -66,7 +82,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
           onClick={() => setFlipped(!flipped)}
         >
           {/* FRONT */}
-          <div className="absolute inset-0 backface-hidden rounded-2xl p-5 shadow-xl text-white overflow-hidden"
+          <div ref={frontRef} className="absolute inset-0 backface-hidden rounded-2xl p-5 shadow-xl text-white overflow-hidden"
                style={{ background: 'linear-gradient(135deg, hsl(220 91% 25%), hsl(142 85% 35%))' }}>
             <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-white/10" />
             <div className="absolute -left-8 -bottom-8 w-32 h-32 rounded-full bg-white/5" />
@@ -96,7 +112,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
           </div>
 
           {/* BACK */}
-          <div className="absolute inset-0 backface-hidden rotate-y-180 rounded-2xl shadow-xl text-white overflow-hidden"
+          <div ref={backRef} className="absolute inset-0 backface-hidden rotate-y-180 rounded-2xl shadow-xl text-white overflow-hidden"
                style={{ background: 'linear-gradient(135deg, hsl(220 91% 15%), hsl(142 85% 25%))' }}>
             <div className="p-2.5 h-full flex flex-col gap-1">
               <div className="text-center">
@@ -249,22 +265,13 @@ const AccountCard: React.FC<AccountCardProps> = ({
           <Share2 className="h-5 w-5 text-foreground" />
           <h3 className="font-roboto font-bold">Share your card</h3>
         </div>
-        <div className="grid grid-cols-3 gap-2">
-          <Button variant="outline" onClick={() => handleShare('twitter')} className="gap-1">
-            <Twitter className="h-4 w-4" /> X
-          </Button>
-          <Button variant="outline" onClick={() => handleShare('facebook')} className="gap-1">
-            <Facebook className="h-4 w-4" /> FB
-          </Button>
-          <Button variant="outline" onClick={() => handleShare('copy')} className="gap-1">
-            <LinkIcon className="h-4 w-4" /> Copy
-          </Button>
-        </div>
-        {typeof navigator !== 'undefined' && (navigator as any).share && (
-          <Button onClick={() => handleShare('native')} className="w-full mt-2 gap-2">
-            <Share2 className="h-4 w-4" /> Share via device
-          </Button>
-        )}
+        <Button onClick={handleShareCard} disabled={sharing} className="w-full gap-2">
+          <Share2 className="h-4 w-4" />
+          {sharing ? 'Preparing image…' : `Share ${flipped ? 'back' : 'front'} of card`}
+        </Button>
+        <p className="text-xs text-muted-foreground mt-2 text-center">
+          Captures the side currently showing. Flip the card first to share the other side.
+        </p>
       </div>
     </div>
   );
