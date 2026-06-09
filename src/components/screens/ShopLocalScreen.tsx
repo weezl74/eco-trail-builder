@@ -4,6 +4,7 @@ import { useSavings, RenewableType, RENEWABLE_COSTS } from '@/hooks/useSavings';
 import { toast } from '@/hooks/use-toast';
 
 type Category = 'libraries' | 'allotments' | 'leisure' | 'ev' | 'eco';
+type Saving = { money: number; co2: number; water: number };
 
 const CATEGORY_INFO: Record<
   Category,
