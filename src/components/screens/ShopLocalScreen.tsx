@@ -13,31 +13,31 @@ const CATEGORY_INFO: Record<
     label: 'Libraries',
     color: '#2563eb',
     message: 'Use your library and spare the carbon of buying new books!',
-    delta: { money: 8, co2: 5, water: 20 },
+    delta: { money: 25, co2: 18, water: 40 },
   },
   allotments: {
     label: 'Allotments',
     color: '#16a34a',
     message: 'Grow your own veg here — cut food miles and packaging waste.',
-    delta: { money: 12, co2: 8, water: 50 },
+    delta: { money: 35, co2: 22, water: 120 },
   },
   leisure: {
     label: 'Leisure Centres',
     color: '#9333ea',
     message: 'Walk your warm-up to our local leisure centres rather than go by car.',
-    delta: { money: 3, co2: 2, water: 0 },
+    delta: { money: 12, co2: 9, water: 0 },
   },
   ev: {
     label: 'EV Chargepoints',
     color: '#0ea5e9',
     message: 'Charge your EV locally with low-carbon power and skip the petrol pump.',
-    delta: { money: 5, co2: 6, water: 0 },
+    delta: { money: 20, co2: 28, water: 0 },
   },
   eco: {
     label: 'Eco-friendly Businesses',
     color: '#f59e0b',
     message: 'Invest your pound locally to keep supply-chain travel emissions low.',
-    delta: { money: 4, co2: 3, water: 10 },
+    delta: { money: 18, co2: 14, water: 25 },
   },
 };
 
