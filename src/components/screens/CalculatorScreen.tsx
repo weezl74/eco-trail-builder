@@ -101,6 +101,7 @@ const CalculatorScreen: React.FC = () => {
 
   const handleComplete = async (categoryId: string, impact: number) => {
     if (!user) { setActive(null); return; }
+    const wasFirstTime = !scores[categoryId];
     // Recompute footprint from all responses to keep it accurate
     const { data: responses } = await supabase
       .from('user_responses')
@@ -114,8 +115,35 @@ const CalculatorScreen: React.FC = () => {
     });
     setScores(agg);
     setFootprint(total);
-    await supabase.from('profiles').update({ current_footprint: total }).eq('user_id', user.id);
-    toast({ title: 'Score updated', description: `${active?.label}: ${agg[categoryId] || 0} kg CO₂` });
+
+    // Award points: 25 first time completing a category, +50 bonus for completing all 6
+    let pointsAwarded = 0;
+    if (wasFirstTime) pointsAwarded += 25;
+    const completedCount = Object.keys(agg).length;
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('total_points, calc_bonus_awarded')
+      .eq('user_id', user.id)
+      .maybeSingle();
+    const currentPoints = profile?.total_points || 0;
+    let newPoints = currentPoints + pointsAwarded;
+    if (completedCount >= 6 && !profile?.calc_bonus_awarded) {
+      newPoints += 50;
+      pointsAwarded += 50;
+    }
+    await supabase
+      .from('profiles')
+      .update({
+        current_footprint: total,
+        total_points: newPoints,
+        ...(completedCount >= 6 ? { calc_bonus_awarded: true } : {}),
+      })
+      .eq('user_id', user.id);
+
+    toast({
+      title: pointsAwarded > 0 ? `+${pointsAwarded} points!` : 'Score updated',
+      description: `${active?.label}: ${agg[categoryId] || 0} kg CO₂${wasFirstTime ? ' • Carbon Counter badge earned!' : ''}`,
+    });
     setActive(null);
   };
 

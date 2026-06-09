@@ -20,7 +20,7 @@ const SimplifiedApp = ({ onBackToLanding, language = 'en' }: SimplifiedAppProps)
 
   useEffect(() => {
     if (user) loadUserData();
-  }, [user]);
+  }, [user, activeTab]);
 
   const loadUserData = async () => {
     if (!user) return;
@@ -43,13 +43,13 @@ const SimplifiedApp = ({ onBackToLanding, language = 'en' }: SimplifiedAppProps)
     ? new Date(userProfile.created_at).getFullYear().toString()
     : '2026';
 
-  const badges = totalPoints > 0
-    ? [
-        { id: 'starter', label: 'First Step' },
-        ...(totalPoints >= 100 ? [{ id: 'p100', label: '100 Points' }] : []),
-        ...(totalPoints >= 500 ? [{ id: 'p500', label: 'Eco Champion' }] : []),
-      ]
-    : [];
+  const hasCalculated = (userProfile?.current_footprint || 0) > 0;
+  const badges = [
+    ...(hasCalculated ? [{ id: 'calc', label: 'Carbon Counter' }] : []),
+    ...(totalPoints > 0 ? [{ id: 'starter', label: 'First Step' }] : []),
+    ...(totalPoints >= 100 ? [{ id: 'p100', label: '100 Points' }] : []),
+    ...(totalPoints >= 500 ? [{ id: 'p500', label: 'Eco Champion' }] : []),
+  ];
   const rewards = totalPoints >= 200
     ? [{ id: 'r1', label: '10% off local cafés', value: 'Unlocked' }]
     : [];
