@@ -16,6 +16,7 @@ interface SimplifiedAppProps {
 const SimplifiedApp = ({ onBackToLanding, language = 'en' }: SimplifiedAppProps) => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
+  const [challengesInitialView, setChallengesInitialView] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
 
   useEffect(() => {
@@ -57,9 +58,9 @@ const SimplifiedApp = ({ onBackToLanding, language = 'en' }: SimplifiedAppProps)
   const renderTabContent = () => {
     switch (activeTab) {
       case 'home':
-        return <HomeScreen />;
+        return <HomeScreen onGoToPledges={() => { setChallengesInitialView('pledges'); setActiveTab('challenges'); }} />;
       case 'challenges':
-        return <ChallengesScreen />;
+        return <ChallengesScreen initialView={challengesInitialView} key={challengesInitialView ?? 'root'} />;
       case 'calculator':
         return <CalculatorScreen />;
       case 'community':
@@ -84,7 +85,7 @@ const SimplifiedApp = ({ onBackToLanding, language = 'en' }: SimplifiedAppProps)
   return (
     <>
       {renderTabContent()}
-      <BottomNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+      <BottomNavigation activeTab={activeTab} onTabChange={(t) => { setChallengesInitialView(null); setActiveTab(t); }} />
     </>
   );
 };

@@ -3,7 +3,7 @@ import { Mail, Gift, Calendar, Shirt } from 'lucide-react';
 import SheepAvatarScreen from './screens/SheepAvatarScreen';
 import { useSavings } from '@/hooks/useSavings';
 
-const HomeScreen: React.FC = () => {
+const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges }) => {
   const [showAvatar, setShowAvatar] = useState(false);
   const { savings, pledged, woolPoints, treePoints } = useSavings();
 
@@ -46,6 +46,16 @@ const HomeScreen: React.FC = () => {
           <p className="flex items-center gap-2"><span className="text-blue-400 text-xl">💧</span> Water: {savings.water}L</p>
           <p className="flex items-center gap-2 text-[#f5a623]"><span className="text-xl">✓</span> Pledges made: {pledged.length}</p>
         </div>
+      </div>
+
+      {/* CTA */}
+      <div className="mx-4 mt-6 flex justify-center">
+        <button
+          onClick={onGoToPledges}
+          className="bg-[#f5a623] hover:bg-[#e69517] active:scale-95 transition text-black font-serif font-bold text-lg rounded-2xl px-8 py-4 shadow-lg w-full max-w-sm"
+        >
+          Save Me More
+        </button>
       </div>
     </div>
   );

@@ -20,8 +20,8 @@ const tiles = [
   { id: 'mega-pledges', label: 'Mega Pledges', icon: megaIcon.url },
 ];
 
-const ChallengesScreen: React.FC<{ onSelect?: (id: string) => void }> = () => {
-  const [view, setView] = useState<string | null>(null);
+const ChallengesScreen: React.FC<{ onSelect?: (id: string) => void; initialView?: string | null }> = ({ initialView = null }) => {
+  const [view, setView] = useState<string | null>(initialView);
 
   if (view === 'quizzes') return <QuizzesScreen onBack={() => setView(null)} />;
   if (view === 'pledges') return <PledgesScreen onBack={() => setView(null)} />;
