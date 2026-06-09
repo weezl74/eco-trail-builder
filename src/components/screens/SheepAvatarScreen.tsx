@@ -4,11 +4,10 @@ import { useSavings } from '@/hooks/useSavings';
 import { toast } from '@/hooks/use-toast';
 import sheepAsset from '@/assets/sheep-avatar.jpg.asset.json';
 
-type AccessoryId = 'sunglasses' | 'tophat' | 'uniform' | 'bowtie';
+type AccessoryId = 'sunglasses' | 'tophat' | 'bowtie';
 const ACCESSORIES: { id: AccessoryId; label: string; cost: number }[] = [
   { id: 'sunglasses', label: 'Sunglasses', cost: 40 },
   { id: 'tophat', label: 'Top Hat', cost: 60 },
-  { id: 'uniform', label: 'Hi-Vis Uniform', cost: 80 },
   { id: 'bowtie', label: 'Bow Tie', cost: 30 },
 ];
 
@@ -44,34 +43,43 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           <img
             src={sheepAsset.url}
             alt="Your sheep avatar"
-            className={`w-full h-full object-contain select-none ${has('uniform') ? 'hue-rotate-[30deg] saturate-150' : ''}`}
+            className="w-full h-full object-contain select-none"
             draggable={false}
           />
-          {/* Sunglasses overlay (over the face) */}
+          {/* Sunglasses overlay — sits across the eyes (face is small, top-centre) */}
           {has('sunglasses') && (
-            <svg viewBox="0 0 200 240" className="absolute inset-0 w-full h-full pointer-events-none">
-              <rect x="78" y="46" width="20" height="10" rx="2" fill="#000" />
-              <rect x="102" y="46" width="20" height="10" rx="2" fill="#000" />
-              <line x1="98" y1="51" x2="102" y2="51" stroke="#000" strokeWidth="2" />
-            </svg>
+            <div
+              className="absolute pointer-events-none flex items-center gap-[2%]"
+              style={{ left: '40%', top: '15%', width: '20%' }}
+            >
+              <div className="flex-1 aspect-[2/1] rounded-sm bg-black" />
+              <div className="flex-1 aspect-[2/1] rounded-sm bg-black" />
+            </div>
           )}
-          {/* Top hat overlay (above the head) */}
+          {/* Top hat overlay — sits above the head */}
           {has('tophat') && (
-            <svg viewBox="0 0 200 240" className="absolute inset-0 w-full h-full pointer-events-none">
-              <rect x="80" y="0" width="40" height="20" fill="#1f1f1f" />
-              <rect x="70" y="18" width="60" height="5" fill="#1f1f1f" />
-              <rect x="80" y="6" width="40" height="3" fill="#8b0000" />
-            </svg>
+            <div
+              className="absolute pointer-events-none"
+              style={{ left: '42%', top: '2%', width: '16%' }}
+            >
+              <div className="h-6 bg-[#1f1f1f]">
+                <div className="h-1 bg-[#8b0000] mt-2" />
+              </div>
+              <div className="h-1.5 bg-[#1f1f1f] -mx-2" />
+            </div>
           )}
-          {/* Bow tie overlay (under the chin) */}
+          {/* Bow tie overlay — sits under the chin */}
           {has('bowtie') && (
-            <svg viewBox="0 0 200 240" className="absolute inset-0 w-full h-full pointer-events-none">
-              <g transform="translate(100,82)">
-                <polygon points="-14,-6 0,0 -14,6" fill="#dc2626" />
-                <polygon points="14,-6 0,0 14,6" fill="#dc2626" />
-                <circle cx="0" cy="0" r="3" fill="#7a0d0d" />
-              </g>
-            </svg>
+            <div
+              className="absolute pointer-events-none"
+              style={{ left: '44%', top: '24%', width: '12%' }}
+            >
+              <svg viewBox="0 0 40 20" className="w-full">
+                <polygon points="0,2 20,10 0,18" fill="#dc2626" />
+                <polygon points="40,2 20,10 40,18" fill="#dc2626" />
+                <circle cx="20" cy="10" r="3" fill="#7a0d0d" />
+              </svg>
+            </div>
           )}
         </div>
       </div>

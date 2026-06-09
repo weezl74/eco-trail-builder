@@ -27,11 +27,19 @@ const DEFAULT: State = {
   accessories: [],
 };
 
+const RESET_KEY = 'eco_accessories_reset_v1';
 const read = (): State => {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return DEFAULT;
-    return { ...DEFAULT, ...(JSON.parse(raw) as Partial<State>) };
+    const parsed = { ...DEFAULT, ...(JSON.parse(raw) as Partial<State>) };
+    // One-time reset of accessories (user requested clean slate)
+    if (!localStorage.getItem(RESET_KEY)) {
+      parsed.accessories = [];
+      localStorage.setItem(KEY, JSON.stringify(parsed));
+      localStorage.setItem(RESET_KEY, '1');
+    }
+    return parsed;
   } catch {
     return DEFAULT;
   }
