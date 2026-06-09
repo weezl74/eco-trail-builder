@@ -5,7 +5,7 @@ import { useSavings } from '@/hooks/useSavings';
 
 const HomeScreen: React.FC = () => {
   const [showAvatar, setShowAvatar] = useState(false);
-  const { savings, pledged } = useSavings();
+  const { savings, pledged, woolPoints, treePoints } = useSavings();
 
   if (showAvatar) {
     return <SheepAvatarScreen onBack={() => setShowAvatar(false)} />;
@@ -22,6 +22,18 @@ const HomeScreen: React.FC = () => {
           <button onClick={() => setShowAvatar(true)} aria-label="Customise sheep">
             <Shirt className="h-7 w-7 text-white" strokeWidth={2.5} />
           </button>
+        </div>
+      </div>
+
+      {/* Points balances */}
+      <div className="mx-4 mt-4 grid grid-cols-2 gap-3">
+        <div className="bg-[#f5a623] rounded-2xl p-4 text-center text-black font-serif font-bold">
+          <div className="text-3xl">{woolPoints}</div>
+          <div className="text-xs uppercase tracking-wide">Wool Points</div>
+        </div>
+        <div className="bg-green-700 rounded-2xl p-4 text-center text-white font-serif font-bold">
+          <div className="text-3xl">{treePoints}</div>
+          <div className="text-xs uppercase tracking-wide">Tree Points</div>
         </div>
       </div>
 
