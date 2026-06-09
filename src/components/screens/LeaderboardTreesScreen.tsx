@@ -34,20 +34,21 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
   useEffect(() => {
     (async () => {
       const { data } = await supabase.rpc('get_leaderboard', { _limit: 20 });
-      if (data && data.length > 0) {
-        setRows(
-          data.map((d: any) => ({
-            name: d.username || 'User',
-            points: d.total_points ?? 0,
-          }))
-        );
-      } else {
-        setRows(mode === 'wool' ? woolFallback : treeFallback);
-      }
+      const real: Row[] = (data || []).map((d: any) => ({
+        name: d.display_name || d.username || 'User',
+        points: d.total_points ?? 0,
+      }));
+      const fallback = mode === 'wool' ? woolFallback : treeFallback;
+      const merged = [...real, ...fallback].reduce<Row[]>((acc, r) => {
+        if (!acc.find((x) => x.name.toLowerCase() === r.name.toLowerCase())) acc.push(r);
+        return acc;
+      }, []);
+      merged.sort((a, b) => b.points - a.points);
+      setRows(merged);
     })();
   }, [mode]);
 
-  const board = mode === 'wool' ? rows : treeFallback;
+  const board = rows;
   const heading = mode === 'wool' ? 'WOOL POINTS' : 'TREE POINTS';
   const myPoints = mode === 'wool' ? woolPoints : treePoints;
 
