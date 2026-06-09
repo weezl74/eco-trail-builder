@@ -45,20 +45,32 @@ const AccountCard: React.FC<AccountCardProps> = ({
   };
 
   const shareText = `I've earned ${totalPoints} green points and reduced my footprint to ${currentFootprint.toFixed(1)}t CO₂e on the Caerphilly climate app! 🌱`;
-  const shareUrl = typeof window !== 'undefined' ? window.location.origin : '';
 
-  const handleShare = async (platform: 'twitter' | 'facebook' | 'copy' | 'native') => {
-    if (platform === 'twitter') {
-      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, '_blank');
-    } else if (platform === 'facebook') {
-      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`, '_blank');
-    } else if (platform === 'copy') {
-      await navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
-      toast({ title: 'Copied!', description: 'Share text copied to clipboard.' });
-    } else if (platform === 'native' && (navigator as any).share) {
-      try {
-        await (navigator as any).share({ title: 'My Green Card', text: shareText, url: shareUrl });
-      } catch {}
+  const handleShareCard = async () => {
+    const target = flipped ? backRef.current : frontRef.current;
+    if (!target) return;
+    setSharing(true);
+    try {
+      const dataUrl = await toPng(target, { cacheBust: true, pixelRatio: 2 });
+      const blob = await (await fetch(dataUrl)).blob();
+      const file = new File([blob], 'green-member-card.png', { type: 'image/png' });
+      const nav = navigator as any;
+      if (nav.canShare && nav.canShare({ files: [file] }) && nav.share) {
+        await nav.share({ files: [file], title: 'My Green Member Card', text: shareText });
+      } else {
+        // Fallback: download the image
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = 'green-member-card.png';
+        a.click();
+        toast({ title: 'Card image saved', description: 'Sharing not supported on this device — image downloaded instead.' });
+      }
+    } catch (err: any) {
+      if (err?.name !== 'AbortError') {
+        toast({ title: 'Could not share card', description: err?.message ?? 'Unknown error', variant: 'destructive' });
+      }
+    } finally {
+      setSharing(false);
     }
   };
 
