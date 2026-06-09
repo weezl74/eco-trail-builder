@@ -1,32 +1,58 @@
 import { useEffect, useState, useCallback } from 'react';
 
 export type Saving = { money: number; co2: number; water: number };
+export type RenewableType = 'solar' | 'wind' | 'mine_water';
+export type Renewable = { id: string; type: RenewableType; x: number; y: number };
 
-const KEY_SAVINGS = 'eco_savings_v1';
-const KEY_PLEDGES = 'eco_pledges_v1';
+type State = {
+  savings: Saving;
+  pledged: string[];
+  woolPoints: number;
+  treePoints: number;
+  treesPlanted: number;
+  renewables: Renewable[];
+  accessories: string[];
+};
 
-const DEFAULT: Saving = { money: 515, co2: 1417, water: 0 };
+const KEY = 'eco_state_v2';
+const EVT = 'eco_state_update';
 
-const read = <T,>(key: string, fallback: T): T => {
+const DEFAULT: State = {
+  savings: { money: 515, co2: 1417, water: 0 },
+  pledged: [],
+  woolPoints: 250,
+  treePoints: 120,
+  treesPlanted: 4,
+  renewables: [],
+  accessories: [],
+};
+
+const read = (): State => {
   try {
-    const raw = localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : fallback;
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return DEFAULT;
+    return { ...DEFAULT, ...(JSON.parse(raw) as Partial<State>) };
   } catch {
-    return fallback;
+    return DEFAULT;
   }
 };
 
-const EVT = 'eco_savings_update';
+const write = (s: State) => {
+  localStorage.setItem(KEY, JSON.stringify(s));
+  window.dispatchEvent(new Event(EVT));
+};
+
+export const RENEWABLE_COSTS: Record<RenewableType, number> = {
+  solar: 50,
+  wind: 80,
+  mine_water: 120,
+};
 
 export const useSavings = () => {
-  const [savings, setSavings] = useState<Saving>(() => read(KEY_SAVINGS, DEFAULT));
-  const [pledged, setPledged] = useState<string[]>(() => read(KEY_PLEDGES, []));
+  const [state, setState] = useState<State>(() => read());
 
   useEffect(() => {
-    const sync = () => {
-      setSavings(read(KEY_SAVINGS, DEFAULT));
-      setPledged(read(KEY_PLEDGES, []));
-    };
+    const sync = () => setState(read());
     window.addEventListener(EVT, sync);
     window.addEventListener('storage', sync);
     return () => {
@@ -35,23 +61,60 @@ export const useSavings = () => {
     };
   }, []);
 
-  const addPledge = useCallback(
-    (id: string, delta: Saving) => {
-      const currentPledges = read<string[]>(KEY_PLEDGES, []);
-      if (currentPledges.includes(id)) return false;
-      const current = read<Saving>(KEY_SAVINGS, DEFAULT);
-      const next: Saving = {
-        money: current.money + delta.money,
-        co2: current.co2 + delta.co2,
-        water: current.water + delta.water,
-      };
-      localStorage.setItem(KEY_SAVINGS, JSON.stringify(next));
-      localStorage.setItem(KEY_PLEDGES, JSON.stringify([...currentPledges, id]));
-      window.dispatchEvent(new Event(EVT));
-      return true;
-    },
-    []
-  );
+  const addPledge = useCallback((id: string, delta: Saving) => {
+    const s = read();
+    if (s.pledged.includes(id)) return false;
+    const next: State = {
+      ...s,
+      pledged: [...s.pledged, id],
+      savings: {
+        money: s.savings.money + delta.money,
+        co2: s.savings.co2 + delta.co2,
+        water: s.savings.water + delta.water,
+      },
+      woolPoints: s.woolPoints + 25,
+      treePoints: s.treePoints + 10,
+    };
+    write(next);
+    return true;
+  }, []);
 
-  return { savings, pledged, addPledge };
+  const buyRenewable = useCallback((type: RenewableType, x: number, y: number) => {
+    const s = read();
+    const cost = RENEWABLE_COSTS[type];
+    if (s.woolPoints < cost) return false;
+    const next: State = {
+      ...s,
+      woolPoints: s.woolPoints - cost,
+      renewables: [
+        ...s.renewables,
+        { id: `${type}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, type, x, y },
+      ],
+    };
+    write(next);
+    return true;
+  }, []);
+
+  const buyAccessory = useCallback((id: string, cost: number) => {
+    const s = read();
+    if (s.accessories.includes(id)) return true;
+    if (s.woolPoints < cost) return false;
+    write({ ...s, woolPoints: s.woolPoints - cost, accessories: [...s.accessories, id] });
+    return true;
+  }, []);
+
+  const plantTree = useCallback((cost = 100) => {
+    const s = read();
+    if (s.treePoints < cost) return false;
+    write({ ...s, treePoints: s.treePoints - cost, treesPlanted: s.treesPlanted + 1 });
+    return true;
+  }, []);
+
+  return {
+    ...state,
+    addPledge,
+    buyRenewable,
+    buyAccessory,
+    plantTree,
+  };
 };
