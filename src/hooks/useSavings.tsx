@@ -120,11 +120,17 @@ export const useSavings = () => {
     return true;
   }, []);
 
+  const setCardColor = useCallback((color: string) => {
+    const s = read();
+    write({ ...s, cardColor: color });
+  }, []);
+
   return {
     ...state,
     addPledge,
     buyRenewable,
     buyAccessory,
     plantTree,
+    setCardColor,
   };
 };
