@@ -81,19 +81,55 @@ const AccountCard: React.FC<AccountCardProps> = ({
           {/* BACK */}
           <div className="absolute inset-0 backface-hidden rotate-y-180 rounded-2xl shadow-xl text-white overflow-hidden"
                style={{ background: 'linear-gradient(135deg, hsl(220 91% 15%), hsl(142 85% 25%))' }}>
-            <div className="h-8 bg-black/60 mt-4" />
-            <div className="p-4 space-y-3">
-              <div className="bg-white/15 rounded-lg p-2 text-xs flex items-center gap-2">
-                <Sparkles className="h-3 w-3" /> Tap to flip back
+            <div className="p-3 h-full flex flex-col">
+              <div className="text-center">
+                <p className="font-roboto font-bold text-sm tracking-wider">#WalkMyWarmUp</p>
+                <p className="text-[9px] opacity-80 leading-tight mt-0.5">
+                  93% of gym users drive ≤1 mile, then warm up the same distance on a machine. Walk, run, cycle or bus there instead — collect a stamp each visit.
+                </p>
               </div>
-              <div className="flex justify-between text-xs">
-                <span>ID: {(name || 'USER').slice(0, 4).toUpperCase()}-{totalPoints}</span>
-                <span>Caerphilly Green</span>
+
+              <div className="grid grid-cols-5 gap-1 mt-2 flex-1">
+                {Array.from({ length: 10 }).map((_, i) => {
+                  const stamped = i < 2;
+                  const isReward = i === 9;
+                  return (
+                    <div
+                      key={i}
+                      className={`relative rounded-full border-2 flex items-center justify-center aspect-square ${
+                        stamped
+                          ? 'border-[#f4971d] bg-[#f4971d]/30'
+                          : isReward
+                          ? 'border-dashed border-yellow-300/80 bg-yellow-300/10'
+                          : 'border-white/40 bg-white/5'
+                      }`}
+                    >
+                      {stamped ? (
+                        <span className="text-[9px] font-roboto font-bold leading-none text-center transform -rotate-12">
+                          ✓
+                          <br />
+                          GYM
+                        </span>
+                      ) : isReward ? (
+                        <span className="text-[8px] font-roboto font-bold leading-none text-center text-yellow-200">
+                          FAMILY
+                          <br />
+                          SWIM
+                        </span>
+                      ) : (
+                        <span className="text-[10px] opacity-50">{i + 1}</span>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
+
+              <p className="text-center text-[9px] opacity-70 mt-1">Stamp 10 = free family swim 🏊</p>
             </div>
           </div>
         </div>
       </div>
+
 
       <p className="text-center text-xs text-muted-foreground mt-2">Tap card to flip</p>
 
