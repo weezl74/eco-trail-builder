@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
+import { useSavings } from '@/hooks/useSavings';
 
 type Tab = 'all' | 'activated' | 'progress' | 'groups';
 
@@ -35,13 +36,13 @@ const pledges = [
 
 const PledgesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const [tab, setTab] = useState<Tab>('all');
-  const [activated, setActivated] = useState<Record<string, boolean>>({
-    fryer: true,
-    'one-degree': true,
-  });
+  const { pledged, addPledge } = useSavings();
+  const activated = pledged.reduce<Record<string, boolean>>((acc, id) => { acc[id] = true; return acc; }, {});
 
-  const toggle = (id: string) =>
-    setActivated((s) => ({ ...s, [id]: !s[id] }));
+  const activate = (p: typeof pledges[number]) => {
+    if (activated[p.id]) return;
+    addPledge(p.id, { money: p.savings, co2: p.carbon, water: 0 });
+  };
 
   const visible = pledges.filter((p) => {
     if (tab === 'activated' || tab === 'progress') return activated[p.id];
@@ -87,7 +88,8 @@ const PledgesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
 
             <div className="flex justify-center mt-4">
               <button
-                onClick={() => toggle(p.id)}
+                onClick={() => activate(p)}
+                disabled={!!activated[p.id]}
                 className={`px-6 py-2 rounded-lg font-serif font-bold ${activated[p.id] ? 'bg-[#555]' : 'bg-[#f5a623] text-black'}`}
               >
                 {activated[p.id] ? 'Activated' : 'Activate'}
