@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import BottomNavigation from './BottomNavigation';
-import WasteCalculator from './WasteCalculator';
+import CalculatorScreen from './screens/CalculatorScreen';
 import HomeScreen from './HomeScreen';
 import ChallengesScreen from './ChallengesScreen';
 import CommunityScreen from './CommunityScreen';
