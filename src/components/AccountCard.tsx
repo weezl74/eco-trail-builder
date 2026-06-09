@@ -265,22 +265,13 @@ const AccountCard: React.FC<AccountCardProps> = ({
           <Share2 className="h-5 w-5 text-foreground" />
           <h3 className="font-roboto font-bold">Share your card</h3>
         </div>
-        <div className="grid grid-cols-3 gap-2">
-          <Button variant="outline" onClick={() => handleShare('twitter')} className="gap-1">
-            <Twitter className="h-4 w-4" /> X
-          </Button>
-          <Button variant="outline" onClick={() => handleShare('facebook')} className="gap-1">
-            <Facebook className="h-4 w-4" /> FB
-          </Button>
-          <Button variant="outline" onClick={() => handleShare('copy')} className="gap-1">
-            <LinkIcon className="h-4 w-4" /> Copy
-          </Button>
-        </div>
-        {typeof navigator !== 'undefined' && (navigator as any).share && (
-          <Button onClick={() => handleShare('native')} className="w-full mt-2 gap-2">
-            <Share2 className="h-4 w-4" /> Share via device
-          </Button>
-        )}
+        <Button onClick={handleShareCard} disabled={sharing} className="w-full gap-2">
+          <Share2 className="h-4 w-4" />
+          {sharing ? 'Preparing image…' : `Share ${flipped ? 'back' : 'front'} of card`}
+        </Button>
+        <p className="text-xs text-muted-foreground mt-2 text-center">
+          Captures the side currently showing. Flip the card first to share the other side.
+        </p>
       </div>
     </div>
   );
