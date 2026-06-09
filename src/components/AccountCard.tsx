@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Award, Leaf, Trophy, Share2, Twitter, Facebook, Link as LinkIcon, Sparkles, Gift } from 'lucide-react';
+import { Award, Leaf, Trophy, Share2, Twitter, Facebook, Link as LinkIcon, Sparkles, Gift, QrCode, ScanLine, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 
 interface AccountCardProps {
