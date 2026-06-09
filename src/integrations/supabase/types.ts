@@ -19,6 +19,7 @@ export type Database = {
           address: string | null
           age: string | null
           avatar_level: number
+          calc_bonus_awarded: boolean
           created_at: string
           current_footprint: number
           display_name: string | null
@@ -36,6 +37,7 @@ export type Database = {
           address?: string | null
           age?: string | null
           avatar_level?: number
+          calc_bonus_awarded?: boolean
           created_at?: string
           current_footprint?: number
           display_name?: string | null
@@ -53,6 +55,7 @@ export type Database = {
           address?: string | null
           age?: string | null
           avatar_level?: number
+          calc_bonus_awarded?: boolean
           created_at?: string
           current_footprint?: number
           display_name?: string | null
