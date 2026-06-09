@@ -10,6 +10,7 @@ interface CommunityScreenProps {
 const CommunityScreen: React.FC<CommunityScreenProps> = () => {
   const [view, setView] = useState<'main' | 'leaderboard'>('main');
   const [addOpen, setAddOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   if (view === 'leaderboard') return <LeaderboardTreesScreen onBack={() => setView('main')} />;
 
