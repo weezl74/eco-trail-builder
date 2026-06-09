@@ -117,7 +117,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
 
           {/* BACK */}
           <div ref={backRef} className="absolute inset-0 backface-hidden rotate-y-180 rounded-2xl shadow-xl text-white overflow-hidden"
-               style={{ background: 'linear-gradient(135deg, hsl(220 91% 15%), hsl(142 85% 25%))' }}>
+               style={{ background: palette.back }}>
             <div className="p-2.5 h-full flex flex-col gap-1">
               <div className="text-center">
                 <p className="font-roboto font-bold text-[11px] tracking-wider leading-none">#WalkMyWarmUp</p>
