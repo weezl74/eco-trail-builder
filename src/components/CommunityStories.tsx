@@ -342,11 +342,13 @@ export default function CommunityStories() {
                   <Button
                     variant="ghost"
                     size="sm"
+                    disabled={story.user_id === user?.id}
                     onClick={() => handleToggleKudos(story.id, story.user_has_kudos)}
                     className={`flex items-center gap-2 ${story.user_has_kudos ? 'text-red-500' : ''}`}
+                    title={story.user_id === user?.id ? "You can't kudos your own story" : 'Give one kudos'}
                   >
                     <Heart className={`h-4 w-4 ${story.user_has_kudos ? 'fill-current' : ''}`} />
-                    {story.kudos_count} {story.kudos_count === 1 ? 'kudos' : 'kudos'}
+                    {story.kudos_count} kudos
                   </Button>
                 </div>
               </div>

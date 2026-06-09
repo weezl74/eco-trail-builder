@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 
 const categories = [
   {
@@ -36,11 +39,38 @@ const categories = [
 interface Props {
   open: boolean;
   onOpenChange: (v: boolean) => void;
+  onPosted?: () => void;
 }
 
-const AddStoryDialog: React.FC<Props> = ({ open, onOpenChange }) => {
+const AddStoryDialog: React.FC<Props> = ({ open, onOpenChange, onPosted }) => {
   const [catId, setCatId] = useState(categories[0].id);
+  const [submittingTag, setSubmittingTag] = useState<string | null>(null);
   const cat = categories.find((c) => c.id === catId)!;
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  const share = async (tag: string, text: string) => {
+    if (!user) {
+      toast({ title: 'Please sign in', description: 'You need to be signed in to share a story.' });
+      return;
+    }
+    setSubmittingTag(tag);
+    const { error } = await supabase.from('user_stories').insert({
+      user_id: user.id,
+      title: tag,
+      content: text,
+      run_type: catId,
+      points_earned: 10,
+    });
+    setSubmittingTag(null);
+    if (error) {
+      toast({ title: 'Could not share story', description: error.message, variant: 'destructive' });
+      return;
+    }
+    toast({ title: 'Story shared!', description: tag });
+    onPosted?.();
+    onOpenChange(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -63,11 +93,15 @@ const AddStoryDialog: React.FC<Props> = ({ open, onOpenChange }) => {
             {cat.items.map((it, i) => (
               <button
                 key={i}
-                onClick={() => onOpenChange(false)}
-                className="w-full bg-[#1f1f1f] rounded-xl p-3 text-center border border-white/20"
+                disabled={submittingTag !== null}
+                onClick={() => share(it.tag, it.text)}
+                className="w-full bg-[#1f1f1f] rounded-xl p-3 text-center border border-white/20 disabled:opacity-50"
               >
                 <p className="text-[#f5a623] font-serif font-bold">{it.tag}</p>
                 <p className="text-white font-serif mt-1 text-sm">{it.text}</p>
+                {submittingTag === it.tag && (
+                  <p className="text-white/60 text-xs mt-1">Sharing…</p>
+                )}
               </button>
             ))}
           </div>

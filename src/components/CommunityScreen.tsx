@@ -10,6 +10,7 @@ interface CommunityScreenProps {
 const CommunityScreen: React.FC<CommunityScreenProps> = () => {
   const [view, setView] = useState<'main' | 'leaderboard'>('main');
   const [addOpen, setAddOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   if (view === 'leaderboard') return <LeaderboardTreesScreen onBack={() => setView('main')} />;
 
@@ -26,7 +27,7 @@ const CommunityScreen: React.FC<CommunityScreenProps> = () => {
       </div>
 
       <div className="bg-transparent">
-        <CommunityStories />
+        <CommunityStories key={refreshKey} />
       </div>
 
       <button
@@ -36,7 +37,11 @@ const CommunityScreen: React.FC<CommunityScreenProps> = () => {
         Leaderboard & Trees
       </button>
 
-      <AddStoryDialog open={addOpen} onOpenChange={setAddOpen} />
+      <AddStoryDialog
+        open={addOpen}
+        onOpenChange={setAddOpen}
+        onPosted={() => setRefreshKey((k) => k + 1)}
+      />
     </div>
   );
 };
