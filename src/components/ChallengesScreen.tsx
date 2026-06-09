@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import QuizzesScreen from './screens/QuizzesScreen';
 import PledgesScreen from './screens/PledgesScreen';
 import ShopLocalScreen from './screens/ShopLocalScreen';
+import SprintsScreen from './screens/SprintsScreen';
 
 const tiles = [
   { id: 'quizzes', label: 'Quizzes' },
@@ -18,6 +19,7 @@ const ChallengesScreen: React.FC<{ onSelect?: (id: string) => void }> = () => {
   if (view === 'quizzes') return <QuizzesScreen onBack={() => setView(null)} />;
   if (view === 'pledges') return <PledgesScreen onBack={() => setView(null)} />;
   if (view === 'shop-local') return <ShopLocalScreen onBack={() => setView(null)} />;
+  if (view === 'sprints') return <SprintsScreen onBack={() => setView(null)} />;
 
   return (
     <div className="min-h-screen bg-[#f5a623] pb-24 px-4 pt-8">
