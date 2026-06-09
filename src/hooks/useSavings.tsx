@@ -12,6 +12,7 @@ type State = {
   treesPlanted: number;
   renewables: Renewable[];
   accessories: string[];
+  cardColor: string;
 };
 
 const KEY = 'eco_state_v2';
@@ -25,6 +26,7 @@ const DEFAULT: State = {
   treesPlanted: 4,
   renewables: [],
   accessories: [],
+  cardColor: 'midnight',
 };
 
 const RESET_KEY = 'eco_accessories_reset_v1';
