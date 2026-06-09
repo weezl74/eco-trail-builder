@@ -2,20 +2,14 @@ import React, { useState } from 'react';
 import QuizzesScreen from './screens/QuizzesScreen';
 import PledgesScreen from './screens/PledgesScreen';
 import ShopLocalScreen from './screens/ShopLocalScreen';
-import tileQuizzes from '@/assets/tile-quizzes.png.asset.json';
-import tilePledges from '@/assets/tile-pledges.png.asset.json';
-import tileSprints from '@/assets/tile-sprints.png.asset.json';
-import tileShopLocal from '@/assets/tile-shoplocal.png.asset.json';
-import tileCommunity from '@/assets/tile-community.png.asset.json';
-import tileMega from '@/assets/tile-mega.png.asset.json';
 
 const tiles = [
-  { id: 'quizzes', label: 'Quizzes', img: tileQuizzes.url },
-  { id: 'pledges', label: 'Pledges', img: tilePledges.url },
-  { id: 'sprints', label: 'Sprints', img: tileSprints.url },
-  { id: 'shop-local', label: 'Shop Local', img: tileShopLocal.url },
-  { id: 'community-pledges', label: 'Community\nPledges', img: tileCommunity.url },
-  { id: 'mega-pledges', label: 'Mega Pledges', img: tileMega.url },
+  { id: 'quizzes', label: 'Quizzes' },
+  { id: 'pledges', label: 'Pledges' },
+  { id: 'sprints', label: 'Sprints' },
+  { id: 'shop-local', label: 'Shop Local' },
+  { id: 'community-pledges', label: 'Community\nPledges' },
+  { id: 'mega-pledges', label: 'Mega Pledges' },
 ];
 
 const ChallengesScreen: React.FC<{ onSelect?: (id: string) => void }> = () => {
@@ -32,17 +26,9 @@ const ChallengesScreen: React.FC<{ onSelect?: (id: string) => void }> = () => {
           <button
             key={t.id}
             onClick={() => setView(t.id)}
-            className="bg-[#1f1f1f] rounded-2xl aspect-square flex flex-col items-center justify-between p-4 shadow-lg active:scale-95 transition"
+            className="bg-[#1f1f1f] rounded-2xl aspect-square flex items-center justify-center p-4 shadow-lg active:scale-95 transition"
           >
-            <div className="flex-1 flex items-center justify-center w-full">
-              <img
-                src={t.img}
-                alt={t.label.replace('\n', ' ')}
-                className="max-h-full max-w-full object-contain"
-                loading="lazy"
-              />
-            </div>
-            <span className="text-white font-serif font-bold text-lg text-center whitespace-pre-line leading-tight mt-2">
+            <span className="text-white font-serif font-bold text-2xl text-center whitespace-pre-line leading-tight">
               {t.label}
             </span>
           </button>
