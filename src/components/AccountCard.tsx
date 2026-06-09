@@ -108,16 +108,25 @@ const AccountCard: React.FC<AccountCardProps> = ({
 
               <div className="grid grid-cols-10 gap-1 flex-1 min-h-0 items-center">
                 {Array.from({ length: 10 }).map((_, i) => {
-                  const stamped = i < 2;
+                  const stamped = i < stampsEarned;
                   const isReward = i === 9;
+                  const isNext = i === stampsEarned && !isReward;
                   return (
-                    <div
+                    <button
+                      type="button"
                       key={i}
-                      className={`relative rounded-full border-2 flex items-center justify-center aspect-square ${
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (isNext) setScanOpen(true);
+                      }}
+                      disabled={!isNext}
+                      className={`relative rounded-full border-2 flex items-center justify-center aspect-square transition ${
                         stamped
                           ? 'border-[#f4971d] bg-[#f4971d]/30'
                           : isReward
                           ? 'border-dashed border-yellow-300/80 bg-yellow-300/10'
+                          : isNext
+                          ? 'border-white bg-white/20 animate-pulse cursor-pointer'
                           : 'border-white/40 bg-white/5'
                       }`}
                     >
@@ -129,19 +138,65 @@ const AccountCard: React.FC<AccountCardProps> = ({
                         <span className="text-[6px] font-roboto font-bold leading-none text-center text-yellow-200">
                           FREE<br />SWIM
                         </span>
+                      ) : isNext ? (
+                        <QrCode className="h-3 w-3 text-white" />
                       ) : (
                         <span className="text-[8px] opacity-50">{i + 1}</span>
                       )}
-                    </div>
+                    </button>
                   );
                 })}
               </div>
 
-              <p className="text-center text-[8px] opacity-70 leading-none">Stamp 10 = free family swim 🏊</p>
+              <p className="text-center text-[8px] opacity-70 leading-none">Tap the glowing stamp to scan at the leisure centre</p>
             </div>
           </div>
         </div>
       </div>
+
+      <Dialog open={scanOpen} onOpenChange={setScanOpen}>
+        <DialogContent className="max-w-sm" onClick={(e) => e.stopPropagation()}>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 font-roboto">
+              <ScanLine className="h-5 w-5 text-[#F4971D]" /> Verify your visit
+            </DialogTitle>
+            <DialogDescription className="flex items-center gap-1 text-xs">
+              <MapPin className="h-3 w-3" /> Scan the QR code at reception
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="rounded-2xl bg-[#F4971D]/10 border-2 border-[#F4971D]/30 p-6 flex flex-col items-center">
+            <div className="relative w-48 h-48 bg-white rounded-xl p-3 shadow-inner">
+              <div
+                className="w-full h-full"
+                style={{
+                  backgroundImage:
+                    'linear-gradient(45deg, #000 25%, transparent 25%), linear-gradient(-45deg, #000 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #000 75%), linear-gradient(-45deg, transparent 75%, #000 75%)',
+                  backgroundSize: '14px 14px',
+                  backgroundPosition: '0 0, 0 7px, 7px -7px, -7px 0px',
+                }}
+              />
+              {scanning && (
+                <div className="absolute inset-3 overflow-hidden rounded">
+                  <div className="absolute left-0 right-0 h-1 bg-[#F4971D] shadow-[0_0_12px_2px_#F4971D] animate-[scan_1.4s_ease-in-out]" style={{ top: '50%' }} />
+                </div>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground mt-3 text-center">
+              Point your camera at the QR code at your leisure centre to log this visit.
+            </p>
+          </div>
+
+          <Button
+            onClick={handleSimulateScan}
+            disabled={scanning}
+            className="w-full bg-[#F4971D] hover:bg-[#F4971D]/90 text-white font-roboto rounded-xl"
+          >
+            {scanning ? 'Verifying…' : 'Simulate scan (prototype)'}
+          </Button>
+          <p className="text-[10px] text-center text-muted-foreground -mt-2">For stakeholder demo only</p>
+        </DialogContent>
+      </Dialog>
 
 
       <p className="text-center text-xs text-muted-foreground mt-2">Tap card to flip</p>
