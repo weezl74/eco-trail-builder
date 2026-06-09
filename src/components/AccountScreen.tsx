@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ArrowRight, Sparkles, Share2 } from 'lucide-react';
 import AccountCard from './AccountCard';
 import SheepAvatarScreen from './screens/SheepAvatarScreen';
+import AccountSubScreen, { Page as SubPage } from './screens/AccountSubScreen';
 import { supabase } from '@/integrations/supabase/client';
 
 
