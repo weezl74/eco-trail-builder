@@ -10,123 +10,58 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "13.0.4"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
-      business_pledges: {
-        Row: {
-          action: string
-          business_id: string
-          category: string
-          completed_at: string
-          created_at: string
-          id: string
-          impact_value: number
-          points_earned: number
-        }
-        Insert: {
-          action: string
-          business_id: string
-          category: string
-          completed_at?: string
-          created_at?: string
-          id?: string
-          impact_value: number
-          points_earned?: number
-        }
-        Update: {
-          action?: string
-          business_id?: string
-          category?: string
-          completed_at?: string
-          created_at?: string
-          id?: string
-          impact_value?: number
-          points_earned?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "business_pledges_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "businesses"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      businesses: {
-        Row: {
-          business_name: string
-          business_type: string
-          climate_goals: string | null
-          created_at: string
-          energy_footprint: number | null
-          id: string
-          latitude: number | null
-          longitude: number | null
-          travel_footprint: number | null
-          updated_at: string
-          user_id: string
-          waste_footprint: number | null
-        }
-        Insert: {
-          business_name: string
-          business_type: string
-          climate_goals?: string | null
-          created_at?: string
-          energy_footprint?: number | null
-          id?: string
-          latitude?: number | null
-          longitude?: number | null
-          travel_footprint?: number | null
-          updated_at?: string
-          user_id: string
-          waste_footprint?: number | null
-        }
-        Update: {
-          business_name?: string
-          business_type?: string
-          climate_goals?: string | null
-          created_at?: string
-          energy_footprint?: number | null
-          id?: string
-          latitude?: number | null
-          longitude?: number | null
-          travel_footprint?: number | null
-          updated_at?: string
-          user_id?: string
-          waste_footprint?: number | null
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
-          avatar_level: number | null
+          address: string | null
+          age: string | null
+          avatar_level: number
           created_at: string
-          current_footprint: number | null
+          current_footprint: number
+          display_name: string | null
+          first_name: string | null
           id: string
-          total_points: number | null
+          last_name: string | null
+          phone: string | null
+          postcode: string | null
+          total_points: number
           updated_at: string
           user_id: string
           username: string | null
         }
         Insert: {
-          avatar_level?: number | null
+          address?: string | null
+          age?: string | null
+          avatar_level?: number
           created_at?: string
-          current_footprint?: number | null
+          current_footprint?: number
+          display_name?: string | null
+          first_name?: string | null
           id?: string
-          total_points?: number | null
+          last_name?: string | null
+          phone?: string | null
+          postcode?: string | null
+          total_points?: number
           updated_at?: string
           user_id: string
           username?: string | null
         }
         Update: {
-          avatar_level?: number | null
+          address?: string | null
+          age?: string | null
+          avatar_level?: number
           created_at?: string
-          current_footprint?: number | null
+          current_footprint?: number
+          display_name?: string | null
+          first_name?: string | null
           id?: string
-          total_points?: number | null
+          last_name?: string | null
+          phone?: string | null
+          postcode?: string | null
+          total_points?: number
           updated_at?: string
           user_id?: string
           username?: string | null
@@ -169,7 +104,7 @@ export type Database = {
           planting_date: string | null
           points_used: number
           status: string
-          tree_species: string | null
+          tree_species: string
           updated_at: string
           user_id: string
           what3words_location: string | null
@@ -180,7 +115,7 @@ export type Database = {
           planting_date?: string | null
           points_used?: number
           status?: string
-          tree_species?: string | null
+          tree_species?: string
           updated_at?: string
           user_id: string
           what3words_location?: string | null
@@ -191,7 +126,7 @@ export type Database = {
           planting_date?: string | null
           points_used?: number
           status?: string
-          tree_species?: string | null
+          tree_species?: string
           updated_at?: string
           user_id?: string
           what3words_location?: string | null
