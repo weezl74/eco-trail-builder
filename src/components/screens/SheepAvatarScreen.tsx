@@ -4,11 +4,10 @@ import { useSavings } from '@/hooks/useSavings';
 import { toast } from '@/hooks/use-toast';
 import sheepAsset from '@/assets/sheep-avatar.jpg.asset.json';
 
-type AccessoryId = 'sunglasses' | 'tophat' | 'uniform' | 'bowtie';
+type AccessoryId = 'sunglasses' | 'tophat' | 'bowtie';
 const ACCESSORIES: { id: AccessoryId; label: string; cost: number }[] = [
   { id: 'sunglasses', label: 'Sunglasses', cost: 40 },
   { id: 'tophat', label: 'Top Hat', cost: 60 },
-  { id: 'uniform', label: 'Hi-Vis Uniform', cost: 80 },
   { id: 'bowtie', label: 'Bow Tie', cost: 30 },
 ];
 
