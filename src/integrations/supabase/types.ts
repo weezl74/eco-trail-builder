@@ -14,7 +14,245 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          address: string | null
+          age: string | null
+          avatar_level: number
+          created_at: string
+          current_footprint: number
+          display_name: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          phone: string | null
+          postcode: string | null
+          total_points: number
+          updated_at: string
+          user_id: string
+          username: string | null
+        }
+        Insert: {
+          address?: string | null
+          age?: string | null
+          avatar_level?: number
+          created_at?: string
+          current_footprint?: number
+          display_name?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone?: string | null
+          postcode?: string | null
+          total_points?: number
+          updated_at?: string
+          user_id: string
+          username?: string | null
+        }
+        Update: {
+          address?: string | null
+          age?: string | null
+          avatar_level?: number
+          created_at?: string
+          current_footprint?: number
+          display_name?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone?: string | null
+          postcode?: string | null
+          total_points?: number
+          updated_at?: string
+          user_id?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      story_kudos: {
+        Row: {
+          created_at: string
+          id: string
+          story_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          story_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          story_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "story_kudos_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "user_stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tree_requests: {
+        Row: {
+          created_at: string
+          id: string
+          planting_date: string | null
+          points_used: number
+          status: string
+          tree_species: string
+          updated_at: string
+          user_id: string
+          what3words_location: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          planting_date?: string | null
+          points_used?: number
+          status?: string
+          tree_species?: string
+          updated_at?: string
+          user_id: string
+          what3words_location?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          planting_date?: string | null
+          points_used?: number
+          status?: string
+          tree_species?: string
+          updated_at?: string
+          user_id?: string
+          what3words_location?: string | null
+        }
+        Relationships: []
+      }
+      user_pledges: {
+        Row: {
+          action: string
+          category: string
+          completed_at: string
+          id: string
+          points_earned: number
+          user_id: string
+        }
+        Insert: {
+          action: string
+          category: string
+          completed_at?: string
+          id?: string
+          points_earned: number
+          user_id: string
+        }
+        Update: {
+          action?: string
+          category?: string
+          completed_at?: string
+          id?: string
+          points_earned?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_renewables: {
+        Row: {
+          id: string
+          points_cost: number
+          purchased_at: string
+          technology_type: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          points_cost: number
+          purchased_at?: string
+          technology_type: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          points_cost?: number
+          purchased_at?: string
+          technology_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_responses: {
+        Row: {
+          answer_value: string
+          category: string
+          created_at: string
+          id: string
+          impact_value: number
+          question_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answer_value: string
+          category: string
+          created_at?: string
+          id?: string
+          impact_value: number
+          question_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answer_value?: string
+          category?: string
+          created_at?: string
+          id?: string
+          impact_value?: number
+          question_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_stories: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          image_url: string | null
+          points_earned: number
+          run_type: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          points_earned?: number
+          run_type: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          points_earned?: number
+          run_type?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
