@@ -36,13 +36,13 @@ const pledges = [
 
 const PledgesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const [tab, setTab] = useState<Tab>('all');
-  const [activated, setActivated] = useState<Record<string, boolean>>({
-    fryer: true,
-    'one-degree': true,
-  });
+  const { pledged, addPledge } = useSavings();
+  const activated = pledged.reduce<Record<string, boolean>>((acc, id) => { acc[id] = true; return acc; }, {});
 
-  const toggle = (id: string) =>
-    setActivated((s) => ({ ...s, [id]: !s[id] }));
+  const activate = (p: typeof pledges[number]) => {
+    if (activated[p.id]) return;
+    addPledge(p.id, { money: p.savings, co2: p.carbon, water: 0 });
+  };
 
   const visible = pledges.filter((p) => {
     if (tab === 'activated' || tab === 'progress') return activated[p.id];
