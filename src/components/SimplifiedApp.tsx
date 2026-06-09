@@ -20,7 +20,7 @@ const SimplifiedApp = ({ onBackToLanding, language = 'en' }: SimplifiedAppProps)
 
   useEffect(() => {
     if (user) loadUserData();
-  }, [user]);
+  }, [user, activeTab]);
 
   const loadUserData = async () => {
     if (!user) return;
