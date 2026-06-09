@@ -88,7 +88,8 @@ const PledgesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
 
             <div className="flex justify-center mt-4">
               <button
-                onClick={() => toggle(p.id)}
+                onClick={() => activate(p)}
+                disabled={!!activated[p.id]}
                 className={`px-6 py-2 rounded-lg font-serif font-bold ${activated[p.id] ? 'bg-[#555]' : 'bg-[#f5a623] text-black'}`}
               >
                 {activated[p.id] ? 'Activated' : 'Activate'}
