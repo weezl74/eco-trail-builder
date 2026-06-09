@@ -58,9 +58,9 @@ const SimplifiedApp = ({ onBackToLanding, language = 'en' }: SimplifiedAppProps)
   const renderTabContent = () => {
     switch (activeTab) {
       case 'home':
-        return <HomeScreen />;
+        return <HomeScreen onGoToPledges={() => { setChallengesInitialView('pledges'); setActiveTab('challenges'); }} />;
       case 'challenges':
-        return <ChallengesScreen />;
+        return <ChallengesScreen initialView={challengesInitialView} key={challengesInitialView ?? 'root'} />;
       case 'calculator':
         return <CalculatorScreen />;
       case 'community':
