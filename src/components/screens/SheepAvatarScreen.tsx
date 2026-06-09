@@ -5,26 +5,110 @@ import { toast } from '@/hooks/use-toast';
 import sheepAsset from '@/assets/sheep-avatar.jpg.asset.json';
 import { CARD_PALETTES, getPalette } from '@/lib/cardPalettes';
 
-type AccessoryId = 'tophat' | 'bowtie';
-const ACCESSORIES: { id: AccessoryId; label: string; cost: number }[] = [
-  { id: 'tophat', label: 'Top Hat', cost: 60 },
-  { id: 'bowtie', label: 'Bow Tie', cost: 30 },
+type AccessoryId =
+  | 'sunglasses'
+  | 'tophat'
+  | 'bowtie'
+  | 'umbrella'
+  | 'wellies'
+  | 'scarf'
+  | 'sunhat'
+  | 'raincoat';
+
+type Accessory = {
+  id: AccessoryId;
+  label: string;
+  emoji: string;
+  cost: number;
+  carbonNote: string;
+};
+
+const ACCESSORIES: Accessory[] = [
+  {
+    id: 'sunglasses',
+    label: 'Sunglasses',
+    emoji: '🕶️',
+    cost: 40,
+    carbonNote:
+      'Heatwaves in Wales are now 5× more likely than 50 years ago — sunny days are getting longer and hotter.',
+  },
+  {
+    id: 'sunhat',
+    label: 'Sun Hat',
+    emoji: '👒',
+    cost: 35,
+    carbonNote:
+      '2022 was the UK\'s hottest year on record — 40°C was reached for the first time ever.',
+  },
+  {
+    id: 'umbrella',
+    label: 'Umbrella',
+    emoji: '☂️',
+    cost: 45,
+    carbonNote:
+      'A 1°C warmer planet holds about 8% more water in the air — so when it rains, it pours much harder.',
+  },
+  {
+    id: 'raincoat',
+    label: 'Raincoat',
+    emoji: '🧥',
+    cost: 55,
+    carbonNote:
+      'Flash floods in Wales have roughly tripled since 2000 as storms grow more intense.',
+  },
+  {
+    id: 'wellies',
+    label: 'Wellies',
+    emoji: '🥾',
+    cost: 50,
+    carbonNote:
+      'UK winter rainfall is up 17% since 1990 — wellies are basically climate kit now.',
+  },
+  {
+    id: 'scarf',
+    label: 'Scarf',
+    emoji: '🧣',
+    cost: 30,
+    carbonNote:
+      'Layering up lets you turn the thermostat down 1°C — saving around 300kg of CO₂ a year per home.',
+  },
+  {
+    id: 'tophat',
+    label: 'Top Hat',
+    emoji: '🎩',
+    cost: 60,
+    carbonNote:
+      'Caerphilly\'s frosty days have halved since the 1960s — warmer winters are reshaping our seasons.',
+  },
+  {
+    id: 'bowtie',
+    label: 'Bow Tie',
+    emoji: '🎀',
+    cost: 30,
+    carbonNote:
+      'Dressing smart for less: one second-hand outfit saves around 25kg of CO₂ versus buying new.',
+  },
 ];
 
 type Tab = 'avatar' | 'card';
 
 const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const [tab, setTab] = useState<Tab>('avatar');
+  const [openNote, setOpenNote] = useState<AccessoryId | null>(null);
   const { woolPoints, accessories, buyAccessory, cardColor, setCardColor } = useSavings();
   const palette = getPalette(cardColor);
 
-  const handleBuy = (a: typeof ACCESSORIES[number]) => {
-    if (accessories.includes(a.id)) return;
+  const handleBuy = (a: Accessory) => {
+    if (accessories.includes(a.id)) {
+      setOpenNote(a.id);
+      return;
+    }
     const ok = buyAccessory(a.id, a.cost);
     toast({
       title: ok ? `${a.label} unlocked` : 'Not enough wool',
-      description: ok ? `-${a.cost} wool points` : `${a.label} costs ${a.cost} wool.`,
+      description: ok ? a.carbonNote : `${a.label} costs ${a.cost} wool.`,
     });
+    if (ok) setOpenNote(a.id);
   };
 
   const has = (id: AccessoryId) => accessories.includes(id);
@@ -41,7 +125,6 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
         Wool Points: {woolPoints}
       </div>
 
-      {/* Tabs */}
       <div className="flex bg-[#1f1f1f] rounded-full p-1 mb-4">
         <button
           onClick={() => setTab('avatar')}
@@ -63,24 +146,72 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
 
       {tab === 'avatar' && (
         <>
-          <div className="flex-1 flex items-center justify-center">
-            <div className="relative w-72 h-72">
+          <div className="flex items-center justify-center mb-3">
+            <div className="relative w-64 h-64">
               <img
                 src={sheepAsset.url}
                 alt="Your sheep avatar"
                 className="w-full h-full object-contain select-none"
                 draggable={false}
               />
-              {has('tophat') && (
-                <div className="absolute pointer-events-none" style={{ left: '42%', top: '2%', width: '16%' }}>
-                  <div className="h-6 bg-[#1f1f1f]">
-                    <div className="h-1 bg-[#8b0000] mt-2" />
-                  </div>
-                  <div className="h-1.5 bg-[#1f1f1f] -mx-2" />
+
+              {/* Umbrella — floats above the sheep */}
+              {has('umbrella') && (
+                <div
+                  className="absolute pointer-events-none text-5xl text-center"
+                  style={{ left: '50%', top: '-8%', transform: 'translateX(-50%)' }}
+                >
+                  ☂️
                 </div>
               )}
+
+              {/* Top hat */}
+              {has('tophat') && (
+                <div
+                  className="absolute pointer-events-none text-3xl text-center"
+                  style={{ left: '50%', top: '-2%', transform: 'translateX(-50%)' }}
+                >
+                  🎩
+                </div>
+              )}
+
+              {/* Sun hat */}
+              {has('sunhat') && (
+                <div
+                  className="absolute pointer-events-none text-3xl text-center"
+                  style={{ left: '50%', top: '0%', transform: 'translateX(-50%)' }}
+                >
+                  👒
+                </div>
+              )}
+
+              {/* Sunglasses — across the eyes */}
+              {has('sunglasses') && (
+                <div
+                  className="absolute pointer-events-none flex items-center gap-[2px]"
+                  style={{ left: '50%', top: '11%', width: '22%', transform: 'translateX(-50%)' }}
+                >
+                  <div className="flex-1 aspect-[2/1] rounded-sm bg-black" />
+                  <div className="flex-1 aspect-[2/1] rounded-sm bg-black" />
+                </div>
+              )}
+
+              {/* Scarf */}
+              {has('scarf') && (
+                <div
+                  className="absolute pointer-events-none text-2xl text-center"
+                  style={{ left: '50%', top: '24%', transform: 'translateX(-50%)' }}
+                >
+                  🧣
+                </div>
+              )}
+
+              {/* Bow tie */}
               {has('bowtie') && (
-                <div className="absolute pointer-events-none" style={{ left: '44%', top: '24%', width: '12%' }}>
+                <div
+                  className="absolute pointer-events-none"
+                  style={{ left: '50%', top: '22%', width: '12%', transform: 'translateX(-50%)' }}
+                >
                   <svg viewBox="0 0 40 20" className="w-full">
                     <polygon points="0,2 20,10 0,18" fill="#dc2626" />
                     <polygon points="40,2 20,10 40,18" fill="#dc2626" />
@@ -88,12 +219,34 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                   </svg>
                 </div>
               )}
+
+              {/* Raincoat */}
+              {has('raincoat') && (
+                <div
+                  className="absolute pointer-events-none text-4xl text-center"
+                  style={{ left: '50%', top: '40%', transform: 'translateX(-50%)' }}
+                >
+                  🧥
+                </div>
+              )}
+
+              {/* Wellies */}
+              {has('wellies') && (
+                <div
+                  className="absolute pointer-events-none text-2xl text-center"
+                  style={{ left: '50%', top: '78%', transform: 'translateX(-50%)' }}
+                >
+                  🥾
+                </div>
+              )}
             </div>
           </div>
 
-          <div className="bg-[#3a3a3a] rounded-2xl p-4">
-            <p className="text-white font-serif font-bold text-sm mb-2">Accessories</p>
-            <div className="grid grid-cols-2 gap-2">
+          <div className="bg-[#3a3a3a] rounded-2xl p-3">
+            <p className="text-white font-serif font-bold text-sm mb-2">
+              Accessories <span className="opacity-60 text-xs">(tap to see climate fact)</span>
+            </p>
+            <div className="grid grid-cols-3 gap-2">
               {ACCESSORIES.map((a) => {
                 const owned = has(a.id);
                 const afford = woolPoints >= a.cost;
@@ -101,27 +254,42 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                   <button
                     key={a.id}
                     onClick={() => handleBuy(a)}
-                    disabled={owned || !afford}
-                    className={`rounded-xl p-2 text-xs font-serif font-bold text-left flex items-center justify-between ${
+                    disabled={!owned && !afford}
+                    className={`rounded-xl p-2 text-[11px] font-serif font-bold flex flex-col items-center gap-1 ${
                       owned ? 'bg-[#F4971D] text-black' : afford ? 'bg-white text-black' : 'bg-white/30 text-white'
                     }`}
                   >
-                    <span>{a.label}</span>
-                    <span className="flex items-center gap-1">
+                    <span className="text-xl leading-none">{a.emoji}</span>
+                    <span className="leading-tight text-center">{a.label}</span>
+                    <span className="flex items-center gap-1 text-[10px]">
                       {!owned && !afford && <Lock className="h-3 w-3" />}
-                      {owned ? '✓' : `${a.cost}`}
+                      {owned ? '✓ owned' : `${a.cost} wool`}
                     </span>
                   </button>
                 );
               })}
             </div>
+
+            {openNote && (() => {
+              const a = ACCESSORIES.find((x) => x.id === openNote)!;
+              return (
+                <div className="mt-3 rounded-xl bg-green-900/40 border border-green-400/30 p-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Leaf className="h-4 w-4 text-green-300" />
+                    <span className="text-green-100 text-xs font-serif font-bold uppercase tracking-wide">
+                      Why {a.label.toLowerCase()}?
+                    </span>
+                  </div>
+                  <p className="text-white/90 text-xs leading-snug">{a.carbonNote}</p>
+                </div>
+              );
+            })()}
           </div>
         </>
       )}
 
       {tab === 'card' && (
         <>
-          {/* Live preview */}
           <div className="mb-4" style={{ aspectRatio: '1.586 / 1' }}>
             <div
               className="w-full h-full rounded-2xl p-5 shadow-xl text-white relative overflow-hidden"
@@ -134,7 +302,6 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
             </div>
           </div>
 
-          {/* Palette picker */}
           <div className="bg-[#1f1f1f] rounded-2xl p-4 space-y-3">
             <p className="text-white font-serif font-bold text-sm">Choose a colour</p>
             <div className="grid grid-cols-2 gap-2">
@@ -148,10 +315,7 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                       selected ? 'border-[#F4971D] bg-white/10' : 'border-transparent bg-white/5'
                     }`}
                   >
-                    <div
-                      className="h-10 w-full rounded-md mb-2"
-                      style={{ background: p.front }}
-                    />
+                    <div className="h-10 w-full rounded-md mb-2" style={{ background: p.front }} />
                     <div className="flex items-center justify-between">
                       <span className="text-white text-xs font-serif font-bold">{p.label}</span>
                       <span className="flex items-center gap-0.5">
@@ -170,7 +334,6 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
               })}
             </div>
 
-            {/* Carbon reason for selected */}
             <div className="rounded-xl bg-green-900/40 border border-green-400/30 p-3">
               <div className="flex items-center gap-2 mb-1">
                 <Leaf className="h-4 w-4 text-green-300" />
