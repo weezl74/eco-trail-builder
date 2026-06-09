@@ -5,7 +5,7 @@ import { useSavings } from '@/hooks/useSavings';
 
 const HomeScreen: React.FC = () => {
   const [showAvatar, setShowAvatar] = useState(false);
-  const { savings } = useSavings();
+  const { savings, pledged } = useSavings();
 
   if (showAvatar) {
     return <SheepAvatarScreen onBack={() => setShowAvatar(false)} />;
@@ -32,6 +32,7 @@ const HomeScreen: React.FC = () => {
           <p className="flex items-center gap-2"><span className="text-yellow-400 text-xl">£</span> Money: £{savings.money}</p>
           <p className="flex items-center gap-2"><span className="text-red-400 text-sm font-mono">CO₂e</span> CO₂e: {savings.co2} kg</p>
           <p className="flex items-center gap-2"><span className="text-blue-400 text-xl">💧</span> Water: {savings.water}L</p>
+          <p className="flex items-center gap-2 text-[#f5a623]"><span className="text-xl">✓</span> Pledges made: {pledged.length}</p>
         </div>
       </div>
     </div>
