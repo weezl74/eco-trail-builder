@@ -165,15 +165,15 @@ const About: React.FC<{ onBack: () => void }> = ({ onBack }) => (
 
 const Terms: React.FC<{ onBack: () => void }> = ({ onBack }) => (
   <Shell title="Terms and Conditions" onBack={onBack}>
-    <p>
-      By using Nurture you agree to use the app for personal, non-commercial purposes
-      and to keep your sign-in credentials private. Pledges, points and leaderboard
-      rankings are intended for motivation, not as legally binding commitments.
-    </p>
-    <p>
-      We may update these terms occasionally. Continued use of the app after updates
-      means you accept the revised terms.
-    </p>
+    <p>Read the full Nurture App terms and privacy policy on our website.</p>
+    <a
+      href="https://ccbc-decarb.github.io/privacy-policy/"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block w-full text-center rounded-2xl bg-[#1f1f1f] hover:bg-black text-white font-bold py-3"
+    >
+      Open Privacy Policy
+    </a>
   </Shell>
 );
 

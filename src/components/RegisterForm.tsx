@@ -111,9 +111,25 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onComplete }) => {
           </button>
           <span className="text-white font-serif font-bold text-base leading-snug">
             I have read and agree{' '}
-            <span className="text-blue-400 underline">Nurture App's Terms of Service</span>{' '}
+            <a
+              href="https://ccbc-decarb.github.io/privacy-policy/"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="text-blue-400 underline"
+            >
+              Nurture App's Terms of Service
+            </a>{' '}
             <span className="font-bold">and</span>{' '}
-            <span className="text-blue-400 underline">Privacy Notice</span>
+            <a
+              href="https://ccbc-decarb.github.io/privacy-policy/"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="text-blue-400 underline"
+            >
+              Privacy Notice
+            </a>
           </span>
         </label>
       </div>
