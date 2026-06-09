@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
+import { useSavings } from '@/hooks/useSavings';
 
 type Tab = 'all' | 'activated' | 'progress' | 'groups';
 
