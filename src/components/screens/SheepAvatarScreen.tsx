@@ -27,7 +27,7 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const has = (id: AccessoryId) => accessories.includes(id);
 
   return (
-    <div className="min-h-screen bg-[#f5a623] pb-24 px-4 pt-4 flex flex-col">
+    <div className="min-h-screen bg-[#F4971D] pb-24 px-4 pt-4 flex flex-col">
       {onBack && (
         <button onClick={onBack} className="text-black flex items-center gap-1 font-serif font-bold mb-2">
           <ArrowLeft className="h-5 w-5" /> Back
@@ -99,7 +99,7 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                   onClick={() => handleBuy(a)}
                   disabled={owned || !afford}
                   className={`rounded-xl p-2 text-xs font-serif font-bold text-left flex items-center justify-between ${
-                    owned ? 'bg-[#f5a623] text-black' : afford ? 'bg-white text-black' : 'bg-white/30 text-white'
+                    owned ? 'bg-[#F4971D] text-black' : afford ? 'bg-white text-black' : 'bg-white/30 text-white'
                   }`}
                 >
                   <span>{a.label}</span>
@@ -114,7 +114,7 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
 
           <button
             onClick={() => setCustomising(false)}
-            className="w-full mt-4 bg-[#f5a623] text-white font-serif font-bold py-3 rounded-xl"
+            className="w-full mt-4 bg-[#F4971D] text-white font-serif font-bold py-3 rounded-xl"
           >
             Confirm
           </button>

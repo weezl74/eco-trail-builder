@@ -1,16 +1,17 @@
 import React from 'react';
 import dayBg from '@/assets/svg/welcome-day.svg.asset.json';
-import sunsetBg from '@/assets/svg/welcome-sunset.svg.asset.json';
 import nightBg from '@/assets/svg/welcome-night.svg.asset.json';
 
 interface LandingScreenProps {
   onBeetleClick?: () => void;
 }
 
+const sunsetBgUrl = '/welcome-sunset-orange.svg';
+
 const pickBackground = () => {
   const h = new Date().getHours();
   if (h >= 6 && h < 17) return dayBg.url;
-  if (h >= 17 && h < 20) return sunsetBg.url;
+  if (h >= 17 && h < 20) return sunsetBgUrl;
   return nightBg.url;
 };
 

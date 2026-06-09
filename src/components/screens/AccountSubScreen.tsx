@@ -23,10 +23,10 @@ interface Props {
 const Shell: React.FC<{ title: string; onBack: () => void; children: React.ReactNode }> = ({
   title, onBack, children,
 }) => (
-  <div className="min-h-screen bg-[#F4971D] pb-24 px-4 pt-6 font-roboto">
+  <div className="min-h-screen bg-[#F4971D] pb-24 px-4 pt-10 font-roboto">
     <button
       onClick={onBack}
-      className="flex items-center gap-2 text-white font-bold mb-4"
+      className="flex items-center gap-2 bg-[#1f1f1f] text-white font-bold mb-4 px-4 py-2 rounded-full shadow-lg"
     >
       <ArrowLeft className="h-5 w-5" /> Back
     </button>
