@@ -27,7 +27,7 @@ const CommunityScreen: React.FC<CommunityScreenProps> = () => {
       </div>
 
       <div className="bg-transparent">
-        <CommunityStories />
+        <CommunityStories key={refreshKey} />
       </div>
 
       <button
@@ -37,7 +37,11 @@ const CommunityScreen: React.FC<CommunityScreenProps> = () => {
         Leaderboard & Trees
       </button>
 
-      <AddStoryDialog open={addOpen} onOpenChange={setAddOpen} />
+      <AddStoryDialog
+        open={addOpen}
+        onOpenChange={setAddOpen}
+        onPosted={() => setRefreshKey((k) => k + 1)}
+      />
     </div>
   );
 };
