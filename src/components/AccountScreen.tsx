@@ -43,6 +43,7 @@ const AccountScreen: React.FC<AccountScreenProps> = ({
   name, memberSince, totalPoints, currentFootprint, badges = [], rewards = [], onLogOut,
 }) => {
   const [editingAvatar, setEditingAvatar] = useState(false);
+  const [subPage, setSubPage] = useState<SubPage | null>(null);
 
   const handleLogOut = async () => {
     await supabase.auth.signOut();
@@ -57,6 +58,10 @@ const AccountScreen: React.FC<AccountScreenProps> = ({
 
   if (editingAvatar) {
     return <SheepAvatarScreen onBack={() => setEditingAvatar(false)} />;
+  }
+
+  if (subPage) {
+    return <AccountSubScreen page={subPage} onBack={() => setSubPage(null)} />;
   }
 
 
