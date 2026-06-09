@@ -1,15 +1,11 @@
 import React, { useState } from 'react';
 import { Mail, Gift, Calendar, Shirt } from 'lucide-react';
 import SheepAvatarScreen from './screens/SheepAvatarScreen';
+import { useSavings } from '@/hooks/useSavings';
 
-interface HomeScreenProps {
-  money?: number;
-  co2?: number;
-  water?: number;
-}
-
-const HomeScreen: React.FC<HomeScreenProps> = ({ money = 515, co2 = 1417, water = 0 }) => {
+const HomeScreen: React.FC = () => {
   const [showAvatar, setShowAvatar] = useState(false);
+  const { savings } = useSavings();
 
   if (showAvatar) {
     return <SheepAvatarScreen onBack={() => setShowAvatar(false)} />;
@@ -33,9 +29,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ money = 515, co2 = 1417, water 
       <div className="mx-4 mt-4 bg-[#1f1f1f] rounded-2xl p-5 text-white">
         <h2 className="font-serif font-bold text-xl text-center mb-3">Estimated Savings</h2>
         <div className="space-y-2 font-serif font-bold">
-          <p className="flex items-center gap-2"><span className="text-yellow-400 text-xl">£</span> Money: £{money}</p>
-          <p className="flex items-center gap-2"><span className="text-red-400 text-sm font-mono">CO₂e</span> CO₂e: {co2} kg</p>
-          <p className="flex items-center gap-2"><span className="text-blue-400 text-xl">💧</span> Water: {water}L</p>
+          <p className="flex items-center gap-2"><span className="text-yellow-400 text-xl">£</span> Money: £{savings.money}</p>
+          <p className="flex items-center gap-2"><span className="text-red-400 text-sm font-mono">CO₂e</span> CO₂e: {savings.co2} kg</p>
+          <p className="flex items-center gap-2"><span className="text-blue-400 text-xl">💧</span> Water: {savings.water}L</p>
         </div>
       </div>
     </div>
