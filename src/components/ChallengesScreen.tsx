@@ -5,14 +5,19 @@ import ShopLocalScreen from './screens/ShopLocalScreen';
 import SprintsScreen from './screens/SprintsScreen';
 import MegaPledgesScreen from './screens/MegaPledgesScreen';
 import CommunityPledgesScreen from './screens/CommunityPledgesScreen';
+import quizIcon from '@/assets/svg/quiz-icon.svg.asset.json';
+import pledgeIcon from '@/assets/svg/pledge.svg.asset.json';
+import quickWinsIcon from '@/assets/svg/quick-wins.svg.asset.json';
+import communityIcon from '@/assets/svg/community-pledge.svg.asset.json';
+import megaIcon from '@/assets/svg/mega-pledge.svg.asset.json';
 
 const tiles = [
-  { id: 'quizzes', label: 'Quizzes' },
-  { id: 'pledges', label: 'Pledges' },
-  { id: 'sprints', label: 'Sprints' },
-  { id: 'shop-local', label: 'Shop Local' },
-  { id: 'community-pledges', label: 'Community\nPledges' },
-  { id: 'mega-pledges', label: 'Mega Pledges' },
+  { id: 'quizzes', label: 'Quizzes', icon: quizIcon.url },
+  { id: 'pledges', label: 'Pledges', icon: pledgeIcon.url },
+  { id: 'sprints', label: 'Sprints', icon: quickWinsIcon.url },
+  { id: 'shop-local', label: 'Shop Local', icon: null },
+  { id: 'community-pledges', label: 'Community\nPledges', icon: communityIcon.url },
+  { id: 'mega-pledges', label: 'Mega Pledges', icon: megaIcon.url },
 ];
 
 const ChallengesScreen: React.FC<{ onSelect?: (id: string) => void }> = () => {
@@ -32,9 +37,12 @@ const ChallengesScreen: React.FC<{ onSelect?: (id: string) => void }> = () => {
           <button
             key={t.id}
             onClick={() => setView(t.id)}
-            className="bg-[#1f1f1f] rounded-2xl aspect-square flex items-center justify-center p-4 shadow-lg active:scale-95 transition"
+            className="bg-[#1f1f1f] rounded-2xl aspect-square flex flex-col items-center justify-center gap-2 p-4 shadow-lg active:scale-95 transition"
           >
-            <span className="text-white font-serif font-bold text-2xl text-center whitespace-pre-line leading-tight">
+            {t.icon && (
+              <img src={t.icon} alt="" className="h-16 w-16 object-contain" draggable={false} />
+            )}
+            <span className="text-white font-serif font-bold text-xl text-center whitespace-pre-line leading-tight">
               {t.label}
             </span>
           </button>
