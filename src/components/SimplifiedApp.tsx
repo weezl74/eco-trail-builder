@@ -85,7 +85,7 @@ const SimplifiedApp = ({ onBackToLanding, language = 'en' }: SimplifiedAppProps)
   return (
     <>
       {renderTabContent()}
-      <BottomNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+      <BottomNavigation activeTab={activeTab} onTabChange={(t) => { setChallengesInitialView(null); setActiveTab(t); }} />
     </>
   );
 };
