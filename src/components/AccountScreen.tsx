@@ -68,7 +68,7 @@ const AccountScreen: React.FC<AccountScreenProps> = ({
   return (
     <div className="min-h-screen bg-[#f5a623] pb-24 px-4 pt-6">
       {/* Carbon card placeholder uses the flippable card */}
-      <div className="bg-[#fff8d6] rounded-2xl p-3 mb-4 shadow-lg">
+      <div className="mb-4">
         <AccountCard
           name={name}
           memberSince={memberSince}
