@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Mail, Gift, Calendar, Shirt } from 'lucide-react';
-import homeSheep from '@/assets/home-sheep.png.asset.json';
 import SheepAvatarScreen from './screens/SheepAvatarScreen';
 
 interface HomeScreenProps {
@@ -38,11 +37,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ money = 515, co2 = 1417, water 
           <p className="flex items-center gap-2"><span className="text-red-400 text-sm font-mono">CO₂e</span> CO₂e: {co2} kg</p>
           <p className="flex items-center gap-2"><span className="text-blue-400 text-xl">💧</span> Water: {water}L</p>
         </div>
-      </div>
-
-      {/* Sheep illustration */}
-      <div className="flex-1 flex items-end justify-center mt-4">
-        <img src={homeSheep.url} alt="Sheep in landscape with cars and factory" className="w-full object-contain max-h-[60vh]" />
       </div>
     </div>
   );
