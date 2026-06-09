@@ -87,7 +87,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
         >
           {/* FRONT */}
           <div ref={frontRef} className="absolute inset-0 backface-hidden rounded-2xl p-5 shadow-xl text-white overflow-hidden"
-               style={{ background: 'linear-gradient(135deg, hsl(220 91% 25%), hsl(142 85% 35%))' }}>
+               style={{ background: palette.front }}>
             <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-white/10" />
             <div className="absolute -left-8 -bottom-8 w-32 h-32 rounded-full bg-white/5" />
             <div className="relative h-full flex flex-col justify-between">
