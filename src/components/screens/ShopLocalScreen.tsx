@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Filter, Check } from 'lucide-react';
-import { useSavings, Saving } from '@/hooks/useSavings';
+import { ArrowLeft, Filter, Sun, Wind, Droplet, Thermometer } from 'lucide-react';
+import { useSavings, RenewableType, RENEWABLE_COSTS } from '@/hooks/useSavings';
 import { toast } from '@/hooks/use-toast';
 
 type Category = 'libraries' | 'allotments' | 'leisure' | 'ev' | 'eco';
