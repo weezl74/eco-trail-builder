@@ -32,6 +32,8 @@ const AccountCard: React.FC<AccountCardProps> = ({
   const frontRef = useRef<HTMLDivElement>(null);
   const backRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const { cardColor } = useSavings();
+  const palette = getPalette(cardColor);
 
   const handleSimulateScan = () => {
     setScanning(true);
