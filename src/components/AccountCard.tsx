@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { toPng } from 'html-to-image';
+import { useSavings } from '@/hooks/useSavings';
+import { getPalette } from '@/lib/cardPalettes';
 
 interface AccountCardProps {
   name: string;
@@ -30,6 +32,8 @@ const AccountCard: React.FC<AccountCardProps> = ({
   const frontRef = useRef<HTMLDivElement>(null);
   const backRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const { cardColor } = useSavings();
+  const palette = getPalette(cardColor);
 
   const handleSimulateScan = () => {
     setScanning(true);
@@ -83,7 +87,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
         >
           {/* FRONT */}
           <div ref={frontRef} className="absolute inset-0 backface-hidden rounded-2xl p-5 shadow-xl text-white overflow-hidden"
-               style={{ background: 'linear-gradient(135deg, hsl(220 91% 25%), hsl(142 85% 35%))' }}>
+               style={{ background: palette.front }}>
             <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-white/10" />
             <div className="absolute -left-8 -bottom-8 w-32 h-32 rounded-full bg-white/5" />
             <div className="relative h-full flex flex-col justify-between">
@@ -113,7 +117,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
 
           {/* BACK */}
           <div ref={backRef} className="absolute inset-0 backface-hidden rotate-y-180 rounded-2xl shadow-xl text-white overflow-hidden"
-               style={{ background: 'linear-gradient(135deg, hsl(220 91% 15%), hsl(142 85% 25%))' }}>
+               style={{ background: palette.back }}>
             <div className="p-2.5 h-full flex flex-col gap-1">
               <div className="text-center">
                 <p className="font-roboto font-bold text-[11px] tracking-wider leading-none">#WalkMyWarmUp</p>
