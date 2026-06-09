@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { toPng } from 'html-to-image';
+import { useSavings } from '@/hooks/useSavings';
+import { getPalette } from '@/lib/cardPalettes';
 
 interface AccountCardProps {
   name: string;
