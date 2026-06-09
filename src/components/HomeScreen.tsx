@@ -3,7 +3,7 @@ import { Mail, Gift, Calendar, Shirt } from 'lucide-react';
 import SheepAvatarScreen from './screens/SheepAvatarScreen';
 import { useSavings } from '@/hooks/useSavings';
 
-const HomeScreen: React.FC = () => {
+const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges }) => {
   const [showAvatar, setShowAvatar] = useState(false);
   const { savings, pledged, woolPoints, treePoints } = useSavings();
 
