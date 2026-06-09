@@ -26,6 +26,9 @@ const AccountCard: React.FC<AccountCardProps> = ({
   const [stampsEarned, setStampsEarned] = useState(2);
   const [scanOpen, setScanOpen] = useState(false);
   const [scanning, setScanning] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const frontRef = useRef<HTMLDivElement>(null);
+  const backRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   const handleSimulateScan = () => {
