@@ -61,11 +61,7 @@ const SimplifiedApp = ({ onBackToLanding, language = 'en' }: SimplifiedAppProps)
       case 'challenges':
         return <ChallengesScreen />;
       case 'calculator':
-        return (
-          <div className="min-h-screen bg-background pb-24">
-            <WasteCalculator />
-          </div>
-        );
+        return <CalculatorScreen />;
       case 'community':
         return <CommunityScreen userPoints={totalPoints} />;
       case 'account':
