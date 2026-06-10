@@ -24,7 +24,8 @@ const Field: React.FC<{
   onChange: (v: string) => void;
   type?: string;
   inputMode?: 'text' | 'numeric' | 'tel' | 'email';
-}> = ({ label, value, placeholder, onChange, type = 'text', inputMode }) => (
+  trailing?: React.ReactNode;
+}> = ({ label, value, placeholder, onChange, type = 'text', inputMode, trailing }) => (
   <div className="w-full bg-[#f5a623] rounded-2xl px-5 py-4 flex items-center gap-3 shadow-md">
     <span className="font-serif font-bold text-black text-lg whitespace-nowrap">{label}:</span>
     <input
@@ -35,6 +36,7 @@ const Field: React.FC<{
       placeholder={placeholder}
       className="flex-1 bg-transparent outline-none font-serif font-bold text-black placeholder:text-black/80 placeholder:font-bold text-base min-w-0"
     />
+    {trailing}
   </div>
 );
 
