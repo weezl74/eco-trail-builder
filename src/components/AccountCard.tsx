@@ -248,64 +248,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
       </Dialog>
 
 
-      <p className="text-center text-xs text-muted-foreground mt-2">Tap card to flip</p>
-
-      {/* Badges */}
-      <div className="mt-6">
-        <div className="flex items-center gap-2 mb-3">
-          <Award className="h-5 w-5 text-foreground" />
-          <h3 className="font-roboto font-bold">Badges</h3>
-        </div>
-        {badges.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No badges yet — start logging actions to earn your first!</p>
-        ) : (
-          <div className="grid grid-cols-3 gap-3">
-            {badges.map((b) => (
-              <div key={b.id} className="bg-secondary rounded-xl p-3 flex flex-col items-center text-center">
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                  {b.icon ?? <Trophy className="h-5 w-5 text-primary" />}
-                </div>
-                <p className="text-xs font-semibold">{b.label}</p>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Rewards */}
-      <div className="mt-6">
-        <div className="flex items-center gap-2 mb-3">
-          <Gift className="h-5 w-5 text-foreground" />
-          <h3 className="font-roboto font-bold">Rewards</h3>
-        </div>
-        {rewards.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Keep earning points to unlock rewards.</p>
-        ) : (
-          <div className="space-y-2">
-            {rewards.map((r) => (
-              <div key={r.id} className="bg-secondary rounded-xl p-3 flex items-center justify-between">
-                <span className="text-sm font-semibold">{r.label}</span>
-                {r.value && <span className="text-xs text-muted-foreground">{r.value}</span>}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Share */}
-      <div className="mt-6">
-        <div className="flex items-center gap-2 mb-3">
-          <Share2 className="h-5 w-5 text-foreground" />
-          <h3 className="font-roboto font-bold">Share your card</h3>
-        </div>
-        <Button onClick={handleShareCard} disabled={sharing} className="w-full gap-2">
-          <Share2 className="h-4 w-4" />
-          {sharing ? 'Preparing image…' : `Share ${flipped ? 'back' : 'front'} of card`}
-        </Button>
-        <p className="text-xs text-muted-foreground mt-2 text-center">
-          Captures the side currently showing. Flip the card first to share the other side.
-        </p>
-      </div>
+      <p className="text-center text-xs text-white/80 mt-2">Tap card to flip</p>
     </div>
   );
 };
