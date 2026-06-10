@@ -367,7 +367,7 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                   </button>
                   <div className="absolute left-1/2 -translate-x-1/2 -top-2 -translate-y-full w-56 bg-black/90 text-white text-[11px] font-serif px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition pointer-events-none shadow-lg z-30">
                     <div className="font-bold mb-1">{p.name}</div>
-                    <div>{info.message}</div>
+                    <div>{p.carbonAction ?? info.message}</div>
                     <div className="mt-1 opacity-80">
                       {isPledged ? '✓ Pledged' : 'Tap to pledge'} · +£{info.delta.money} · {info.delta.co2}kg CO₂e · {info.delta.water}L
                     </div>
