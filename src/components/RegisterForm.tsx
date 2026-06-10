@@ -94,7 +94,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onComplete }) => {
         <Field label="Email" placeholder="Enter your Email"
           value={d.email} onChange={(v) => setD({ ...d, email: v })} type="email" inputMode="email" />
         <Field label="Password" placeholder="Min 6 characters"
-          value={password} onChange={setPassword} type="password" />
+          value={password} onChange={setPassword} type={showPw ? 'text' : 'password'}
+          trailing={
+            <button type="button" onClick={() => setShowPw((s) => !s)} className="text-black" aria-label={showPw ? 'Hide password' : 'Show password'}>
+              {showPw ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+            </button>
+          } />
         <Field label="Address" placeholder="Enter your Address"
           value={d.address} onChange={(v) => setD({ ...d, address: v })} />
         <Field label="Postcode" placeholder="Enter your Postcode"
