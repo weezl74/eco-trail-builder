@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowLeft, Filter, Sun, Wind, Droplet, Thermometer } from 'lucide-react';
 import { useSavings, RenewableType, RENEWABLE_COSTS } from '@/hooks/useSavings';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 type Category = 'libraries' | 'allotments' | 'leisure' | 'ev' | 'eco';
 type Saving = { money: number; co2: number; water: number };
@@ -47,32 +48,28 @@ const CATEGORIES = (Object.keys(CATEGORY_INFO) as Category[]).map((id) => ({
   ...CATEGORY_INFO[id],
 }));
 
-const BBOX = { minLng: -3.45, minLat: 51.50, maxLng: -2.90, maxLat: 51.90 };
+// Map DB `category` strings to our internal Category groups
+const DB_CATEGORY_MAP: Record<string, Category> = {
+  'Library': 'libraries',
+  'Allotment': 'allotments',
+  'Leisure Centre': 'leisure',
+  'EV Charger': 'ev',
+  'Refill Shop': 'eco',
+  'Reuse Shop': 'eco',
+  'Uniform Recycling': 'eco',
+};
 
-const POIS: { name: string; category: Category; lat: number; lng: number }[] = [
-  { name: 'Caerphilly Library', category: 'libraries', lat: 51.5778, lng: -3.2186 },
-  { name: 'Bargoed Library', category: 'libraries', lat: 51.6936, lng: -3.2419 },
-  { name: 'Blackwood Library', category: 'libraries', lat: 51.6700, lng: -3.1950 },
-  { name: 'Risca Library', category: 'libraries', lat: 51.6100, lng: -3.0950 },
-  { name: 'Ystrad Mynach Library', category: 'libraries', lat: 51.6450, lng: -3.2350 },
-  { name: 'Virginia Park Allotments', category: 'allotments', lat: 51.5820, lng: -3.2250 },
-  { name: 'Trecenydd Allotments', category: 'allotments', lat: 51.5860, lng: -3.2400 },
-  { name: 'Pontllanfraith Allotments', category: 'allotments', lat: 51.6650, lng: -3.1700 },
-  { name: 'Bedwas Allotments', category: 'allotments', lat: 51.5900, lng: -3.1900 },
-  { name: 'Caerphilly Leisure Centre', category: 'leisure', lat: 51.5760, lng: -3.2150 },
-  { name: 'Newbridge Leisure Centre', category: 'leisure', lat: 51.6700, lng: -3.1450 },
-  { name: 'Heolddu Leisure Centre', category: 'leisure', lat: 51.6950, lng: -3.2480 },
-  { name: 'Risca Leisure Centre', category: 'leisure', lat: 51.6080, lng: -3.0980 },
-  { name: 'Crossways Car Park EV', category: 'ev', lat: 51.5790, lng: -3.2200 },
-  { name: 'Blackwood EV Hub', category: 'ev', lat: 51.6720, lng: -3.1930 },
-  { name: 'Bargoed EV Point', category: 'ev', lat: 51.6940, lng: -3.2400 },
-  { name: 'Penallta House EV', category: 'ev', lat: 51.6480, lng: -3.2300 },
-  { name: 'Risca EV Point', category: 'ev', lat: 51.6110, lng: -3.0960 },
-  { name: 'The Green Grocer', category: 'eco', lat: 51.5800, lng: -3.2170 },
-  { name: 'Refill Caerphilly', category: 'eco', lat: 51.5775, lng: -3.2195 },
-  { name: 'Eco Café Blackwood', category: 'eco', lat: 51.6705, lng: -3.1960 },
-  { name: 'Zero Waste Bargoed', category: 'eco', lat: 51.6930, lng: -3.2410 },
-];
+// Tightened to actual Caerphilly borough range from the seeded data
+const BBOX = { minLng: -3.30, minLat: 51.55, maxLng: -3.05, maxLat: 51.72 };
+
+type POI = {
+  id: number;
+  name: string;
+  category: Category;
+  lat: number;
+  lng: number;
+  carbonAction: string | null;
+};
 
 const project = (lat: number, lng: number) => {
   const x = ((lng - BBOX.minLng) / (BBOX.maxLng - BBOX.minLng)) * 100;
@@ -80,7 +77,7 @@ const project = (lat: number, lng: number) => {
   return { x, y };
 };
 
-const pinId = (p: { name: string; category: Category }) => `${p.category}:${p.name}`;
+const pinId = (p: { id: number; category: Category }) => `${p.category}:${p.id}`;
 
 type Mode = 'local' | 'cool';
 
@@ -97,7 +94,40 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   );
   const [showFilter, setShowFilter] = useState(false);
   const [placing, setPlacing] = useState<RenewableType | null>(null);
+  const [pois, setPois] = useState<POI[]>([]);
   const { pledged, addPledge, renewables, woolPoints, buyRenewable } = useSavings();
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const { data, error } = await supabase
+        .from('map_locations')
+        .select('id, title, latitude, longitude, category, carbon_action');
+      if (!mounted) return;
+      if (error) {
+        console.error('Failed to load map locations', error);
+        return;
+      }
+      const mapped: POI[] = (data ?? [])
+        .map((r) => {
+          const cat = DB_CATEGORY_MAP[r.category ?? ''];
+          if (!cat || r.latitude == null || r.longitude == null) return null;
+          return {
+            id: r.id,
+            name: r.title,
+            category: cat,
+            lat: Number(r.latitude),
+            lng: Number(r.longitude),
+            carbonAction: r.carbon_action,
+          } as POI;
+        })
+        .filter((p): p is POI => p !== null);
+      setPois(mapped);
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const toggle = (id: Category) =>
     setActive((prev) => {
@@ -106,21 +136,22 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
       return next;
     });
 
-  const visible = POIS.filter((p) => active.has(p.category));
+  const visible = pois.filter((p) => active.has(p.category));
 
-  const handlePledge = (p: { name: string; category: Category }) => {
+  const handlePledge = (p: POI) => {
     const info = CATEGORY_INFO[p.category];
     const id = pinId(p);
     const ok = addPledge(id, info.delta);
     if (ok) {
       toast({
         title: `Pledged: ${p.name}`,
-        description: `${info.message} +£${info.delta.money} · ${info.delta.co2}kg CO₂e · ${info.delta.water}L · +25 wool`,
+        description: `${p.carbonAction ?? info.message} +£${info.delta.money} · ${info.delta.co2}kg CO₂e · ${info.delta.water}L · +25 wool`,
       });
     } else {
       toast({ title: 'Already pledged', description: p.name });
     }
   };
+
 
   // Cooling % from renewables placed
   const cooling = Math.min(95, renewables.length * 6);
