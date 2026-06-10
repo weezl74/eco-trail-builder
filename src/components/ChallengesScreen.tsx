@@ -5,23 +5,24 @@ import ShopLocalScreen from './screens/ShopLocalScreen';
 import SprintsScreen from './screens/SprintsScreen';
 import MegaPledgesScreen from './screens/MegaPledgesScreen';
 import CommunityPledgesScreen from './screens/CommunityPledgesScreen';
+import { useTranslations } from '@/hooks/useTranslations';
 import quizIcon from '@/assets/svg/quiz-icon.svg.asset.json';
 import pledgeIcon from '@/assets/svg/pledge.svg.asset.json';
 import quickWinsIcon from '@/assets/svg/quick-wins.svg.asset.json';
 import communityIcon from '@/assets/svg/community-pledge.svg.asset.json';
 import megaIcon from '@/assets/svg/mega-pledge.svg.asset.json';
 
-const tiles = [
-  { id: 'quizzes', label: 'Quizzes', icon: quizIcon.url },
-  { id: 'pledges', label: 'Pledges', icon: pledgeIcon.url },
-  { id: 'sprints', label: 'Sprints', icon: quickWinsIcon.url },
-  { id: 'shop-local', label: 'Shop Local', icon: null },
-  { id: 'community-pledges', label: 'Community\nPledges', icon: communityIcon.url },
-  { id: 'mega-pledges', label: 'Mega Pledges', icon: megaIcon.url },
-];
-
 const ChallengesScreen: React.FC<{ onSelect?: (id: string) => void; initialView?: string | null }> = ({ initialView = null }) => {
   const [view, setView] = useState<string | null>(initialView);
+  const { t } = useTranslations();
+  const tiles = [
+    { id: 'quizzes', label: t('Quizzes'), icon: quizIcon.url },
+    { id: 'pledges', label: t('Pledges'), icon: pledgeIcon.url },
+    { id: 'sprints', label: t('Sprints'), icon: quickWinsIcon.url },
+    { id: 'shop-local', label: t('Shop Local'), icon: null },
+    { id: 'community-pledges', label: t('Community\nPledges'), icon: communityIcon.url },
+    { id: 'mega-pledges', label: t('Mega Pledges'), icon: megaIcon.url },
+  ];
 
   if (view === 'quizzes') return <QuizzesScreen onBack={() => setView(null)} />;
   if (view === 'pledges') return <PledgesScreen onBack={() => setView(null)} />;

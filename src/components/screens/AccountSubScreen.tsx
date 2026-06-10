@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslations } from '@/hooks/useTranslations';
 
 type Page =
   | 'account-info'
@@ -22,20 +23,23 @@ interface Props {
 
 const Shell: React.FC<{ title: string; onBack: () => void; children: React.ReactNode }> = ({
   title, onBack, children,
-}) => (
-  <div className="min-h-screen bg-[#F4971D] pb-24 px-4 pt-10 font-roboto">
-    <button
-      onClick={onBack}
-      className="flex items-center gap-2 bg-[#1f1f1f] text-white font-bold mb-4 px-4 py-2 rounded-full shadow-lg"
-    >
-      <ArrowLeft className="h-5 w-5" /> Back
-    </button>
-    <h1 className="text-white text-2xl font-bold mb-4">{title}</h1>
-    <div className="bg-white rounded-2xl p-5 shadow-lg space-y-4 text-[#1f1f1f]">
-      {children}
+}) => {
+  const { t } = useTranslations();
+  return (
+    <div className="min-h-screen bg-[#F4971D] pb-24 px-4 pt-10 font-roboto">
+      <button
+        onClick={onBack}
+        className="flex items-center gap-2 bg-[#1f1f1f] text-white font-bold mb-4 px-4 py-2 rounded-full shadow-lg"
+      >
+        <ArrowLeft className="h-5 w-5" /> {t('Back')}
+      </button>
+      <h1 className="text-white text-2xl font-bold mb-4">{title}</h1>
+      <div className="bg-white rounded-2xl p-5 shadow-lg space-y-4 text-[#1f1f1f]">
+        {children}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const AccountInfo: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { user } = useAuth();

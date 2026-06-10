@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff } from 'lucide-react';
+import { useTranslations } from '@/hooks/useTranslations';
+
 
 interface LoginFormProps {
   onSuccess: () => void;
@@ -37,6 +39,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
   const [resetEmail, setResetEmail] = useState('');
   const [resetBusy, setResetBusy] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslations();
 
   const handleLogin = async () => {
     if (!email || !password) return;
@@ -68,11 +71,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
 
   return (
     <div className="min-h-screen w-full bg-black flex flex-col px-4 pt-10 pb-28">
-      <h1 className="text-white font-serif font-bold text-3xl text-center mb-8">Login</h1>
+      <h1 className="text-white font-serif font-bold text-3xl text-center mb-8">{t('Login')}</h1>
       <div className="flex flex-col gap-5">
-        <Field label="Email" placeholder="your@email.com" value={email} onChange={setEmail} type="email" />
+        <Field label={t('Email')} placeholder="your@email.com" value={email} onChange={setEmail} type="email" />
         <Field
-          label="Password"
+          label={t('Password')}
           placeholder="••••••••"
           value={password}
           onChange={setPassword}
@@ -88,17 +91,17 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
           onClick={() => { setResetEmail(email); setForgotOpen(true); }}
           className="self-end text-white/90 underline font-serif text-sm pr-2"
         >
-          Forgot password?
+          {t('Forgot password?')}
         </button>
       </div>
 
       {forgotOpen && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center px-6" onClick={() => setForgotOpen(false)}>
           <div className="w-full max-w-md bg-[#1f1f1f] rounded-2xl p-5 space-y-4" onClick={(e) => e.stopPropagation()}>
-            <h2 className="text-white font-serif font-bold text-xl">Reset your password</h2>
-            <p className="text-white/80 text-sm font-serif">Enter your email and we'll send a reset link.</p>
+            <h2 className="text-white font-serif font-bold text-xl">{t('Reset your password')}</h2>
+            <p className="text-white/80 text-sm font-serif">{t("Enter your email and we'll send a reset link.")}</p>
             <div className="w-full bg-[#f5a623] rounded-2xl px-5 py-4 flex items-center gap-3">
-              <span className="font-serif font-bold text-black text-lg">Email:</span>
+              <span className="font-serif font-bold text-black text-lg">{t('Email')}:</span>
               <input
                 type="email"
                 value={resetEmail}
@@ -112,14 +115,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
                 onClick={() => setForgotOpen(false)}
                 className="flex-1 py-3 rounded-2xl bg-white/10 text-white font-serif font-bold"
               >
-                Cancel
+                {t('Cancel')}
               </button>
               <button
                 disabled={!resetEmail || resetBusy}
                 onClick={handleForgot}
                 className={`flex-1 py-3 rounded-2xl font-serif font-bold ${resetEmail && !resetBusy ? 'bg-[#3a5a8a] text-white' : 'bg-[#3a5a8a]/60 text-white/70'}`}
               >
-                {resetBusy ? 'Sending…' : 'Send link'}
+                {resetBusy ? t('Sending…') : t('Send link')}
               </button>
             </div>
           </div>
@@ -134,7 +137,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
             !loading && email && password ? 'bg-[#3a5a8a] text-white active:scale-[0.98]' : 'bg-[#3a5a8a]/60 text-white/70'
           }`}
         >
-          {loading ? 'Signing in...' : 'Sign In'}
+          {loading ? t('Signing in...') : t('Sign In')}
         </button>
       </div>
     </div>
