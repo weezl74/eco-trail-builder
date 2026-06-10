@@ -79,15 +79,7 @@ const AccountScreen: React.FC<AccountScreenProps> = ({
         />
       </div>
 
-      {/* Quick action buttons (badges / share) */}
-      <div className="flex justify-center gap-12 mb-6">
-        <button className="bg-[#1f1f1f] rounded-2xl w-16 h-16 flex items-center justify-center shadow-lg">
-          <Sparkles className="h-8 w-8 text-white" />
-        </button>
-        <button className="bg-[#1f1f1f] rounded-2xl w-16 h-16 flex items-center justify-center shadow-lg">
-          <Share2 className="h-8 w-8 text-white" />
-        </button>
-      </div>
+      {/* Quick action buttons removed — share now lives on the card itself */}
 
       <Section title="Account">
         <Row label="Edit Carbon Card" onClick={() => setEditingAvatar(true)} />
