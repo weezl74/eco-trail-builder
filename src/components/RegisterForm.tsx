@@ -45,6 +45,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onComplete }) => {
     firstName: '', lastName: '', email: '', address: '', postcode: '', phone: '', age: '',
   });
   const [password, setPassword] = useState('');
+  const [showPw, setShowPw] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
