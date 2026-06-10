@@ -90,14 +90,43 @@ const AccountCard: React.FC<AccountCardProps> = ({
                style={{ background: palette.front }}>
             <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-white/10" />
             <div className="absolute -left-8 -bottom-8 w-32 h-32 rounded-full bg-white/5" />
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); handleShareCard(); }}
+              disabled={sharing}
+              aria-label="Share card"
+              className="absolute top-2 right-2 z-10 h-9 w-9 rounded-full bg-white/20 backdrop-blur flex items-center justify-center active:scale-95 disabled:opacity-60"
+            >
+              <Share2 className="h-4 w-4 text-white" />
+            </button>
             <div className="relative h-full flex flex-col justify-between">
-              <div className="flex justify-between items-start">
+              <div className="flex justify-between items-start pr-10">
                 <div>
                   <p className="text-xs opacity-80 font-roboto">GREEN MEMBER CARD</p>
                   <p className="text-lg font-bold mt-1">{name}</p>
                 </div>
                 <Leaf className="h-7 w-7 opacity-90" />
               </div>
+
+              {badges.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {badges.slice(0, 6).map((b) => (
+                    <div
+                      key={b.id}
+                      title={b.label}
+                      className="h-7 w-7 rounded-full bg-white/25 border border-white/40 flex items-center justify-center"
+                    >
+                      {b.icon ?? <Trophy className="h-3.5 w-3.5 text-white" />}
+                    </div>
+                  ))}
+                  {badges.length > 6 && (
+                    <div className="h-7 px-2 rounded-full bg-white/25 border border-white/40 flex items-center justify-center text-[10px] font-bold">
+                      +{badges.length - 6}
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="flex items-end justify-between">
                 <div>
                   <p className="text-xs opacity-80">POINTS</p>
