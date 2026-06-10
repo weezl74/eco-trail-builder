@@ -279,16 +279,16 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
               </p>
             </div>
             <div className="grid grid-cols-3 gap-2">
-              {(Object.keys(RENEWABLE_META) as RenewableType[]).map((t) => {
-                const meta = RENEWABLE_META[t];
+              {(Object.keys(RENEWABLE_META) as RenewableType[]).map((rt) => {
+                const meta = RENEWABLE_META[rt];
                 const Icon = meta.icon;
-                const cost = RENEWABLE_COSTS[t];
-                const selected = placing === t;
+                const cost = RENEWABLE_COSTS[rt];
+                const selected = placing === rt;
                 const afford = woolPoints >= cost;
                 return (
                   <button
-                    key={t}
-                    onClick={() => setPlacing(selected ? null : t)}
+                    key={rt}
+                    onClick={() => setPlacing(selected ? null : rt)}
                     disabled={!afford}
                     className={`rounded-xl p-2 font-serif text-xs flex flex-col items-center gap-1 border-2 transition ${
                       selected ? 'border-black bg-[#f5a623]' : 'border-transparent bg-gray-100'
