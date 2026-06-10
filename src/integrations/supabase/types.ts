@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      map_locations: {
+        Row: {
+          carbon_action: string | null
+          category: string | null
+          city: string | null
+          country: string | null
+          created_at: string
+          description: string | null
+          id: number
+          latitude: number | null
+          longitude: number | null
+          postcode: string | null
+          street_address: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          carbon_action?: string | null
+          category?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          description?: string | null
+          id: number
+          latitude?: number | null
+          longitude?: number | null
+          postcode?: string | null
+          street_address?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          carbon_action?: string | null
+          category?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          description?: string | null
+          id?: number
+          latitude?: number | null
+          longitude?: number | null
+          postcode?: string | null
+          street_address?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       pledges: {
         Row: {
           category: string | null
@@ -153,6 +201,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      translations: {
+        Row: {
+          created_at: string
+          english_version: string | null
+          id: number
+          language_code: string
+          source_table: string | null
+          translation: string
+          type_id: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          english_version?: string | null
+          id: number
+          language_code: string
+          source_table?: string | null
+          translation: string
+          type_id?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          english_version?: string | null
+          id?: number
+          language_code?: string
+          source_table?: string | null
+          translation?: string
+          type_id?: number | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       tree_requests: {
         Row: {
