@@ -51,32 +51,50 @@ const AccountCard: React.FC<AccountCardProps> = ({
   const shareText = `I've earned ${totalPoints} green points and reduced my footprint to ${currentFootprint.toFixed(1)}t CO₂e on the Caerphilly climate app! 🌱`;
 
   const handleShareCard = async () => {
-    const target = flipped ? backRef.current : frontRef.current;
-    if (!target) return;
     setSharing(true);
+    const nav = navigator as any;
+    const shareUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    const sharePayload = {
+      title: 'My Green Member Card',
+      text: shareText,
+      url: shareUrl,
+    };
+
+    // 1) Try the native share sheet with just text + URL first.
+    //    This is what social apps (WhatsApp, Messenger, X, Instagram DMs, etc.)
+    //    actually accept — sharing a file restricts the sheet to image-only apps.
     try {
-      const dataUrl = await toPng(target, { cacheBust: true, pixelRatio: 2 });
-      const blob = await (await fetch(dataUrl)).blob();
-      const file = new File([blob], 'green-member-card.png', { type: 'image/png' });
-      const nav = navigator as any;
-      if (nav.canShare && nav.canShare({ files: [file] }) && nav.share) {
-        await nav.share({ files: [file], title: 'My Green Member Card', text: shareText });
-      } else {
-        // Fallback: download the image
-        const a = document.createElement('a');
-        a.href = dataUrl;
-        a.download = 'green-member-card.png';
-        a.click();
-        toast({ title: 'Card image saved', description: 'Sharing not supported on this device — image downloaded instead.' });
+      if (nav.share && (!nav.canShare || nav.canShare(sharePayload))) {
+        await nav.share(sharePayload);
+        setSharing(false);
+        return;
       }
     } catch (err: any) {
-      if (err?.name !== 'AbortError') {
-        toast({ title: 'Could not share card', description: err?.message ?? 'Unknown error', variant: 'destructive' });
+      if (err?.name === 'AbortError') {
+        setSharing(false);
+        return;
       }
+      // fall through to clipboard fallback
+    }
+
+    // 2) Clipboard fallback — copy the message + link so they can paste anywhere.
+    try {
+      await navigator.clipboard.writeText(`${shareText} ${shareUrl}`.trim());
+      toast({
+        title: 'Copied to clipboard',
+        description: 'Your card message and link are ready to paste into any app.',
+      });
+    } catch {
+      toast({
+        title: 'Could not share',
+        description: 'Sharing is not supported on this device.',
+        variant: 'destructive',
+      });
     } finally {
       setSharing(false);
     }
   };
+
 
   return (
     <div className="w-full">
