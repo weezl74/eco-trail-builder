@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Mail, Gift, Calendar, Shirt } from 'lucide-react';
 import SheepAvatarScreen from './screens/SheepAvatarScreen';
 import { useSavings } from '@/hooks/useSavings';
+import badHomepageAsset from '@/assets/final-bad-homepage.svg.asset.json';
+
 
 const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges }) => {
   const [showAvatar, setShowAvatar] = useState(false);
@@ -48,6 +50,16 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
         </div>
       </div>
 
+      {/* Illustration */}
+      <div className="mx-4 mt-4 rounded-2xl overflow-hidden bg-[#1f1f1f]">
+        <img
+          src={badHomepageAsset.url}
+          alt="A scene showing the impact of pollution and unsustainable choices"
+          className="w-full h-auto block"
+          loading="lazy"
+        />
+      </div>
+
       {/* CTA */}
       <div className="mx-4 mt-6 flex justify-center">
         <button
@@ -57,6 +69,7 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
           Save Me More
         </button>
       </div>
+
     </div>
   );
 };
