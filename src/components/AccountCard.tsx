@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Award, Leaf, Trophy, Share2, Sparkles, Gift, QrCode, ScanLine, MapPin } from 'lucide-react';
+import { Leaf, Trophy, Share2, QrCode, ScanLine, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
@@ -90,14 +90,43 @@ const AccountCard: React.FC<AccountCardProps> = ({
                style={{ background: palette.front }}>
             <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-white/10" />
             <div className="absolute -left-8 -bottom-8 w-32 h-32 rounded-full bg-white/5" />
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); handleShareCard(); }}
+              disabled={sharing}
+              aria-label="Share card"
+              className="absolute top-2 right-2 z-10 h-9 w-9 rounded-full bg-white/20 backdrop-blur flex items-center justify-center active:scale-95 disabled:opacity-60"
+            >
+              <Share2 className="h-4 w-4 text-white" />
+            </button>
             <div className="relative h-full flex flex-col justify-between">
-              <div className="flex justify-between items-start">
+              <div className="flex justify-between items-start pr-10">
                 <div>
                   <p className="text-xs opacity-80 font-roboto">GREEN MEMBER CARD</p>
                   <p className="text-lg font-bold mt-1">{name}</p>
                 </div>
                 <Leaf className="h-7 w-7 opacity-90" />
               </div>
+
+              {badges.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {badges.slice(0, 6).map((b) => (
+                    <div
+                      key={b.id}
+                      title={b.label}
+                      className="h-7 w-7 rounded-full bg-white/25 border border-white/40 flex items-center justify-center"
+                    >
+                      {b.icon ?? <Trophy className="h-3.5 w-3.5 text-white" />}
+                    </div>
+                  ))}
+                  {badges.length > 6 && (
+                    <div className="h-7 px-2 rounded-full bg-white/25 border border-white/40 flex items-center justify-center text-[10px] font-bold">
+                      +{badges.length - 6}
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="flex items-end justify-between">
                 <div>
                   <p className="text-xs opacity-80">POINTS</p>
@@ -219,64 +248,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
       </Dialog>
 
 
-      <p className="text-center text-xs text-muted-foreground mt-2">Tap card to flip</p>
-
-      {/* Badges */}
-      <div className="mt-6">
-        <div className="flex items-center gap-2 mb-3">
-          <Award className="h-5 w-5 text-foreground" />
-          <h3 className="font-roboto font-bold">Badges</h3>
-        </div>
-        {badges.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No badges yet — start logging actions to earn your first!</p>
-        ) : (
-          <div className="grid grid-cols-3 gap-3">
-            {badges.map((b) => (
-              <div key={b.id} className="bg-secondary rounded-xl p-3 flex flex-col items-center text-center">
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                  {b.icon ?? <Trophy className="h-5 w-5 text-primary" />}
-                </div>
-                <p className="text-xs font-semibold">{b.label}</p>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Rewards */}
-      <div className="mt-6">
-        <div className="flex items-center gap-2 mb-3">
-          <Gift className="h-5 w-5 text-foreground" />
-          <h3 className="font-roboto font-bold">Rewards</h3>
-        </div>
-        {rewards.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Keep earning points to unlock rewards.</p>
-        ) : (
-          <div className="space-y-2">
-            {rewards.map((r) => (
-              <div key={r.id} className="bg-secondary rounded-xl p-3 flex items-center justify-between">
-                <span className="text-sm font-semibold">{r.label}</span>
-                {r.value && <span className="text-xs text-muted-foreground">{r.value}</span>}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Share */}
-      <div className="mt-6">
-        <div className="flex items-center gap-2 mb-3">
-          <Share2 className="h-5 w-5 text-foreground" />
-          <h3 className="font-roboto font-bold">Share your card</h3>
-        </div>
-        <Button onClick={handleShareCard} disabled={sharing} className="w-full gap-2">
-          <Share2 className="h-4 w-4" />
-          {sharing ? 'Preparing image…' : `Share ${flipped ? 'back' : 'front'} of card`}
-        </Button>
-        <p className="text-xs text-muted-foreground mt-2 text-center">
-          Captures the side currently showing. Flip the card first to share the other side.
-        </p>
-      </div>
+      <p className="text-center text-xs text-white/80 mt-2">Tap card to flip</p>
     </div>
   );
 };

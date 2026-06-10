@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface RegisterFormProps {
   onComplete: (details: RegistrationDetails) => void;
@@ -23,7 +24,8 @@ const Field: React.FC<{
   onChange: (v: string) => void;
   type?: string;
   inputMode?: 'text' | 'numeric' | 'tel' | 'email';
-}> = ({ label, value, placeholder, onChange, type = 'text', inputMode }) => (
+  trailing?: React.ReactNode;
+}> = ({ label, value, placeholder, onChange, type = 'text', inputMode, trailing }) => (
   <div className="w-full bg-[#f5a623] rounded-2xl px-5 py-4 flex items-center gap-3 shadow-md">
     <span className="font-serif font-bold text-black text-lg whitespace-nowrap">{label}:</span>
     <input
@@ -34,6 +36,7 @@ const Field: React.FC<{
       placeholder={placeholder}
       className="flex-1 bg-transparent outline-none font-serif font-bold text-black placeholder:text-black/80 placeholder:font-bold text-base min-w-0"
     />
+    {trailing}
   </div>
 );
 
@@ -42,6 +45,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onComplete }) => {
     firstName: '', lastName: '', email: '', address: '', postcode: '', phone: '', age: '',
   });
   const [password, setPassword] = useState('');
+  const [showPw, setShowPw] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -90,7 +94,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onComplete }) => {
         <Field label="Email" placeholder="Enter your Email"
           value={d.email} onChange={(v) => setD({ ...d, email: v })} type="email" inputMode="email" />
         <Field label="Password" placeholder="Min 6 characters"
-          value={password} onChange={setPassword} type="password" />
+          value={password} onChange={setPassword} type={showPw ? 'text' : 'password'}
+          trailing={
+            <button type="button" onClick={() => setShowPw((s) => !s)} className="text-black" aria-label={showPw ? 'Hide password' : 'Show password'}>
+              {showPw ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+            </button>
+          } />
         <Field label="Address" placeholder="Enter your Address"
           value={d.address} onChange={(v) => setD({ ...d, address: v })} />
         <Field label="Postcode" placeholder="Enter your Postcode"
