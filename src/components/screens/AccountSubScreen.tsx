@@ -109,6 +109,7 @@ const ChangePassword: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { toast } = useToast();
   const [pw, setPw] = useState('');
   const [pw2, setPw2] = useState('');
+  const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
 
   const submit = async () => {
@@ -135,11 +136,16 @@ const ChangePassword: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     <Shell title="Change Password" onBack={onBack}>
       <div className="space-y-2">
         <Label>New password</Label>
-        <Input type="password" value={pw} onChange={(e) => setPw(e.target.value)} className="rounded-xl" />
+        <div className="relative">
+          <Input type={show ? 'text' : 'password'} value={pw} onChange={(e) => setPw(e.target.value)} className="rounded-xl pr-10" />
+          <button type="button" onClick={() => setShow((s) => !s)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#1f1f1f]" aria-label={show ? 'Hide password' : 'Show password'}>
+            {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </button>
+        </div>
       </div>
       <div className="space-y-2">
         <Label>Confirm new password</Label>
-        <Input type="password" value={pw2} onChange={(e) => setPw2(e.target.value)} className="rounded-xl" />
+        <Input type={show ? 'text' : 'password'} value={pw2} onChange={(e) => setPw2(e.target.value)} className="rounded-xl" />
       </div>
       <Button
         onClick={submit}
