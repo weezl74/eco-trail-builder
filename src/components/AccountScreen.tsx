@@ -4,6 +4,8 @@ import AccountCard from './AccountCard';
 import SheepAvatarScreen from './screens/SheepAvatarScreen';
 import AccountSubScreen, { Page as SubPage } from './screens/AccountSubScreen';
 import { supabase } from '@/integrations/supabase/client';
+import { useTranslations } from '@/hooks/useTranslations';
+
 
 
 interface AccountScreenProps {
@@ -44,6 +46,7 @@ const AccountScreen: React.FC<AccountScreenProps> = ({
 }) => {
   const [editingAvatar, setEditingAvatar] = useState(false);
   const [subPage, setSubPage] = useState<SubPage | null>(null);
+  const { t } = useTranslations();
 
   const handleLogOut = async () => {
     await supabase.auth.signOut();
@@ -81,24 +84,24 @@ const AccountScreen: React.FC<AccountScreenProps> = ({
 
       {/* Quick action buttons removed — share now lives on the card itself */}
 
-      <Section title="Account">
-        <Row label="Edit Carbon Card" onClick={() => setEditingAvatar(true)} />
-        <Row label="Account Information" onClick={() => setSubPage('account-info')} />
-        <Row label="Privacy Settings" onClick={() => setSubPage('privacy')} />
-        <Row label="Change Password" onClick={() => setSubPage('change-password')} />
+      <Section title={t('Account')}>
+        <Row label={t('Edit Carbon Card')} onClick={() => setEditingAvatar(true)} />
+        <Row label={t('Account Information')} onClick={() => setSubPage('account-info')} />
+        <Row label={t('Privacy Settings')} onClick={() => setSubPage('privacy')} />
+        <Row label={t('Change Password')} onClick={() => setSubPage('change-password')} />
       </Section>
 
-      <Section title="Support">
-        <Row label="About Nurture" onClick={() => setSubPage('about')} />
-        <Row label="Terms and Conditions" onClick={() => setSubPage('terms')} />
-        <Row label="Contact Us" onClick={() => setSubPage('contact')} />
+      <Section title={t('Support')}>
+        <Row label={t('About Nurture')} onClick={() => setSubPage('about')} />
+        <Row label={t('Terms and Conditions')} onClick={() => setSubPage('terms')} />
+        <Row label={t('Contact Us')} onClick={() => setSubPage('contact')} />
       </Section>
 
       <div className="mb-5">
-        <p className="font-serif font-bold text-black text-base mb-2 px-1">Session and Data</p>
+        <p className="font-serif font-bold text-black text-base mb-2 px-1">{t('Session and Data')}</p>
         <div className="bg-[#1f1f1f] rounded-2xl px-5 divide-y divide-white/10">
-          <Row label="Log Out" warn onClick={handleLogOut} />
-          <Row label="Delete Account" danger onClick={handleDelete} />
+          <Row label={t('Log Out')} warn onClick={handleLogOut} />
+          <Row label={t('Delete Account')} danger onClick={handleDelete} />
         </div>
       </div>
     </div>

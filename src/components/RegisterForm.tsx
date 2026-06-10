@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff } from 'lucide-react';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface RegisterFormProps {
   onComplete: (details: RegistrationDetails) => void;
@@ -49,6 +50,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onComplete }) => {
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslations();
 
   const canSubmit =
     agreed && !loading &&
@@ -87,26 +89,26 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onComplete }) => {
   return (
     <div className="min-h-screen w-full bg-black flex flex-col px-4 pt-6 pb-28">
       <div className="flex flex-col gap-4 flex-1">
-        <Field label="First Name" placeholder="Enter your First Name"
+        <Field label={t('First Name')} placeholder={t('Enter your First Name')}
           value={d.firstName} onChange={(v) => setD({ ...d, firstName: v })} />
-        <Field label="Last Name" placeholder="Enter your Last Name"
+        <Field label={t('Last Name')} placeholder={t('Enter your Last Name')}
           value={d.lastName} onChange={(v) => setD({ ...d, lastName: v })} />
-        <Field label="Email" placeholder="Enter your Email"
+        <Field label={t('Email')} placeholder={t('Enter your Email')}
           value={d.email} onChange={(v) => setD({ ...d, email: v })} type="email" inputMode="email" />
-        <Field label="Password" placeholder="Min 6 characters"
+        <Field label={t('Password')} placeholder={t('Min 6 characters')}
           value={password} onChange={setPassword} type={showPw ? 'text' : 'password'}
           trailing={
             <button type="button" onClick={() => setShowPw((s) => !s)} className="text-black" aria-label={showPw ? 'Hide password' : 'Show password'}>
               {showPw ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
             </button>
           } />
-        <Field label="Address" placeholder="Enter your Address"
+        <Field label={t('Address')} placeholder={t('Enter your Address')}
           value={d.address} onChange={(v) => setD({ ...d, address: v })} />
-        <Field label="Postcode" placeholder="Enter your Postcode"
+        <Field label={t('Postcode')} placeholder={t('Enter your Postcode')}
           value={d.postcode} onChange={(v) => setD({ ...d, postcode: v })} />
-        <Field label="Phone Number" placeholder="Enter your Phone Number"
+        <Field label={t('Phone Number')} placeholder={t('Enter your Phone Number')}
           value={d.phone} onChange={(v) => setD({ ...d, phone: v })} type="tel" inputMode="tel" />
-        <Field label="Age" placeholder="Enter your Age"
+        <Field label={t('Age')} placeholder={t('Enter your Age')}
           value={d.age} onChange={(v) => setD({ ...d, age: v })} inputMode="numeric" />
 
         <label className="flex items-start gap-3 pt-2 cursor-pointer select-none">
@@ -151,7 +153,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onComplete }) => {
             canSubmit ? 'bg-[#3a5a8a] text-white active:scale-[0.98]' : 'bg-[#3a5a8a]/60 text-white/70 cursor-not-allowed'
           }`}
         >
-          {loading ? 'Creating account...' : 'Confirm Details'}
+          {loading ? t('Creating account...') : t('Confirm Details')}
         </button>
       </div>
     </div>
