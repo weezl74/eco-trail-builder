@@ -15,19 +15,22 @@ const pickBackground = () => {
   return nightBg.url;
 };
 
+import { useTranslations } from '@/hooks/useTranslations';
+
 const LandingScreen: React.FC<LandingScreenProps> = ({ onBeetleClick }) => {
   const bg = pickBackground();
+  const { t } = useTranslations();
   return (
     <div className="min-h-screen w-full relative overflow-hidden bg-[#3a2418]">
       <img
         src={bg}
-        alt="Welcome - Tap to Start"
+        alt={t('Welcome - Tap to Start')}
         className="absolute inset-0 w-full h-full object-cover object-center select-none pointer-events-none"
         draggable={false}
       />
       <button
         onClick={onBeetleClick}
-        aria-label="Tap to Start"
+        aria-label={t('Tap to Start')}
         className="absolute left-1/2 -translate-x-1/2 bottom-[6%] w-[70%] h-[14%] rounded-2xl focus:outline-none focus:ring-4 focus:ring-white/30 active:scale-95 transition-transform"
       />
     </div>

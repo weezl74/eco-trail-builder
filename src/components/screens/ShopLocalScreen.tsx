@@ -3,6 +3,7 @@ import { ArrowLeft, Filter, Sun, Wind, Droplet, Thermometer } from 'lucide-react
 import { useSavings, RenewableType, RENEWABLE_COSTS } from '@/hooks/useSavings';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useTranslations } from '@/hooks/useTranslations';
 
 type Category = 'libraries' | 'allotments' | 'leisure' | 'ev' | 'eco';
 type Saving = { money: number; co2: number; water: number };
@@ -96,6 +97,7 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const [placing, setPlacing] = useState<RenewableType | null>(null);
   const [pois, setPois] = useState<POI[]>([]);
   const { pledged, addPledge, renewables, woolPoints, buyRenewable } = useSavings();
+  const { t } = useTranslations();
 
   useEffect(() => {
     let mounted = true;
@@ -144,11 +146,11 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
     const ok = addPledge(id, info.delta);
     if (ok) {
       toast({
-        title: `Pledged: ${p.name}`,
-        description: `${p.carbonAction ?? info.message} +£${info.delta.money} · ${info.delta.co2}kg CO₂e · ${info.delta.water}L · +25 wool`,
+        title: `${t('Pledged')}: ${p.name}`,
+        description: `${p.carbonAction ?? info.message} +£${info.delta.money} · ${info.delta.co2}kg CO₂e · ${info.delta.water}L · +25 ${t('wool')}`,
       });
     } else {
-      toast({ title: 'Already pledged', description: p.name });
+      toast({ title: t('Already pledged'), description: p.name });
     }
   };
 
@@ -167,14 +169,14 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
     const ok = buyRenewable(placing, x, y);
     if (ok) {
       toast({
-        title: `${RENEWABLE_META[placing].label} placed`,
-        description: `-${RENEWABLE_COSTS[placing]} wool · borough cooled by another 6%`,
+        title: `${t(RENEWABLE_META[placing].label)} ${t('placed')}`,
+        description: `-${RENEWABLE_COSTS[placing]} ${t('wool')}`,
       });
       setPlacing(null);
     } else {
       toast({
-        title: 'Not enough wool',
-        description: `${RENEWABLE_META[placing].label} costs ${RENEWABLE_COSTS[placing]} wool points.`,
+        title: t('Not enough wool'),
+        description: `${t(RENEWABLE_META[placing].label)} ${RENEWABLE_COSTS[placing]} ${t('wool')}`,
       });
     }
   };
@@ -203,7 +205,7 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
               mode === m ? 'bg-[#f5a623] text-black' : 'text-black/60'
             }`}
           >
-            {m === 'local' ? 'Local Map' : 'Cool the Borough'}
+            {m === 'local' ? t('Local Map') : t('Cool the Borough')}
           </button>
         ))}
       </div>
@@ -214,7 +216,7 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           className="absolute top-3 right-3 z-30 bg-white rounded-2xl px-4 py-2 shadow font-serif font-bold flex items-center gap-2"
         >
           <Filter className="h-4 w-4" />
-          Filter ({active.size})
+          {t('Filter')} ({active.size})
         </button>
       )}
 
@@ -231,7 +233,7 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                 className="w-4 h-4 rounded-full border border-black/20"
                 style={{ background: c.color }}
               />
-              <span className="font-serif text-sm">{c.label}</span>
+              <span className="font-serif text-sm">{t(c.label)}</span>
             </label>
           ))}
         </div>
@@ -242,7 +244,7 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           {CATEGORIES.filter((c) => active.has(c.id)).map((c) => (
             <div key={c.id} className="flex items-center gap-1 text-xs font-serif">
               <span className="w-3 h-3 rounded-full" style={{ background: c.color }} />
-              {c.label}
+              {t(c.label)}
             </div>
           ))}
         </div>
@@ -264,16 +266,16 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
               />
             </div>
             <p className="text-[10px] font-serif font-bold mt-1 text-center leading-tight">
-              {cooling}%<br/>cooler
+              {cooling}%<br/>{t('cooler')}
             </p>
           </div>
 
           {/* Wool + buy bar */}
           <div className="absolute bottom-28 left-3 right-3 z-30 bg-white/95 rounded-2xl shadow p-3">
             <div className="flex items-center justify-between mb-2">
-              <p className="font-serif font-bold text-sm">Wool: {woolPoints}</p>
+              <p className="font-serif font-bold text-sm">{t('Wool:')} {woolPoints}</p>
               <p className="font-serif text-xs opacity-70">
-                {placing ? 'Tap the map to place' : 'Pick a renewable'}
+                {placing ? t('Tap the map to place') : t('Pick a renewable')}
               </p>
             </div>
             <div className="grid grid-cols-3 gap-2">
@@ -293,8 +295,8 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                     } ${!afford ? 'opacity-40' : ''}`}
                   >
                     <Icon className="h-5 w-5" style={{ color: meta.color }} />
-                    <span className="font-bold leading-tight text-center">{meta.label}</span>
-                    <span>{cost} wool</span>
+                    <span className="font-bold leading-tight text-center">{t(meta.label)}</span>
+                    <span>{cost} {t('wool')}</span>
                   </button>
                 );
               })}
@@ -338,7 +340,7 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                 >
                   <button
                     onClick={() => handlePledge(p)}
-                    aria-label={`Pledge: ${p.name}`}
+                    aria-label={`${t('Pledged')}: ${p.name}`}
                     className="block"
                   >
                     <svg width="24" height="32" viewBox="0 0 22 30">
@@ -369,7 +371,7 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                     <div className="font-bold mb-1">{p.name}</div>
                     <div>{p.carbonAction ?? info.message}</div>
                     <div className="mt-1 opacity-80">
-                      {isPledged ? '✓ Pledged' : 'Tap to pledge'} · +£{info.delta.money} · {info.delta.co2}kg CO₂e · {info.delta.water}L
+                      {isPledged ? `✓ ${t('Pledged')}` : t('Tap to pledge')} · +£{info.delta.money} · {info.delta.co2}kg CO₂e · {info.delta.water}L
                     </div>
                   </div>
                 </div>

@@ -10,6 +10,7 @@ import { Heart, Plus, Clock, Zap, Camera, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslations } from "@/hooks/useTranslations";
 
 interface Story {
   id: string;
@@ -52,6 +53,7 @@ export default function CommunityStories() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslations();
 
   useEffect(() => {
     fetchStories();
@@ -240,7 +242,7 @@ export default function CommunityStories() {
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
     
-    if (diffInHours < 1) return "Just now";
+    if (diffInHours < 1) return t("Just now");
     if (diffInHours < 24) return `${diffInHours}h ago`;
     const diffInDays = Math.floor(diffInHours / 24);
     if (diffInDays < 7) return `${diffInDays}d ago`;
@@ -260,11 +262,11 @@ export default function CommunityStories() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Community Stories</CardTitle>
+          <CardTitle>{t('Community Stories')}</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground text-center py-8">
-            Please sign in to view and share community stories.
+            {t('Please sign in to view and share community stories.')}
           </p>
         </CardContent>
       </Card>
@@ -274,7 +276,7 @@ export default function CommunityStories() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Community Stories</CardTitle>
+        <CardTitle>{t('Community Stories')}</CardTitle>
       </CardHeader>
       <CardContent>
         {loading ? (
@@ -348,7 +350,7 @@ export default function CommunityStories() {
                     title={story.user_id === user?.id ? "You can't kudos your own story" : 'Give one kudos'}
                   >
                     <Heart className={`h-4 w-4 ${story.user_has_kudos ? 'fill-current' : ''}`} />
-                    {story.kudos_count} kudos
+                    {story.kudos_count} {t('kudos')}
                   </Button>
                 </div>
               </div>
@@ -357,7 +359,7 @@ export default function CommunityStories() {
             {stories.length === 0 && (
               <div className="text-center py-8 text-muted-foreground">
                 <Heart className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>No stories shared yet. Be the first to share your success!</p>
+                <p>{t('No stories shared yet. Be the first to share your success!')}</p>
               </div>
             )}
           </div>

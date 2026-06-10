@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import CategoryQuestionnaire from '@/components/CategoryQuestionnaire';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslations } from '@/hooks/useTranslations';
 
 type Cat = {
   id: string; // questionnaire id
@@ -73,6 +74,7 @@ const Dial: React.FC<{ value: number; max?: number }> = ({ value, max = 10000 })
 const CalculatorScreen: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslations();
   const [footprint, setFootprint] = useState(0);
   const [scores, setScores] = useState<Record<string, number>>({});
   const [active, setActive] = useState<Cat | null>(null);
@@ -141,8 +143,8 @@ const CalculatorScreen: React.FC = () => {
       .eq('user_id', user.id);
 
     toast({
-      title: pointsAwarded > 0 ? `+${pointsAwarded} points!` : 'Score updated',
-      description: `${active?.label}: ${agg[categoryId] || 0} kg CO₂${wasFirstTime ? ' • Carbon Counter badge earned!' : ''}`,
+      title: pointsAwarded > 0 ? `+${pointsAwarded} ${t('points!')}` : t('Score updated'),
+      description: `${active ? t(active.label) : ''}: ${agg[categoryId] || 0} kg CO₂${wasFirstTime ? ' • ' + t('Carbon Counter badge earned!') : ''}`,
     });
     setActive(null);
   };
@@ -165,7 +167,7 @@ const CalculatorScreen: React.FC = () => {
               onClick={() => setActive(c)}
               className="flex flex-col items-center"
             >
-              <span className="font-serif font-bold text-white text-lg mb-2">{c.label}</span>
+              <span className="font-serif font-bold text-white text-lg mb-2">{t(c.label)}</span>
               <div
                 className="w-full aspect-square rounded-2xl bg-white p-1.5 shadow-md"
               >
@@ -184,7 +186,7 @@ const CalculatorScreen: React.FC = () => {
 
       {active && (
         <CategoryQuestionnaire
-          category={{ id: active.id, title: active.label, description: active.description }}
+          category={{ id: active.id, title: t(active.label), description: t(active.description) }}
           onComplete={handleComplete}
           onClose={() => setActive(null)}
           user={user}

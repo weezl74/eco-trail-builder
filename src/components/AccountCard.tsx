@@ -6,6 +6,8 @@ import { useToast } from '@/hooks/use-toast';
 import { toPng } from 'html-to-image';
 import { useSavings } from '@/hooks/useSavings';
 import { getPalette } from '@/lib/cardPalettes';
+import { useTranslations } from '@/hooks/useTranslations';
+
 
 interface AccountCardProps {
   name: string;
@@ -34,6 +36,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
   const { toast } = useToast();
   const { cardColor } = useSavings();
   const palette = getPalette(cardColor);
+  const { t } = useTranslations();
 
   const handleSimulateScan = () => {
     setScanning(true);
@@ -42,8 +45,8 @@ const AccountCard: React.FC<AccountCardProps> = ({
       setStampsEarned((n) => Math.min(10, n + 1));
       setScanOpen(false);
       toast({
-        title: 'Visit verified! 🎉',
-        description: 'Stamp added to your #WalkMyWarmUp card.',
+        title: t('Visit verified! 🎉'),
+        description: t('Stamp added to your #WalkMyWarmUp card.'),
       });
     }, 1400);
   };
@@ -81,13 +84,13 @@ const AccountCard: React.FC<AccountCardProps> = ({
     try {
       await navigator.clipboard.writeText(`${shareText} ${shareUrl}`.trim());
       toast({
-        title: 'Copied to clipboard',
-        description: 'Your card message and link are ready to paste into any app.',
+        title: t('Copied to clipboard'),
+        description: t('Your card message and link are ready to paste into any app.'),
       });
     } catch {
       toast({
-        title: 'Could not share',
-        description: 'Sharing is not supported on this device.',
+        title: t('Could not share'),
+        description: t('Sharing is not supported on this device.'),
         variant: 'destructive',
       });
     } finally {
@@ -112,7 +115,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
               type="button"
               onClick={(e) => { e.stopPropagation(); handleShareCard(); }}
               disabled={sharing}
-              aria-label="Share card"
+              aria-label={t('Share card')}
               className="absolute top-2 right-2 z-10 h-9 w-9 rounded-full bg-white/20 backdrop-blur flex items-center justify-center active:scale-95 disabled:opacity-60"
             >
               <Share2 className="h-4 w-4 text-white" />
@@ -120,7 +123,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
             <div className="relative h-full flex flex-col justify-between">
               <div className="flex justify-between items-start pr-10">
                 <div>
-                  <p className="text-xs opacity-80 font-roboto">GREEN MEMBER CARD</p>
+                  <p className="text-xs opacity-80 font-roboto">{t('GREEN MEMBER CARD')}</p>
                   <p className="text-lg font-bold mt-1">{name}</p>
                 </div>
                 <Leaf className="h-7 w-7 opacity-90" />
@@ -147,15 +150,15 @@ const AccountCard: React.FC<AccountCardProps> = ({
 
               <div className="flex items-end justify-between">
                 <div>
-                  <p className="text-xs opacity-80">POINTS</p>
+                  <p className="text-xs opacity-80">{t('POINTS')}</p>
                   <p className="text-2xl font-bold tracking-wider">{totalPoints.toLocaleString()}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs opacity-80">FOOTPRINT</p>
+                  <p className="text-xs opacity-80">{t('FOOTPRINT')}</p>
                   <p className="text-lg font-bold">{currentFootprint.toFixed(1)}t</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs opacity-80">MEMBER</p>
+                  <p className="text-xs opacity-80">{t('MEMBER')}</p>
                   <p className="text-sm font-bold">{memberSince}</p>
                 </div>
               </div>
@@ -225,10 +228,10 @@ const AccountCard: React.FC<AccountCardProps> = ({
         <DialogContent className="max-w-sm" onClick={(e) => e.stopPropagation()}>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 font-roboto">
-              <ScanLine className="h-5 w-5 text-[#F4971D]" /> Verify your visit
+              <ScanLine className="h-5 w-5 text-[#F4971D]" /> {t('Verify your visit')}
             </DialogTitle>
             <DialogDescription className="flex items-center gap-1 text-xs">
-              <MapPin className="h-3 w-3" /> Scan the QR code at reception
+              <MapPin className="h-3 w-3" /> {t('Scan the QR code at reception')}
             </DialogDescription>
           </DialogHeader>
 
@@ -250,7 +253,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
               )}
             </div>
             <p className="text-xs text-muted-foreground mt-3 text-center">
-              Point your camera at the QR code at your leisure centre to log this visit.
+              {t('Point your camera at the QR code at your leisure centre to log this visit.')}
             </p>
           </div>
 
@@ -259,14 +262,14 @@ const AccountCard: React.FC<AccountCardProps> = ({
             disabled={scanning}
             className="w-full bg-[#F4971D] hover:bg-[#F4971D]/90 text-white font-roboto rounded-xl"
           >
-            {scanning ? 'Verifying…' : 'Simulate scan (prototype)'}
+            {scanning ? t('Verifying…') : t('Simulate scan (prototype)')}
           </Button>
-          <p className="text-[10px] text-center text-muted-foreground -mt-2">For stakeholder demo only</p>
+          <p className="text-[10px] text-center text-muted-foreground -mt-2">{t('For stakeholder demo only')}</p>
         </DialogContent>
       </Dialog>
 
 
-      <p className="text-center text-xs text-white/80 mt-2">Tap card to flip</p>
+      <p className="text-center text-xs text-white/80 mt-2">{t('Tap card to flip')}</p>
     </div>
   );
 };
