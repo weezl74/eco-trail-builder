@@ -4,6 +4,7 @@ import { useSavings } from '@/hooks/useSavings';
 import { toast } from '@/hooks/use-toast';
 import sheepAsset from '@/assets/sheep-avatar.jpg.asset.json';
 import { CARD_PALETTES, getPalette } from '@/lib/cardPalettes';
+import { useTranslations } from '@/hooks/useTranslations';
 
 type AccessoryId =
   | 'sunglasses'
@@ -97,6 +98,7 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const [openNote, setOpenNote] = useState<AccessoryId | null>(null);
   const { woolPoints, accessories, buyAccessory, cardColor, setCardColor } = useSavings();
   const palette = getPalette(cardColor);
+  const { t } = useTranslations();
 
   const handleBuy = (a: Accessory) => {
     if (accessories.includes(a.id)) {
@@ -105,8 +107,8 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
     }
     const ok = buyAccessory(a.id, a.cost);
     toast({
-      title: ok ? `${a.label} unlocked` : 'Not enough wool',
-      description: ok ? a.carbonNote : `${a.label} costs ${a.cost} wool.`,
+      title: ok ? `${t(a.label)} ${t('unlocked')}` : t('Not enough wool'),
+      description: ok ? a.carbonNote : `${t(a.label)} ${t('costs')} ${a.cost} ${t('wool')}.`,
     });
     if (ok) setOpenNote(a.id);
   };
@@ -117,12 +119,12 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
     <div className="min-h-screen bg-[#F4971D] pb-24 px-4 pt-4 flex flex-col">
       {onBack && (
         <button onClick={onBack} className="text-black flex items-center gap-1 font-serif font-bold mb-2">
-          <ArrowLeft className="h-5 w-5" /> Back
+          <ArrowLeft className="h-5 w-5" /> {t('Back')}
         </button>
       )}
 
       <div className="text-center font-serif font-bold text-black mb-3">
-        Wool Points: {woolPoints}
+        {t('Wool Points')}: {woolPoints}
       </div>
 
       <div className="flex bg-[#1f1f1f] rounded-full p-1 mb-4">
@@ -132,7 +134,7 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
             tab === 'avatar' ? 'bg-white text-black' : 'text-white'
           }`}
         >
-          Avatar
+          {t('Avatar')}
         </button>
         <button
           onClick={() => setTab('card')}
@@ -140,7 +142,7 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
             tab === 'card' ? 'bg-white text-black' : 'text-white'
           }`}
         >
-          Card Colour
+          {t('Card Colour')}
         </button>
       </div>
 
@@ -244,7 +246,7 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
 
           <div className="bg-[#3a3a3a] rounded-2xl p-3">
             <p className="text-white font-serif font-bold text-sm mb-2">
-              Accessories <span className="opacity-60 text-xs">(tap to see climate fact)</span>
+              {t('Accessories')} <span className="opacity-60 text-xs">{t('(tap to see climate fact)')}</span>
             </p>
             <div className="grid grid-cols-3 gap-2">
               {ACCESSORIES.map((a) => {
@@ -260,10 +262,10 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                     }`}
                   >
                     <span className="text-xl leading-none">{a.emoji}</span>
-                    <span className="leading-tight text-center">{a.label}</span>
+                    <span className="leading-tight text-center">{t(a.label)}</span>
                     <span className="flex items-center gap-1 text-[10px]">
                       {!owned && !afford && <Lock className="h-3 w-3" />}
-                      {owned ? '✓ owned' : `${a.cost} wool`}
+                      {owned ? `✓ ${t('owned')}` : `${a.cost} ${t('wool')}`}
                     </span>
                   </button>
                 );
@@ -303,7 +305,7 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           </div>
 
           <div className="bg-[#1f1f1f] rounded-2xl p-4 space-y-3">
-            <p className="text-white font-serif font-bold text-sm">Choose a colour</p>
+            <p className="text-white font-serif font-bold text-sm">{t('Choose a colour')}</p>
             <div className="grid grid-cols-2 gap-2">
               {CARD_PALETTES.map((p) => {
                 const selected = p.id === cardColor;
@@ -317,7 +319,7 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                   >
                     <div className="h-10 w-full rounded-md mb-2" style={{ background: p.front }} />
                     <div className="flex items-center justify-between">
-                      <span className="text-white text-xs font-serif font-bold">{p.label}</span>
+                      <span className="text-white text-xs font-serif font-bold">{t(p.label)}</span>
                       <span className="flex items-center gap-0.5">
                         {[1, 2, 3, 4].map((i) => (
                           <Leaf
@@ -338,7 +340,7 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
               <div className="flex items-center gap-2 mb-1">
                 <Leaf className="h-4 w-4 text-green-300" />
                 <span className="text-green-100 text-xs font-serif font-bold uppercase tracking-wide">
-                  Carbon impact
+                  {t('Carbon impact')}
                 </span>
               </div>
               <p className="text-white/90 text-xs leading-snug">{palette.carbonNote}</p>
@@ -351,7 +353,7 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
         onClick={onBack}
         className="w-full mt-4 bg-[#5a3d1c] text-white font-serif font-bold py-4 rounded-xl"
       >
-        CONFIRM
+        {t('CONFIRM')}
       </button>
     </div>
   );

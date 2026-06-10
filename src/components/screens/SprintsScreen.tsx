@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ArrowLeft, Check } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface SprintTemplate {
   id: string;
@@ -58,12 +59,12 @@ const lerpColor = (a: [number, number, number], b: [number, number, number], t: 
 const CountdownCircle: React.FC<{ sprint: ActiveSprint; now: number; size?: number }> = ({
   sprint, now, size = 96,
 }) => {
+  const { t } = useTranslations();
   const totalMs = sprint.durationDays * 24 * 60 * 60 * 1000;
   const elapsed = Math.min(totalMs, Math.max(0, now - sprint.startedAt));
   const progress = elapsed / totalMs; // 0..1
   const remainingMs = totalMs - elapsed;
 
-  // Red (start) -> Blue (end)
   const red: [number, number, number] = [220, 53, 69];
   const blue: [number, number, number] = [30, 110, 220];
   const color = lerpColor(red, blue, progress);
@@ -76,7 +77,7 @@ const CountdownCircle: React.FC<{ sprint: ActiveSprint; now: number; size?: numb
   const hours = Math.floor((remainingMs % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
   const mins = Math.floor((remainingMs % (60 * 60 * 1000)) / (60 * 1000));
   const label = remainingMs <= 0
-    ? 'Done!'
+    ? t('Done!')
     : days > 0 ? `${days}d ${hours}h` : hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
 
   return (
@@ -109,9 +110,11 @@ const CountdownCircle: React.FC<{ sprint: ActiveSprint; now: number; size?: numb
 const SprintsScreen: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslations();
   const { sprints, persist } = useSprints(user?.id || null);
   const [now, setNow] = useState(Date.now());
   const [pickingFor, setPickingFor] = useState<SprintTemplate | null>(null);
+
 
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 1000 * 30);
@@ -132,8 +135,8 @@ const SprintsScreen: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     persist([newSprint, ...sprints]);
     setPickingFor(null);
     toast({
-      title: 'Sprint started!',
-      description: `${template.title} • ${durationDays} day${durationDays > 1 ? 's' : ''}. Earn ${POINTS_PER_DAY * durationDays} points when you finish.`,
+      title: t('Sprint started!'),
+      description: `${t(template.title)} • ${durationDays} ${durationDays > 1 ? t('days') : t('day')}.`,
     });
   };
 
@@ -144,20 +147,18 @@ const SprintsScreen: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   return (
     <div className="min-h-screen bg-[#F4971D] pb-24 px-4 pt-6 font-roboto">
       <button onClick={onBack} className="flex items-center gap-2 text-white font-bold mb-4">
-        <ArrowLeft className="h-5 w-5" /> Back
+        <ArrowLeft className="h-5 w-5" /> {t('Back')}
       </button>
 
-      <h1 className="text-white text-3xl font-bold mb-1">Sprints</h1>
+      <h1 className="text-white text-3xl font-bold mb-1">{t('Sprints')}</h1>
       <p className="text-white/90 text-sm mb-5">
-        Short bursts of low-carbon living. Pick one, set the length, and watch the
-        countdown turn from red to blue as you go.
+        {t('Short bursts of low-carbon living. Pick one, set the length, and watch the countdown turn from red to blue as you go.')}
       </p>
 
-      {/* Active sprints */}
-      <h2 className="text-white text-xl font-bold mb-3">Active sprints</h2>
+      <h2 className="text-white text-xl font-bold mb-3">{t('Active sprints')}</h2>
       {active.length === 0 ? (
         <div className="bg-white/95 rounded-2xl p-4 mb-6 text-[#1f1f1f] text-sm">
-          No sprints running yet — activate one below to start your countdown.
+          {t('No sprints running yet — activate one below to start your countdown.')}
         </div>
       ) : (
         <div className="space-y-3 mb-6">
@@ -165,26 +166,25 @@ const SprintsScreen: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             <div key={s.id} className="bg-white rounded-2xl p-4 shadow-md flex items-center gap-4">
               <CountdownCircle sprint={s} now={now} />
               <div className="flex-1">
-                <p className="font-bold text-[#1f1f1f] text-lg leading-tight">{s.title}</p>
+                <p className="font-bold text-[#1f1f1f] text-lg leading-tight">{t(s.title)}</p>
                 <p className="text-xs text-[#1f1f1f]/70 mt-1">
-                  {s.durationDays} day sprint • {POINTS_PER_DAY * s.durationDays} pts on completion
+                  {s.durationDays} {s.durationDays > 1 ? t('days') : t('day')} • {POINTS_PER_DAY * s.durationDays} pts
                 </p>
               </div>
               <button
                 onClick={() => remove(s.id)}
                 className="text-xs text-[#1f1f1f]/60 underline"
               >
-                Stop
+                {t('Stop')}
               </button>
             </div>
           ))}
         </div>
       )}
 
-      {/* Completed */}
       {completed.length > 0 && (
         <>
-          <h2 className="text-white text-xl font-bold mb-3">Completed</h2>
+          <h2 className="text-white text-xl font-bold mb-3">{t('Completed')}</h2>
           <div className="space-y-2 mb-6">
             {completed.map((s) => (
               <div key={s.id} className="bg-white/95 rounded-2xl p-3 flex items-center gap-3">
@@ -192,11 +192,11 @@ const SprintsScreen: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                   <Check className="h-5 w-5 text-white" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-bold text-[#1f1f1f] text-sm">{s.title}</p>
-                  <p className="text-[10px] text-[#1f1f1f]/60">{s.durationDays} day sprint</p>
+                  <p className="font-bold text-[#1f1f1f] text-sm">{t(s.title)}</p>
+                  <p className="text-[10px] text-[#1f1f1f]/60">{s.durationDays} {s.durationDays > 1 ? t('days') : t('day')}</p>
                 </div>
                 <button onClick={() => remove(s.id)} className="text-xs text-[#1f1f1f]/60 underline">
-                  Clear
+                  {t('Clear')}
                 </button>
               </div>
             ))}
@@ -204,31 +204,31 @@ const SprintsScreen: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         </>
       )}
 
-      {/* Available */}
-      <h2 className="text-white text-xl font-bold mb-3">Available sprints</h2>
+      <h2 className="text-white text-xl font-bold mb-3">{t('Available sprints')}</h2>
       <div className="space-y-3">
-        {TEMPLATES.map((t) => {
-          const isActive = active.some((s) => s.templateId === t.id);
+        {TEMPLATES.map((tmpl) => {
+          const isActive = active.some((s) => s.templateId === tmpl.id);
           return (
             <button
-              key={t.id}
+              key={tmpl.id}
               disabled={isActive}
-              onClick={() => setPickingFor(t)}
+              onClick={() => setPickingFor(tmpl)}
               className={`w-full text-left bg-white rounded-2xl p-4 shadow-md transition active:scale-[0.99] ${
                 isActive ? 'opacity-60' : ''
               }`}
             >
               <div className="flex items-center justify-between mb-1">
-                <p className="font-bold text-[#1f1f1f] text-lg">{t.title}</p>
+                <p className="font-bold text-[#1f1f1f] text-lg">{t(tmpl.title)}</p>
                 <span className="text-xs text-[#F4971D] font-bold">
-                  {isActive ? 'Running' : t.durations.join(' / ') + ' days'}
+                  {isActive ? t('Running') : tmpl.durations.join(' / ') + ' ' + t('days')}
                 </span>
               </div>
-              <p className="text-xs text-[#1f1f1f]/70">{t.description}</p>
+              <p className="text-xs text-[#1f1f1f]/70">{t(tmpl.description)}</p>
             </button>
           );
         })}
       </div>
+
 
       {/* Duration picker modal */}
       {pickingFor && (
@@ -240,8 +240,8 @@ const SprintsScreen: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             className="bg-white rounded-2xl p-5 w-full max-w-sm shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="font-bold text-[#1f1f1f] text-lg mb-1">{pickingFor.title}</p>
-            <p className="text-sm text-[#1f1f1f]/70 mb-4">Choose a sprint length</p>
+            <p className="font-bold text-[#1f1f1f] text-lg mb-1">{t(pickingFor.title)}</p>
+            <p className="text-sm text-[#1f1f1f]/70 mb-4">{t('Choose a sprint length')}</p>
             <div className="grid grid-cols-3 gap-2">
               {([1, 3, 7] as const).map((d) => {
                 const available = pickingFor.durations.includes(d);
@@ -254,7 +254,7 @@ const SprintsScreen: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                       available ? 'bg-[#F4971D] hover:opacity-90' : 'bg-gray-300 cursor-not-allowed'
                     }`}
                   >
-                    {d} day{d > 1 ? 's' : ''}
+                    {d} {d > 1 ? t('days') : t('day')}
                   </button>
                 );
               })}
@@ -263,7 +263,7 @@ const SprintsScreen: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               onClick={() => setPickingFor(null)}
               className="w-full mt-4 text-sm text-[#1f1f1f]/60"
             >
-              Cancel
+              {t('Cancel')}
             </button>
           </div>
         </div>
