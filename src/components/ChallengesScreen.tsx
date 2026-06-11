@@ -58,7 +58,7 @@ const ChallengesScreen: React.FC<{ onSelect?: (id: string) => void; initialView?
         >
           <img src={walkWarmupIcon} alt="" className="h-16 w-16 object-contain shrink-0" draggable={false} />
           <span className="text-white font-serif font-bold text-xl text-center leading-tight">
-            {t('Join #WalkMyWarmUp')}
+            {t('#WalkMyWarmUp')}
           </span>
         </button>
       </div>
