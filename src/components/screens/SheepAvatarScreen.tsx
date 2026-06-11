@@ -3,8 +3,14 @@ import { ArrowLeft, Lock, Leaf } from 'lucide-react';
 import { useSavings } from '@/hooks/useSavings';
 import { toast } from '@/hooks/use-toast';
 import sheepAsset from '@/assets/sheep-avatar.jpg.asset.json';
+import sheepBody from '@/assets/sheep/SheepBody.svg.asset.json';
+import nelsonHead from '@/assets/sheep/NelsonHead.svg.asset.json';
+import barbHead from '@/assets/sheep/BarbHead.svg.asset.json';
+import raincoatNelson from '@/assets/sheep/RaincoatNelson.svg.asset.json';
+import flyingUmbrella from '@/assets/sheep/FlyingUmbrellaNelson.svg.asset.json';
 import { CARD_PALETTES, getPalette } from '@/lib/cardPalettes';
 import { useTranslations } from '@/hooks/useTranslations';
+import { playGoodBaa } from '@/lib/sounds';
 
 type AccessoryId =
   | 'sunglasses'
