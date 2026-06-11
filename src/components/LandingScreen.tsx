@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import normalBg from '@/assets/svg/landing-normal.jpg.asset.json';
 import wetBg from '@/assets/svg/landing-wet.jpg.asset.json';
 import { useTranslations } from '@/hooks/useTranslations';
@@ -7,12 +7,62 @@ interface LandingScreenProps {
   onBeetleClick?: () => void;
 }
 
-const pickWet = () => Math.random() < 0.5;
+// Open-Meteo WMO weather codes considered "wet"
+// 51-67 drizzle/rain, 71-77 snow, 80-86 showers, 95-99 thunderstorm
+const isWetCode = (code: number) =>
+  (code >= 51 && code <= 67) ||
+  (code >= 71 && code <= 77) ||
+  (code >= 80 && code <= 86) ||
+  (code >= 95 && code <= 99);
+
+const fetchIsWet = async (lat: number, lon: number): Promise<boolean> => {
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=weather_code,precipitation`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('weather fetch failed');
+  const json = await res.json();
+  const code = json?.current?.weather_code;
+  const precip = json?.current?.precipitation ?? 0;
+  if (typeof code === 'number' && isWetCode(code)) return true;
+  return precip > 0.1;
+};
+
+const getLocation = (): Promise<{ lat: number; lon: number }> =>
+  new Promise((resolve, reject) => {
+    if (!('geolocation' in navigator)) return reject(new Error('no geo'));
+    navigator.geolocation.getCurrentPosition(
+      (pos) => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
+      (err) => reject(err),
+      { timeout: 6000, maximumAge: 10 * 60 * 1000 }
+    );
+  });
 
 const LandingScreen: React.FC<LandingScreenProps> = ({ onBeetleClick }) => {
-  const [isWet] = useState(pickWet);
-  const bg = isWet ? wetBg.url : normalBg.url;
+  // Default to Caerphilly, Wales as a sensible fallback for this resident app
+  const [isWet, setIsWet] = useState<boolean>(false);
   const { t } = useTranslations();
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        let coords: { lat: number; lon: number };
+        try {
+          coords = await getLocation();
+        } catch {
+          coords = { lat: 51.578, lon: -3.218 }; // Caerphilly fallback
+        }
+        const wet = await fetchIsWet(coords.lat, coords.lon);
+        if (alive) setIsWet(wet);
+      } catch (e) {
+        console.warn('Landing weather lookup failed', e);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const bg = isWet ? wetBg.url : normalBg.url;
 
   return (
     <button
