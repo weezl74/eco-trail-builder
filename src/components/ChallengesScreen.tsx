@@ -24,7 +24,6 @@ const ChallengesScreen: React.FC<{ onSelect?: (id: string) => void; initialView?
     { id: 'shop-local', label: t('Shop Local'), icon: null },
     { id: 'community-pledges', label: t('Community\nPledges'), icon: communityIcon.url },
     { id: 'mega-pledges', label: t('Mega Pledges'), icon: megaIcon.url },
-    { id: 'walk-warmup', label: t('Join\n#WalkMyWarmUp'), icon: walkWarmupIcon },
   ];
 
   if (view === 'quizzes') return <QuizzesScreen onBack={() => setView(null)} />;
