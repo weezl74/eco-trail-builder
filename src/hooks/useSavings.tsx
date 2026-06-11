@@ -127,6 +127,11 @@ export const useSavings = () => {
     write({ ...s, cardColor: color });
   }, []);
 
+  const setWoolColor = useCallback((color: string) => {
+    const s = read();
+    write({ ...s, woolColor: color });
+  }, []);
+
   return {
     ...state,
     addPledge,
@@ -134,5 +139,6 @@ export const useSavings = () => {
     buyAccessory,
     plantTree,
     setCardColor,
+    setWoolColor,
   };
 };
