@@ -291,6 +291,29 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
             </div>
           </div>
 
+          <div className="bg-[#3a3a3a] rounded-2xl p-3 mb-3">
+            <p className="text-white font-serif font-bold text-sm mb-2">{t('Wool colour')}</p>
+            <div className="grid grid-cols-8 gap-2">
+              {WOOL_COLOURS.map((c) => {
+                const selected = c.value.toLowerCase() === woolColor.toLowerCase();
+                return (
+                  <button
+                    key={c.id}
+                    onClick={() => setWoolColor(c.value)}
+                    aria-label={c.label}
+                    title={c.label}
+                    className={`aspect-square rounded-full border-2 transition ${
+                      selected ? 'border-[#F4971D] scale-110' : 'border-white/30'
+                    }`}
+                    style={{ background: c.value }}
+                  />
+                );
+              })}
+            </div>
+          </div>
+
+
+
           <div className="bg-[#3a3a3a] rounded-2xl p-3">
             <p className="text-white font-serif font-bold text-sm mb-2">
               {t('Accessories')} <span className="opacity-60 text-xs">{t('(tap to see climate fact)')}</span>
