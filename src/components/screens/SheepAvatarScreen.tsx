@@ -102,6 +102,13 @@ type Tab = 'avatar' | 'card';
 const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const [tab, setTab] = useState<Tab>('avatar');
   const [openNote, setOpenNote] = useState<AccessoryId | null>(null);
+  const [head, setHead] = useState<'nelson' | 'barb'>(() => {
+    try { return (localStorage.getItem('sheepHead') as 'nelson' | 'barb') || 'nelson'; } catch { return 'nelson'; }
+  });
+  const pickHead = (h: 'nelson' | 'barb') => {
+    setHead(h);
+    try { localStorage.setItem('sheepHead', h); } catch { /* ignore */ }
+  };
   const { woolPoints, accessories, buyAccessory, cardColor, setCardColor } = useSavings();
   const palette = getPalette(cardColor);
   const { t } = useTranslations();
@@ -112,6 +119,7 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
       return;
     }
     const ok = buyAccessory(a.id, a.cost);
+    if (ok) playGoodBaa();
     toast({
       title: ok ? `${t(a.label)} ${t('unlocked')}` : t('Not enough wool'),
       description: ok ? a.carbonNote : `${t(a.label)} ${t('costs')} ${a.cost} ${t('wool')}.`,
@@ -156,21 +164,44 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
         <>
           <div className="flex items-center justify-center mb-3">
             <div className="relative w-64 h-64">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <button
+              onClick={() => pickHead('nelson')}
+              className={`px-3 py-1 rounded-full text-xs font-serif font-bold ${head === 'nelson' ? 'bg-black text-[#F4971D]' : 'bg-white/70 text-black'}`}
+            >Nelson</button>
+            <button
+              onClick={() => pickHead('barb')}
+              className={`px-3 py-1 rounded-full text-xs font-serif font-bold ${head === 'barb' ? 'bg-black text-[#F4971D]' : 'bg-white/70 text-black'}`}
+            >Barb</button>
+          </div>
+          <div className="flex items-center justify-center mb-3">
+            <div className="relative w-64 h-64">
+              {/* Sheep body — tinted via currentColor */}
               <img
-                src={sheepAsset.url}
-                alt="Your sheep avatar"
-                className="w-full h-full object-contain select-none"
+                src={sheepBody.url}
+                alt="Sheep body"
+                style={{ color: palette.front as string }}
+                className="absolute inset-0 w-full h-full object-contain select-none"
+                draggable={false}
+              />
+              {/* Head — sized & positioned over the body */}
+              <img
+                src={head === 'nelson' ? nelsonHead.url : barbHead.url}
+                alt={head === 'nelson' ? 'Nelson head' : 'Barb head'}
+                className="absolute select-none pointer-events-none"
+                style={{ left: '50%', top: '-6%', width: '52%', transform: 'translateX(-50%)' }}
                 draggable={false}
               />
 
               {/* Umbrella — floats above the sheep */}
               {has('umbrella') && (
-                <div
-                  className="absolute pointer-events-none text-5xl text-center"
-                  style={{ left: '50%', top: '-8%', transform: 'translateX(-50%)' }}
-                >
-                  ☂️
-                </div>
+                <img
+                  src={flyingUmbrella.url}
+                  alt=""
+                  className="absolute pointer-events-none select-none"
+                  style={{ left: '50%', top: '-22%', width: '55%', transform: 'translateX(-50%)' }}
+                  draggable={false}
+                />
               )}
 
               {/* Top hat */}
