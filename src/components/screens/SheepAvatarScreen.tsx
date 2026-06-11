@@ -109,9 +109,20 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
     setHead(h);
     try { localStorage.setItem('sheepHead', h); } catch { /* ignore */ }
   };
-  const { woolPoints, accessories, buyAccessory, cardColor, setCardColor } = useSavings();
+  const { woolPoints, accessories, buyAccessory, cardColor, setCardColor, woolColor, setWoolColor } = useSavings();
   const palette = getPalette(cardColor);
   const { t } = useTranslations();
+
+  const WOOL_COLOURS: { id: string; label: string; value: string }[] = [
+    { id: 'beige', label: 'Beige', value: '#e8d9b8' },
+    { id: 'cream', label: 'Cream', value: '#f5ead0' },
+    { id: 'white', label: 'White', value: '#f7f5f0' },
+    { id: 'grey', label: 'Grey', value: '#9aa0a6' },
+    { id: 'charcoal', label: 'Charcoal', value: '#3f3f46' },
+    { id: 'caramel', label: 'Caramel', value: '#b07a3a' },
+    { id: 'rose', label: 'Rose', value: '#e6a4a4' },
+    { id: 'mint', label: 'Mint', value: '#a8d8b9' },
+  ];
 
   const handleBuy = (a: Accessory) => {
     if (accessories.includes(a.id)) {
@@ -178,7 +189,7 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
               <img
                 src={sheepBody.url}
                 alt="Sheep body"
-                style={{ color: palette.front as string }}
+                style={{ color: woolColor }}
                 className="absolute inset-0 w-full h-full object-contain select-none"
                 draggable={false}
               />
@@ -279,6 +290,29 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
               )}
             </div>
           </div>
+
+          <div className="bg-[#3a3a3a] rounded-2xl p-3 mb-3">
+            <p className="text-white font-serif font-bold text-sm mb-2">{t('Wool colour')}</p>
+            <div className="grid grid-cols-8 gap-2">
+              {WOOL_COLOURS.map((c) => {
+                const selected = c.value.toLowerCase() === woolColor.toLowerCase();
+                return (
+                  <button
+                    key={c.id}
+                    onClick={() => setWoolColor(c.value)}
+                    aria-label={c.label}
+                    title={c.label}
+                    className={`aspect-square rounded-full border-2 transition ${
+                      selected ? 'border-[#F4971D] scale-110' : 'border-white/30'
+                    }`}
+                    style={{ background: c.value }}
+                  />
+                );
+              })}
+            </div>
+          </div>
+
+
 
           <div className="bg-[#3a3a3a] rounded-2xl p-3">
             <p className="text-white font-serif font-bold text-sm mb-2">

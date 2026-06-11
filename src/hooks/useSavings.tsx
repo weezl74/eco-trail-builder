@@ -13,6 +13,7 @@ type State = {
   renewables: Renewable[];
   accessories: string[];
   cardColor: string;
+  woolColor: string;
 };
 
 const KEY = 'eco_state_v2';
@@ -27,6 +28,7 @@ const DEFAULT: State = {
   renewables: [],
   accessories: [],
   cardColor: 'midnight',
+  woolColor: '#e8d9b8',
 };
 
 const RESET_KEY = 'eco_accessories_reset_v1';
@@ -125,6 +127,11 @@ export const useSavings = () => {
     write({ ...s, cardColor: color });
   }, []);
 
+  const setWoolColor = useCallback((color: string) => {
+    const s = read();
+    write({ ...s, woolColor: color });
+  }, []);
+
   return {
     ...state,
     addPledge,
@@ -132,5 +139,6 @@ export const useSavings = () => {
     buyAccessory,
     plantTree,
     setCardColor,
+    setWoolColor,
   };
 };

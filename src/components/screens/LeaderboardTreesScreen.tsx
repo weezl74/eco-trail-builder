@@ -95,10 +95,10 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
       </p>
 
       <div className="bg-[#1f1f1f] rounded-2xl mt-3 overflow-hidden">
-        <div className="grid grid-cols-3 text-white font-serif font-bold text-center py-3 border-b border-white/20">
+        <div className="grid grid-cols-3 text-white font-serif font-bold text-center py-3 border-b border-white/20 text-[11px] sm:text-xs uppercase tracking-wide px-2 gap-1">
           <span>{t('POSITION')}</span>
           <span>{t('USER')}</span>
-          <span>{heading}</span>
+          <span className="whitespace-nowrap">{heading}</span>
         </div>
         {board.map((r, i) => (
           <div
