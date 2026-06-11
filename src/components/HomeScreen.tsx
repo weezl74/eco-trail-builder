@@ -7,6 +7,9 @@ import NelsonMessagesScreen from './screens/NelsonMessagesScreen';
 import { useSavings } from '@/hooks/useSavings';
 import { useTranslations } from '@/hooks/useTranslations';
 import badHomepageAsset from '@/assets/final-bad-homepage.svg.asset.json';
+import sheepBody from '@/assets/sheep/SheepBody.svg.asset.json';
+import nelsonHead from '@/assets/sheep/NelsonHead.svg.asset.json';
+import { getPalette } from '@/lib/cardPalettes';
 
 type Screen = 'home' | 'avatar' | 'calendar' | 'rewards' | 'messages';
 
