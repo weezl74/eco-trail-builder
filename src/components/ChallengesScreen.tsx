@@ -41,16 +41,25 @@ const ChallengesScreen: React.FC<{ onSelect?: (id: string) => void; initialView?
           <button
             key={t.id}
             onClick={() => setView(t.id)}
-            className="bg-[#1f1f1f] rounded-2xl aspect-square flex flex-col items-center justify-center gap-2 p-4 shadow-lg active:scale-95 transition"
+            className="bg-[#1f1f1f] rounded-2xl aspect-square flex flex-col items-center justify-center gap-2 p-3 shadow-lg active:scale-95 transition"
           >
             {t.icon && (
               <img src={t.icon} alt="" className="h-16 w-16 object-contain" draggable={false} />
             )}
-            <span className="text-white font-serif font-bold text-xl text-center whitespace-pre-line leading-tight">
+            <span className="text-white font-serif font-bold text-lg text-center whitespace-pre-line leading-tight px-1">
               {t.label}
             </span>
           </button>
         ))}
+        <button
+          onClick={() => setView('walk-warmup')}
+          className="col-span-2 bg-[#1f1f1f] rounded-2xl flex items-center justify-center gap-4 p-5 shadow-lg active:scale-95 transition"
+        >
+          <img src={walkWarmupIcon} alt="" className="h-16 w-16 object-contain shrink-0" draggable={false} />
+          <span className="text-white font-serif font-bold text-xl text-center leading-tight">
+            {t('Join #WalkMyWarmUp')}
+          </span>
+        </button>
       </div>
     </div>
   );
