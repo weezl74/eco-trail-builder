@@ -78,7 +78,7 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
           <img
             src={sheepBody.url}
             alt=""
-            style={{ color: palette.front as string }}
+            style={{ color: woolColor }}
             className="absolute inset-0 w-full h-full object-contain drop-shadow-lg"
             draggable={false}
           />
