@@ -162,8 +162,6 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
 
       {tab === 'avatar' && (
         <>
-          <div className="flex items-center justify-center mb-3">
-            <div className="relative w-64 h-64">
           <div className="flex items-center justify-center gap-2 mb-2">
             <button
               onClick={() => pickHead('nelson')}
