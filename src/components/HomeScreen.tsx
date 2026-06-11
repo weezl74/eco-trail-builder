@@ -76,7 +76,7 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
           loading="lazy"
         />
         {/* Nelson overlay — bottom left, ~25% width */}
-        <div className="absolute bottom-2 left-2 w-1/4 aspect-square pointer-events-none">
+        <div className="absolute bottom-2 left-2 w-1/2 aspect-square pointer-events-none">
           <img
             src={sheepBody.url}
             alt=""
@@ -88,7 +88,7 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
             src={nelsonHead.url}
             alt="Nelson the sheep"
             className="absolute"
-            style={{ left: '50%', top: '-12%', width: '60%', transform: 'translateX(-50%)' }}
+            style={{ left: '50%', top: '-14%', width: '70%', transform: 'translateX(-50%)' }}
             draggable={false}
           />
         </div>
