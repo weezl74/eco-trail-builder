@@ -189,7 +189,7 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
               <img
                 src={sheepBody.url}
                 alt="Sheep body"
-                style={{ color: palette.front as string }}
+                style={{ color: woolColor }}
                 className="absolute inset-0 w-full h-full object-contain select-none"
                 draggable={false}
               />
