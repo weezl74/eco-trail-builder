@@ -109,9 +109,20 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
     setHead(h);
     try { localStorage.setItem('sheepHead', h); } catch { /* ignore */ }
   };
-  const { woolPoints, accessories, buyAccessory, cardColor, setCardColor } = useSavings();
+  const { woolPoints, accessories, buyAccessory, cardColor, setCardColor, woolColor, setWoolColor } = useSavings();
   const palette = getPalette(cardColor);
   const { t } = useTranslations();
+
+  const WOOL_COLOURS: { id: string; label: string; value: string }[] = [
+    { id: 'beige', label: 'Beige', value: '#e8d9b8' },
+    { id: 'cream', label: 'Cream', value: '#f5ead0' },
+    { id: 'white', label: 'White', value: '#f7f5f0' },
+    { id: 'grey', label: 'Grey', value: '#9aa0a6' },
+    { id: 'charcoal', label: 'Charcoal', value: '#3f3f46' },
+    { id: 'caramel', label: 'Caramel', value: '#b07a3a' },
+    { id: 'rose', label: 'Rose', value: '#e6a4a4' },
+    { id: 'mint', label: 'Mint', value: '#a8d8b9' },
+  ];
 
   const handleBuy = (a: Accessory) => {
     if (accessories.includes(a.id)) {
