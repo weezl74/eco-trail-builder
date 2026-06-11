@@ -25,56 +25,56 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
   return (
     <div className="min-h-screen bg-black pb-24 flex flex-col">
       {/* Pill of icons */}
-      <div className="pt-10 flex justify-center">
-        <div className="bg-[#f5a623] rounded-full px-6 py-3 flex items-center gap-6 shadow-lg">
+      <div className="pt-4 flex justify-center">
+        <div className="bg-[#f5a623] rounded-full px-5 py-2 flex items-center gap-5 shadow-lg">
           <button onClick={() => setScreen('messages')} aria-label="Messages from Nelson">
-            <Mail className="h-7 w-7 text-white" strokeWidth={2.5} />
+            <Mail className="h-6 w-6 text-white" strokeWidth={2.5} />
           </button>
           <button onClick={() => setScreen('rewards')} aria-label="Your rewards">
-            <Gift className="h-7 w-7 text-white" strokeWidth={2.5} />
+            <Gift className="h-6 w-6 text-white" strokeWidth={2.5} />
           </button>
           <button onClick={() => setScreen('calendar')} aria-label="Events and achievements">
-            <Calendar className="h-7 w-7 text-white" strokeWidth={2.5} />
+            <Calendar className="h-6 w-6 text-white" strokeWidth={2.5} />
           </button>
           <button onClick={() => setScreen('avatar')} aria-label="Customise sheep">
-            <Shirt className="h-7 w-7 text-white" strokeWidth={2.5} />
+            <Shirt className="h-6 w-6 text-white" strokeWidth={2.5} />
           </button>
         </div>
       </div>
 
       {/* Points balances */}
-      <div className="mx-4 mt-4 grid grid-cols-2 gap-3">
-        <div className="bg-[#f5a623] rounded-2xl p-4 text-center text-black font-serif font-bold">
-          <div className="text-3xl">{woolPoints}</div>
-          <div className="text-xs uppercase tracking-wide">{t('Wool Points')}</div>
+      <div className="mx-4 mt-3 grid grid-cols-2 gap-3">
+        <div className="bg-[#f5a623] rounded-2xl py-2 px-3 text-center text-black font-serif font-bold">
+          <div className="text-2xl leading-tight">{woolPoints}</div>
+          <div className="text-[10px] uppercase tracking-wide">{t('Wool Points')}</div>
         </div>
-        <div className="bg-green-700 rounded-2xl p-4 text-center text-white font-serif font-bold">
-          <div className="text-3xl">{treePoints}</div>
-          <div className="text-xs uppercase tracking-wide">{t('Tree Points')}</div>
+        <div className="bg-green-700 rounded-2xl py-2 px-3 text-center text-white font-serif font-bold">
+          <div className="text-2xl leading-tight">{treePoints}</div>
+          <div className="text-[10px] uppercase tracking-wide">{t('Tree Points')}</div>
         </div>
       </div>
 
       {/* Estimated savings card */}
-      <div className="mx-4 mt-4 bg-[#1f1f1f] rounded-2xl p-5 text-white">
-        <h2 className="font-serif font-bold text-xl text-center mb-3">{t('Estimated Savings')}</h2>
-        <div className="space-y-2 font-serif font-bold">
-          <p className="flex items-center gap-2"><span className="text-yellow-400 text-xl">£</span> {t('Money')}: £{savings.money}</p>
-          <p className="flex items-center gap-2"><span className="text-red-400 text-sm font-mono">CO₂e</span> CO₂e: {savings.co2} kg</p>
-          <p className="flex items-center gap-2"><span className="text-blue-400 text-xl">💧</span> {t('Water')}: {savings.water}L</p>
-          <p className="flex items-center gap-2 text-[#f5a623]"><span className="text-xl">✓</span> {t('Pledges made')}: {pledged.length}</p>
+      <div className="mx-4 mt-3 bg-[#1f1f1f] rounded-2xl p-3 text-white">
+        <h2 className="font-serif font-bold text-base text-center mb-1.5">{t('Estimated Savings')}</h2>
+        <div className="space-y-1 font-serif font-bold text-sm">
+          <p className="flex items-center gap-2"><span className="text-yellow-400 text-lg">£</span> {t('Money')}: £{savings.money}</p>
+          <p className="flex items-center gap-2"><span className="text-red-400 text-xs font-mono">CO₂e</span> CO₂e: {savings.co2} kg</p>
+          <p className="flex items-center gap-2"><span className="text-blue-400 text-lg">💧</span> {t('Water')}: {savings.water}L</p>
+          <p className="flex items-center gap-2 text-[#f5a623]"><span className="text-lg">✓</span> {t('Pledges made')}: {pledged.length}</p>
         </div>
       </div>
 
       {/* Illustration */}
-      <div className="mx-4 mt-4 rounded-2xl overflow-hidden bg-[#1f1f1f] relative">
+      <div className="mx-4 mt-3 rounded-2xl overflow-hidden bg-[#1f1f1f] relative flex-1 min-h-0">
         <img
           src={badHomepageAsset.url}
           alt="A scene showing the impact of pollution and unsustainable choices"
-          className="w-full h-auto block"
+          className="w-full h-full object-cover block"
           loading="lazy"
         />
-        {/* Nelson overlay — bottom left, ~25% width */}
-        <div className="absolute bottom-2 left-2 w-1/2 aspect-square pointer-events-none">
+        {/* Nelson overlay — bottom left */}
+        <div className="absolute bottom-2 left-2 w-2/5 aspect-square pointer-events-none">
           <img
             src={sheepBody.url}
             alt=""
@@ -93,10 +93,10 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
       </div>
 
       {/* CTA */}
-      <div className="mx-4 mt-6 flex justify-center">
+      <div className="mx-4 mt-3 flex justify-center">
         <button
           onClick={onGoToPledges}
-          className="bg-[#f5a623] hover:bg-[#e69517] active:scale-95 transition text-black font-serif font-bold text-lg rounded-2xl px-8 py-4 shadow-lg w-full max-w-sm"
+          className="bg-[#f5a623] hover:bg-[#e69517] active:scale-95 transition text-black font-serif font-bold text-base rounded-2xl px-8 py-3 shadow-lg w-full max-w-sm"
         >
           {t('Save Me More')}
         </button>
