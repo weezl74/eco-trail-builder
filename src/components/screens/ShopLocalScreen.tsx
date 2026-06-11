@@ -414,6 +414,14 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           </div>
         )}
       </div>
+
+      <WalkMyWarmUpJourney
+        open={walkOpen}
+        onOpenChange={setWalkOpen}
+        onEarned={() => {
+          toast({ title: t('Stamp earned!'), description: '#WalkMyWarmUp' });
+        }}
+      />
     </div>
   );
 };
