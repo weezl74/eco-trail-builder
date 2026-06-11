@@ -26,15 +26,8 @@ const fetchIsWet = async (lat: number, lon: number): Promise<boolean> => {
   return precip > 0.1;
 };
 
-const getLocation = (): Promise<{ lat: number; lon: number }> =>
-  new Promise((resolve, reject) => {
-    if (!('geolocation' in navigator)) return reject(new Error('no geo'));
-    navigator.geolocation.getCurrentPosition(
-      (pos) => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
-      (err) => reject(err),
-      { timeout: 6000, maximumAge: 10 * 60 * 1000 }
-    );
-  });
+
+
 
 const LandingScreen: React.FC<LandingScreenProps> = ({ onBeetleClick }) => {
   // Ty Penallta, Ystrad Mynach — fixed location, no geolocation prompt
