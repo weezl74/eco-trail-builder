@@ -123,13 +123,17 @@ const AccountCard: React.FC<AccountCardProps> = ({
                     <div
                       key={b.id}
                       title={b.label}
-                      className="h-7 w-7 rounded-full bg-white/25 border border-white/40 flex items-center justify-center"
+                      className="h-7 w-7 rounded-full flex items-center justify-center"
+                      style={{ background: 'color-mix(in srgb, currentColor 25%, transparent)', border: '1px solid color-mix(in srgb, currentColor 40%, transparent)' }}
                     >
-                      {b.icon ?? <Trophy className="h-3.5 w-3.5 text-white" />}
+                      {b.icon ?? <Trophy className="h-3.5 w-3.5" />}
                     </div>
                   ))}
                   {badges.length > 6 && (
-                    <div className="h-7 px-2 rounded-full bg-white/25 border border-white/40 flex items-center justify-center text-[10px] font-bold">
+                    <div
+                      className="h-7 px-2 rounded-full flex items-center justify-center text-[10px] font-bold"
+                      style={{ background: 'color-mix(in srgb, currentColor 25%, transparent)', border: '1px solid color-mix(in srgb, currentColor 40%, transparent)' }}
+                    >
                       +{badges.length - 6}
                     </div>
                   )}
