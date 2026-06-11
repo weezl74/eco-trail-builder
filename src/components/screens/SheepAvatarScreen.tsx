@@ -364,11 +364,11 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
         <>
           <div className="mb-4" style={{ aspectRatio: '1.586 / 1' }}>
             <div
-              className="w-full h-full rounded-2xl p-5 shadow-xl text-white relative overflow-hidden"
-              style={{ background: palette.front }}
+              className="w-full h-full rounded-2xl p-5 shadow-xl relative overflow-hidden"
+              style={{ background: palette.front, color: palette.text }}
             >
-              <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-white/10" />
-              <div className="absolute -left-8 -bottom-8 w-32 h-32 rounded-full bg-white/5" />
+              <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full" style={{ background: 'currentColor', opacity: 0.1 }} />
+              <div className="absolute -left-8 -bottom-8 w-32 h-32 rounded-full" style={{ background: 'currentColor', opacity: 0.05 }} />
               <p className="text-xs opacity-80 font-roboto">GREEN MEMBER CARD</p>
               <p className="text-lg font-bold mt-1">Preview</p>
             </div>
