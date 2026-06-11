@@ -47,8 +47,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
+      playBadBaa();
       toast({ title: 'Login failed', description: error.message, variant: 'destructive' });
     } else {
+      playGoodBaa();
       onSuccess();
     }
   };
