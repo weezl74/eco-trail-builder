@@ -9,15 +9,13 @@ import { useTranslations } from '@/hooks/useTranslations';
 import badHomepageAsset from '@/assets/final-bad-homepage.svg.asset.json';
 import sheepBody from '@/assets/sheep/SheepBody.svg.asset.json';
 import nelsonHead from '@/assets/sheep/NelsonHead.svg.asset.json';
-import { getPalette } from '@/lib/cardPalettes';
 
 type Screen = 'home' | 'avatar' | 'calendar' | 'rewards' | 'messages';
 
 const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges }) => {
   const [screen, setScreen] = useState<Screen>('home');
-  const { savings, pledged, woolPoints, treePoints, cardColor } = useSavings();
+  const { savings, pledged, woolPoints, treePoints, woolColor } = useSavings();
   const { t } = useTranslations();
-  const palette = getPalette(cardColor);
 
   if (screen === 'avatar') return <SheepAvatarScreen onBack={() => setScreen('home')} />;
   if (screen === 'calendar') return <EventsCalendarScreen onBack={() => setScreen('home')} />;
