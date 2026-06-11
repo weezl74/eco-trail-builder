@@ -76,7 +76,7 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
           loading="lazy"
         />
         {/* Nelson overlay — bottom left, ~25% width */}
-        <div className="absolute bottom-2 left-2 w-1/4 aspect-square pointer-events-none">
+        <div className="absolute bottom-2 left-2 w-1/2 aspect-square pointer-events-none">
           <img
             src={sheepBody.url}
             alt=""
