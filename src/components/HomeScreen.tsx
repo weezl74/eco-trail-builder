@@ -1,29 +1,40 @@
 import React, { useState } from 'react';
 import { Mail, Gift, Calendar, Shirt } from 'lucide-react';
 import SheepAvatarScreen from './screens/SheepAvatarScreen';
+import EventsCalendarScreen from './screens/EventsCalendarScreen';
+import RewardsScreen from './screens/RewardsScreen';
+import NelsonMessagesScreen from './screens/NelsonMessagesScreen';
 import { useSavings } from '@/hooks/useSavings';
 import { useTranslations } from '@/hooks/useTranslations';
 import badHomepageAsset from '@/assets/final-bad-homepage.svg.asset.json';
 
+type Screen = 'home' | 'avatar' | 'calendar' | 'rewards' | 'messages';
 
 const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges }) => {
-  const [showAvatar, setShowAvatar] = useState(false);
+  const [screen, setScreen] = useState<Screen>('home');
   const { savings, pledged, woolPoints, treePoints } = useSavings();
   const { t } = useTranslations();
 
-  if (showAvatar) {
-    return <SheepAvatarScreen onBack={() => setShowAvatar(false)} />;
-  }
+  if (screen === 'avatar') return <SheepAvatarScreen onBack={() => setScreen('home')} />;
+  if (screen === 'calendar') return <EventsCalendarScreen onBack={() => setScreen('home')} />;
+  if (screen === 'rewards') return <RewardsScreen onBack={() => setScreen('home')} />;
+  if (screen === 'messages') return <NelsonMessagesScreen onBack={() => setScreen('home')} />;
 
   return (
     <div className="min-h-screen bg-black pb-24 flex flex-col">
       {/* Pill of icons */}
       <div className="pt-10 flex justify-center">
         <div className="bg-[#f5a623] rounded-full px-6 py-3 flex items-center gap-6 shadow-lg">
-          <Mail className="h-7 w-7 text-white" strokeWidth={2.5} />
-          <Gift className="h-7 w-7 text-white" strokeWidth={2.5} />
-          <Calendar className="h-7 w-7 text-white" strokeWidth={2.5} />
-          <button onClick={() => setShowAvatar(true)} aria-label="Customise sheep">
+          <button onClick={() => setScreen('messages')} aria-label="Messages from Nelson">
+            <Mail className="h-7 w-7 text-white" strokeWidth={2.5} />
+          </button>
+          <button onClick={() => setScreen('rewards')} aria-label="Your rewards">
+            <Gift className="h-7 w-7 text-white" strokeWidth={2.5} />
+          </button>
+          <button onClick={() => setScreen('calendar')} aria-label="Events and achievements">
+            <Calendar className="h-7 w-7 text-white" strokeWidth={2.5} />
+          </button>
+          <button onClick={() => setScreen('avatar')} aria-label="Customise sheep">
             <Shirt className="h-7 w-7 text-white" strokeWidth={2.5} />
           </button>
         </div>
