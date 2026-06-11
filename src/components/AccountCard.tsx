@@ -94,18 +94,19 @@ const AccountCard: React.FC<AccountCardProps> = ({
           onClick={() => setFlipped(!flipped)}
         >
           {/* FRONT */}
-          <div ref={frontRef} className="absolute inset-0 backface-hidden rounded-2xl p-5 shadow-xl text-white overflow-hidden"
-               style={{ background: palette.front }}>
-            <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-white/10" />
-            <div className="absolute -left-8 -bottom-8 w-32 h-32 rounded-full bg-white/5" />
+          <div ref={frontRef} className="absolute inset-0 backface-hidden rounded-2xl p-5 shadow-xl overflow-hidden"
+               style={{ background: palette.front, color: palette.text }}>
+            <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full" style={{ background: 'currentColor', opacity: 0.1 }} />
+            <div className="absolute -left-8 -bottom-8 w-32 h-32 rounded-full" style={{ background: 'currentColor', opacity: 0.05 }} />
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); handleShareCard(); }}
               disabled={sharing}
               aria-label={t('Share card')}
-              className="absolute top-2 right-2 z-10 h-9 w-9 rounded-full bg-white/20 backdrop-blur flex items-center justify-center active:scale-95 disabled:opacity-60"
+              className="absolute top-2 right-2 z-10 h-9 w-9 rounded-full backdrop-blur flex items-center justify-center active:scale-95 disabled:opacity-60"
+              style={{ background: 'color-mix(in srgb, currentColor 20%, transparent)' }}
             >
-              <Share2 className="h-4 w-4 text-white" />
+              <Share2 className="h-4 w-4" />
             </button>
             <div className="relative h-full flex flex-col justify-between">
               <div className="flex justify-between items-start pr-10">
