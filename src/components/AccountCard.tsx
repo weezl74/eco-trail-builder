@@ -1,12 +1,11 @@
 import React, { useRef, useState } from 'react';
-import { Leaf, Trophy, Share2, QrCode, ScanLine, MapPin } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Leaf, Trophy, Share2, Footprints } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { toPng } from 'html-to-image';
 import { useSavings } from '@/hooks/useSavings';
 import { getPalette } from '@/lib/cardPalettes';
 import { useTranslations } from '@/hooks/useTranslations';
+import WalkMyWarmUpJourney from './WalkMyWarmUpJourney';
 
 
 interface AccountCardProps {
@@ -29,7 +28,6 @@ const AccountCard: React.FC<AccountCardProps> = ({
   const [flipped, setFlipped] = useState(false);
   const [stampsEarned, setStampsEarned] = useState(2);
   const [scanOpen, setScanOpen] = useState(false);
-  const [scanning, setScanning] = useState(false);
   const [sharing, setSharing] = useState(false);
   const frontRef = useRef<HTMLDivElement>(null);
   const backRef = useRef<HTMLDivElement>(null);
@@ -38,18 +36,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
   const palette = getPalette(cardColor);
   const { t } = useTranslations();
 
-  const handleSimulateScan = () => {
-    setScanning(true);
-    setTimeout(() => {
-      setScanning(false);
-      setStampsEarned((n) => Math.min(10, n + 1));
-      setScanOpen(false);
-      toast({
-        title: t('Visit verified! 🎉'),
-        description: t('Stamp added to your #WalkMyWarmUp card.'),
-      });
-    }, 1400);
-  };
+  const earnStamp = () => setStampsEarned((n) => Math.min(10, n + 1));
 
   const shareText = `I've earned ${totalPoints} green points and reduced my footprint to ${currentFootprint.toFixed(1)}t CO₂e on the Caerphilly climate app! 🌱`;
 
@@ -191,7 +178,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
                       }}
                       disabled={!isNext}
                       className={`relative rounded-full border-2 flex items-center justify-center aspect-square transition ${
-                        stamped
+                      stamped
                           ? 'border-[#f4971d] bg-[#f4971d]/30'
                           : isReward
                           ? 'border-dashed border-yellow-300/80 bg-yellow-300/10'
@@ -209,7 +196,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
                           FREE<br />SWIM
                         </span>
                       ) : isNext ? (
-                        <QrCode className="h-3 w-3 text-white" />
+                        <Footprints className="h-3 w-3 text-white" />
                       ) : (
                         <span className="text-[8px] opacity-50">{i + 1}</span>
                       )}
@@ -218,56 +205,13 @@ const AccountCard: React.FC<AccountCardProps> = ({
                 })}
               </div>
 
-              <p className="text-center text-[8px] opacity-70 leading-none">Tap the glowing stamp to scan at the leisure centre</p>
+              <p className="text-center text-[8px] opacity-70 leading-none">Tap the glowing stamp to log a walk, cycle or bus trip</p>
             </div>
           </div>
         </div>
       </div>
 
-      <Dialog open={scanOpen} onOpenChange={setScanOpen}>
-        <DialogContent className="max-w-sm" onClick={(e) => e.stopPropagation()}>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 font-roboto">
-              <ScanLine className="h-5 w-5 text-[#F4971D]" /> {t('Verify your visit')}
-            </DialogTitle>
-            <DialogDescription className="flex items-center gap-1 text-xs">
-              <MapPin className="h-3 w-3" /> {t('Scan the QR code at reception')}
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="rounded-2xl bg-[#F4971D]/10 border-2 border-[#F4971D]/30 p-6 flex flex-col items-center">
-            <div className="relative w-48 h-48 bg-white rounded-xl p-3 shadow-inner">
-              <div
-                className="w-full h-full"
-                style={{
-                  backgroundImage:
-                    'linear-gradient(45deg, #000 25%, transparent 25%), linear-gradient(-45deg, #000 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #000 75%), linear-gradient(-45deg, transparent 75%, #000 75%)',
-                  backgroundSize: '14px 14px',
-                  backgroundPosition: '0 0, 0 7px, 7px -7px, -7px 0px',
-                }}
-              />
-              {scanning && (
-                <div className="absolute inset-3 overflow-hidden rounded">
-                  <div className="absolute left-0 right-0 h-1 bg-[#F4971D] shadow-[0_0_12px_2px_#F4971D] animate-[scan_1.4s_ease-in-out]" style={{ top: '50%' }} />
-                </div>
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground mt-3 text-center">
-              {t('Point your camera at the QR code at your leisure centre to log this visit.')}
-            </p>
-          </div>
-
-          <Button
-            onClick={handleSimulateScan}
-            disabled={scanning}
-            className="w-full bg-[#F4971D] hover:bg-[#F4971D]/90 text-white font-roboto rounded-xl"
-          >
-            {scanning ? t('Verifying…') : t('Simulate scan (prototype)')}
-          </Button>
-          <p className="text-[10px] text-center text-muted-foreground -mt-2">{t('For stakeholder demo only')}</p>
-        </DialogContent>
-      </Dialog>
-
+      <WalkMyWarmUpJourney open={scanOpen} onOpenChange={setScanOpen} onEarned={earnStamp} />
 
       <p className="text-center text-xs text-white/80 mt-2">{t('Tap card to flip')}</p>
     </div>
