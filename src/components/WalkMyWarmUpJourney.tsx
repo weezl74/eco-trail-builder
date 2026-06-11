@@ -34,6 +34,8 @@ const WalkMyWarmUpJourney: React.FC<Props> = ({ open, onOpenChange, onEarned }) 
       setElapsed(0);
       setIntensity(0);
       setVerdict(null);
+      setBusStage('scanning');
+      setManualRef('');
       accelSamples.current = [];
       if (tickRef.current) window.clearInterval(tickRef.current);
       if (accelHandler.current) window.removeEventListener('devicemotion', accelHandler.current);
