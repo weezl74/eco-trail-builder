@@ -37,7 +37,8 @@ const getLocation = (): Promise<{ lat: number; lon: number }> =>
   });
 
 const LandingScreen: React.FC<LandingScreenProps> = ({ onBeetleClick }) => {
-  // Default to Caerphilly, Wales as a sensible fallback for this resident app
+  // Ty Penallta, Ystrad Mynach — fixed location, no geolocation prompt
+  const TY_PENALLTA = { lat: 51.6438, lon: -3.2384 };
   const [isWet, setIsWet] = useState<boolean>(false);
   const { t } = useTranslations();
 
@@ -45,13 +46,7 @@ const LandingScreen: React.FC<LandingScreenProps> = ({ onBeetleClick }) => {
     let alive = true;
     (async () => {
       try {
-        let coords: { lat: number; lon: number };
-        try {
-          coords = await getLocation();
-        } catch {
-          coords = { lat: 51.578, lon: -3.218 }; // Caerphilly fallback
-        }
-        const wet = await fetchIsWet(coords.lat, coords.lon);
+        const wet = await fetchIsWet(TY_PENALLTA.lat, TY_PENALLTA.lon);
         if (alive) setIsWet(wet);
       } catch (e) {
         console.warn('Landing weather lookup failed', e);
@@ -61,6 +56,7 @@ const LandingScreen: React.FC<LandingScreenProps> = ({ onBeetleClick }) => {
       alive = false;
     };
   }, []);
+
 
   const bg = isWet ? wetBg.url : normalBg.url;
 
