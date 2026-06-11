@@ -13,6 +13,7 @@ import quickWinsIcon from '@/assets/svg/quick-wins.svg.asset.json';
 import communityIcon from '@/assets/svg/community-pledge.svg.asset.json';
 import megaIcon from '@/assets/svg/mega-pledge.svg.asset.json';
 import walkWarmupIcon from '@/assets/svg/walk-warmup.png';
+import actLocalIcon from '@/assets/svg/act-local.svg.asset.json';
 
 const ChallengesScreen: React.FC<{ onSelect?: (id: string) => void; initialView?: string | null }> = ({ initialView = null }) => {
   const [view, setView] = useState<string | null>(initialView);
