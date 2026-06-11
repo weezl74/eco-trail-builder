@@ -197,27 +197,96 @@ const WalkMyWarmUpJourney: React.FC<Props> = ({ open, onOpenChange, onEarned }) 
           </div>
         )}
 
-        {mode === 'bus' && (
+        {mode === 'bus' && busStage === 'scanning' && (
           <div className="space-y-3">
-            <div className="rounded-2xl bg-[#F4971D]/10 border-2 border-[#F4971D]/30 p-4 flex flex-col items-center">
-              <div className="w-48 h-32 bg-white rounded-xl p-3 shadow-inner flex items-center justify-center">
+            <div className="relative rounded-2xl overflow-hidden bg-[#1f1f1f] aspect-[4/3]">
+              {/* simulated camera feed */}
+              <div className="absolute inset-0 bg-gradient-to-br from-[#2a2a2a] via-[#1f1f1f] to-[#0f0f0f]" />
+              {/* simulated ticket in frame */}
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-28 bg-[#fdf6e3] rounded-md shadow-2xl p-2 rotate-[-4deg]">
+                <div className="text-[8px] font-bold text-[#1f1f1f]/80">STAGECOACH · CAERPHILLY</div>
+                <div className="text-[7px] text-[#1f1f1f]/60">Day Rider · Adult</div>
                 <div
-                  className="w-full h-full"
+                  className="mt-1 h-8 w-full"
                   style={{
                     backgroundImage:
-                      'repeating-linear-gradient(90deg, #000 0 3px, transparent 3px 6px), repeating-linear-gradient(0deg, #000 0 2px, transparent 2px 5px)',
+                      'repeating-linear-gradient(90deg, #000 0 2px, transparent 2px 4px)',
                   }}
                 />
+                <div className="text-[7px] text-[#1f1f1f]/60 mt-0.5">REF 8842-AC · 11 Jun</div>
               </div>
-              <p className="text-xs text-muted-foreground mt-3 text-center">
-                {t('Point your camera at the barcode on your bus ticket.')}
-              </p>
+              {/* viewfinder corners */}
+              <div className="absolute inset-6 pointer-events-none">
+                <div className="absolute top-0 left-0 w-6 h-6 border-t-4 border-l-4 border-[#F4971D] rounded-tl" />
+                <div className="absolute top-0 right-0 w-6 h-6 border-t-4 border-r-4 border-[#F4971D] rounded-tr" />
+                <div className="absolute bottom-0 left-0 w-6 h-6 border-b-4 border-l-4 border-[#F4971D] rounded-bl" />
+                <div className="absolute bottom-0 right-0 w-6 h-6 border-b-4 border-r-4 border-[#F4971D] rounded-br" />
+              </div>
+              {/* animated scan line */}
+              <div
+                className="absolute left-6 right-6 h-0.5 bg-[#F4971D] shadow-[0_0_12px_2px_rgba(244,151,29,0.8)]"
+                style={{ animation: 'scanline 1.6s ease-in-out infinite' }}
+              />
+              <style>{`@keyframes scanline { 0%,100% { top: 16%; } 50% { top: 80%; } }`}</style>
+              <div className="absolute bottom-2 left-0 right-0 text-center text-[10px] text-white/70">
+                {t('Hold steady — aligning barcode…')}
+              </div>
+            </div>
+            <Button onClick={() => setBusStage('detected')} className="w-full bg-[#F4971D] hover:bg-[#F4971D]/90 text-white rounded-xl">
+              <ScanLine className="h-4 w-4 mr-1" /> {t('Capture ticket')}
+            </Button>
+            <div className="flex gap-2">
+              <Button onClick={() => setBusStage('manual')} variant="outline" className="flex-1 rounded-xl text-xs">
+                {t('Enter ref manually')}
+              </Button>
+              <Button onClick={() => setMode('choose')} variant="ghost" className="flex-1 rounded-xl text-xs">
+                {t('Back')}
+              </Button>
+            </div>
+            <p className="text-[10px] text-center text-muted-foreground">{t('Prototype: real build uses on-device barcode/QR detection')}</p>
+          </div>
+        )}
+
+        {mode === 'bus' && busStage === 'detected' && (
+          <div className="space-y-3">
+            <div className="rounded-2xl border-2 border-green-300 bg-green-50 p-4">
+              <div className="flex items-center gap-2 text-green-700 font-bold text-sm">
+                <ScanLine className="h-4 w-4" /> {t('Ticket detected')}
+              </div>
+              <div className="mt-3 text-xs space-y-1 text-[#1f1f1f]/80">
+                <div className="flex justify-between"><span className="opacity-60">{t('Operator')}</span><span className="font-semibold">Stagecoach</span></div>
+                <div className="flex justify-between"><span className="opacity-60">{t('Type')}</span><span className="font-semibold">{t('Day Rider')}</span></div>
+                <div className="flex justify-between"><span className="opacity-60">{t('Reference')}</span><span className="font-mono">8842-AC</span></div>
+                <div className="flex justify-between"><span className="opacity-60">{t('Valid')}</span><span className="font-semibold">{t('Today')}</span></div>
+              </div>
             </div>
             <Button onClick={confirmBus} className="w-full bg-[#F4971D] hover:bg-[#F4971D]/90 text-white rounded-xl">
-              <ScanLine className="h-4 w-4 mr-1" /> {t('Simulate ticket scan (prototype)')}
+              {t('Claim stamp')}
             </Button>
-            <Button onClick={() => setMode('choose')} variant="ghost" className="w-full rounded-xl">
-              {t('Back')}
+            <Button onClick={() => setBusStage('scanning')} variant="ghost" className="w-full rounded-xl">
+              {t('Rescan')}
+            </Button>
+          </div>
+        )}
+
+        {mode === 'bus' && busStage === 'manual' && (
+          <div className="space-y-3">
+            <label className="text-xs font-bold text-[#1f1f1f]/80">{t('Ticket reference')}</label>
+            <input
+              value={manualRef}
+              onChange={(e) => setManualRef(e.target.value.toUpperCase())}
+              placeholder="e.g. 8842-AC"
+              className="w-full rounded-xl border-2 border-[#1f1f1f]/15 px-3 py-2 font-mono text-sm focus:border-[#F4971D] outline-none"
+            />
+            <Button
+              onClick={confirmBus}
+              disabled={manualRef.trim().length < 4}
+              className="w-full bg-[#F4971D] hover:bg-[#F4971D]/90 text-white rounded-xl disabled:opacity-50"
+            >
+              {t('Submit ticket')}
+            </Button>
+            <Button onClick={() => setBusStage('scanning')} variant="ghost" className="w-full rounded-xl">
+              {t('Back to scanner')}
             </Button>
           </div>
         )}
