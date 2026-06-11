@@ -9,6 +9,7 @@ const topics = [
   { id: 'fossil', label: 'Fossil Fuels' },
   { id: 'renewables', label: 'Renewables' },
   { id: 'biodiversity', label: 'Biodiversity' },
+  { id: 'walk-warmup', label: '#WalkMyWarmUp' },
 ];
 
 const QuizzesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {

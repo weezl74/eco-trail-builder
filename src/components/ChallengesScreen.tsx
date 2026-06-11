@@ -5,12 +5,14 @@ import ShopLocalScreen from './screens/ShopLocalScreen';
 import SprintsScreen from './screens/SprintsScreen';
 import MegaPledgesScreen from './screens/MegaPledgesScreen';
 import CommunityPledgesScreen from './screens/CommunityPledgesScreen';
+import WalkMyWarmUpScreen from './screens/WalkMyWarmUpScreen';
 import { useTranslations } from '@/hooks/useTranslations';
 import quizIcon from '@/assets/svg/quiz-icon.svg.asset.json';
 import pledgeIcon from '@/assets/svg/pledge.svg.asset.json';
 import quickWinsIcon from '@/assets/svg/quick-wins.svg.asset.json';
 import communityIcon from '@/assets/svg/community-pledge.svg.asset.json';
 import megaIcon from '@/assets/svg/mega-pledge.svg.asset.json';
+import walkWarmupIcon from '@/assets/svg/walk-warmup.png';
 
 const ChallengesScreen: React.FC<{ onSelect?: (id: string) => void; initialView?: string | null }> = ({ initialView = null }) => {
   const [view, setView] = useState<string | null>(initialView);
@@ -22,6 +24,7 @@ const ChallengesScreen: React.FC<{ onSelect?: (id: string) => void; initialView?
     { id: 'shop-local', label: t('Shop Local'), icon: null },
     { id: 'community-pledges', label: t('Community\nPledges'), icon: communityIcon.url },
     { id: 'mega-pledges', label: t('Mega Pledges'), icon: megaIcon.url },
+    { id: 'walk-warmup', label: t('Join\n#WalkMyWarmUp'), icon: walkWarmupIcon },
   ];
 
   if (view === 'quizzes') return <QuizzesScreen onBack={() => setView(null)} />;
@@ -30,6 +33,7 @@ const ChallengesScreen: React.FC<{ onSelect?: (id: string) => void; initialView?
   if (view === 'sprints') return <SprintsScreen onBack={() => setView(null)} />;
   if (view === 'mega-pledges') return <MegaPledgesScreen onBack={() => setView(null)} />;
   if (view === 'community-pledges') return <CommunityPledgesScreen onBack={() => setView(null)} />;
+  if (view === 'walk-warmup') return <WalkMyWarmUpScreen onBack={() => setView(null)} />;
 
   return (
     <div className="min-h-screen bg-[#f5a623] pb-24 px-4 pt-8">
