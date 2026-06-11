@@ -158,8 +158,8 @@ const AccountCard: React.FC<AccountCardProps> = ({
           </div>
 
           {/* BACK */}
-          <div ref={backRef} className="absolute inset-0 backface-hidden rotate-y-180 rounded-2xl shadow-xl text-white overflow-hidden"
-               style={{ background: palette.back }}>
+          <div ref={backRef} className="absolute inset-0 backface-hidden rotate-y-180 rounded-2xl shadow-xl overflow-hidden"
+               style={{ background: palette.back, color: palette.text }}>
             <div className="p-2.5 h-full flex flex-col gap-1">
               <div className="text-center">
                 <p className="font-roboto font-bold text-[11px] tracking-wider leading-none">#WalkMyWarmUp</p>
@@ -188,9 +188,16 @@ const AccountCard: React.FC<AccountCardProps> = ({
                           : isReward
                           ? 'border-dashed border-yellow-300/80 bg-yellow-300/10'
                           : isNext
-                          ? 'border-white bg-white/20 animate-pulse cursor-pointer'
-                          : 'border-white/40 bg-white/5'
+                          ? 'animate-pulse cursor-pointer'
+                          : ''
                       }`}
+                      style={
+                        stamped || isReward
+                          ? undefined
+                          : isNext
+                          ? { borderColor: 'currentColor', background: 'color-mix(in srgb, currentColor 20%, transparent)' }
+                          : { borderColor: 'color-mix(in srgb, currentColor 40%, transparent)', background: 'color-mix(in srgb, currentColor 5%, transparent)' }
+                      }
                     >
                       {stamped ? (
                         <span className="text-[7px] font-roboto font-bold leading-none text-center transform -rotate-12">
@@ -201,7 +208,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
                           FREE<br />SWIM
                         </span>
                       ) : isNext ? (
-                        <Footprints className="h-3 w-3 text-white" />
+                        <Footprints className="h-3 w-3" />
                       ) : (
                         <span className="text-[8px] opacity-50">{i + 1}</span>
                       )}
