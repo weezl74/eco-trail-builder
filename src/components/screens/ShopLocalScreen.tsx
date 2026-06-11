@@ -4,6 +4,7 @@ import { useSavings, RenewableType, RENEWABLE_COSTS } from '@/hooks/useSavings';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useTranslations } from '@/hooks/useTranslations';
+import WalkMyWarmUpJourney from '@/components/WalkMyWarmUpJourney';
 
 type Category = 'libraries' | 'allotments' | 'leisure' | 'ev' | 'eco';
 type Saving = { money: number; co2: number; water: number };
@@ -98,6 +99,7 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const [pois, setPois] = useState<POI[]>([]);
   const { pledged, addPledge, renewables, woolPoints, buyRenewable } = useSavings();
   const { t } = useTranslations();
+  const [walkOpen, setWalkOpen] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -332,6 +334,7 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
               const info = CATEGORY_INFO[p.category];
               const id = pinId(p);
               const isPledged = pledged.includes(id);
+              const isLeisure = p.category === 'leisure';
               return (
                 <div
                   key={id}
@@ -339,8 +342,8 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                   style={{ left: `${x}%`, top: `${y}%` }}
                 >
                   <button
-                    onClick={() => handlePledge(p)}
-                    aria-label={`${t('Pledged')}: ${p.name}`}
+                    onClick={() => isLeisure ? setWalkOpen(true) : handlePledge(p)}
+                    aria-label={isLeisure ? `${t('Join')} #WalkMyWarmUp` : `${t('Pledged')}: ${p.name}`}
                     className="block"
                   >
                     <svg width="24" height="32" viewBox="0 0 22 30">
@@ -370,9 +373,15 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                   <div className="absolute left-1/2 -translate-x-1/2 -top-2 -translate-y-full w-56 bg-black/90 text-white text-[11px] font-serif px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition pointer-events-none shadow-lg z-30">
                     <div className="font-bold mb-1">{p.name}</div>
                     <div>{p.carbonAction ?? info.message}</div>
-                    <div className="mt-1 opacity-80">
-                      {isPledged ? `✓ ${t('Pledged')}` : t('Tap to pledge')} · +£{info.delta.money} · {info.delta.co2}kg CO₂e · {info.delta.water}L
-                    </div>
+                    {isLeisure ? (
+                      <div className="mt-1 opacity-90 font-bold text-[#F4971D]">
+                        {t('Tap to join')} #WalkMyWarmUp
+                      </div>
+                    ) : (
+                      <div className="mt-1 opacity-80">
+                        {isPledged ? `✓ ${t('Pledged')}` : t('Tap to pledge')} · +£{info.delta.money} · {info.delta.co2}kg CO₂e · {info.delta.water}L
+                      </div>
+                    )}
                   </div>
                 </div>
               );
@@ -405,6 +414,14 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           </div>
         )}
       </div>
+
+      <WalkMyWarmUpJourney
+        open={walkOpen}
+        onOpenChange={setWalkOpen}
+        onEarned={() => {
+          toast({ title: t('Stamp earned!'), description: '#WalkMyWarmUp' });
+        }}
+      />
     </div>
   );
 };
