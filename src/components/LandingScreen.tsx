@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import normalBg from '@/assets/svg/landing-normal.jpg.asset.json';
 import wetBg from '@/assets/svg/landing-wet.jpg.asset.json';
 import { useTranslations } from '@/hooks/useTranslations';
+import { playNelson } from '@/lib/sounds';
 
 interface LandingScreenProps {
   onBeetleClick?: () => void;
@@ -56,7 +57,7 @@ const LandingScreen: React.FC<LandingScreenProps> = ({ onBeetleClick }) => {
   return (
     <button
       type="button"
-      onClick={onBeetleClick}
+      onClick={() => { playNelson(); onBeetleClick?.(); }}
       aria-label={t('Tap to Start')}
       className="min-h-screen w-full relative overflow-hidden bg-[#3a2418] block focus:outline-none active:scale-[0.99] transition-transform"
     >
