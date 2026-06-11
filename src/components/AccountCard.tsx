@@ -94,18 +94,19 @@ const AccountCard: React.FC<AccountCardProps> = ({
           onClick={() => setFlipped(!flipped)}
         >
           {/* FRONT */}
-          <div ref={frontRef} className="absolute inset-0 backface-hidden rounded-2xl p-5 shadow-xl text-white overflow-hidden"
-               style={{ background: palette.front }}>
-            <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-white/10" />
-            <div className="absolute -left-8 -bottom-8 w-32 h-32 rounded-full bg-white/5" />
+          <div ref={frontRef} className="absolute inset-0 backface-hidden rounded-2xl p-5 shadow-xl overflow-hidden"
+               style={{ background: palette.front, color: palette.text }}>
+            <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full" style={{ background: 'currentColor', opacity: 0.1 }} />
+            <div className="absolute -left-8 -bottom-8 w-32 h-32 rounded-full" style={{ background: 'currentColor', opacity: 0.05 }} />
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); handleShareCard(); }}
               disabled={sharing}
               aria-label={t('Share card')}
-              className="absolute top-2 right-2 z-10 h-9 w-9 rounded-full bg-white/20 backdrop-blur flex items-center justify-center active:scale-95 disabled:opacity-60"
+              className="absolute top-2 right-2 z-10 h-9 w-9 rounded-full backdrop-blur flex items-center justify-center active:scale-95 disabled:opacity-60"
+              style={{ background: 'color-mix(in srgb, currentColor 20%, transparent)' }}
             >
-              <Share2 className="h-4 w-4 text-white" />
+              <Share2 className="h-4 w-4" />
             </button>
             <div className="relative h-full flex flex-col justify-between">
               <div className="flex justify-between items-start pr-10">
@@ -122,13 +123,17 @@ const AccountCard: React.FC<AccountCardProps> = ({
                     <div
                       key={b.id}
                       title={b.label}
-                      className="h-7 w-7 rounded-full bg-white/25 border border-white/40 flex items-center justify-center"
+                      className="h-7 w-7 rounded-full flex items-center justify-center"
+                      style={{ background: 'color-mix(in srgb, currentColor 25%, transparent)', border: '1px solid color-mix(in srgb, currentColor 40%, transparent)' }}
                     >
-                      {b.icon ?? <Trophy className="h-3.5 w-3.5 text-white" />}
+                      {b.icon ?? <Trophy className="h-3.5 w-3.5" />}
                     </div>
                   ))}
                   {badges.length > 6 && (
-                    <div className="h-7 px-2 rounded-full bg-white/25 border border-white/40 flex items-center justify-center text-[10px] font-bold">
+                    <div
+                      className="h-7 px-2 rounded-full flex items-center justify-center text-[10px] font-bold"
+                      style={{ background: 'color-mix(in srgb, currentColor 25%, transparent)', border: '1px solid color-mix(in srgb, currentColor 40%, transparent)' }}
+                    >
                       +{badges.length - 6}
                     </div>
                   )}
@@ -153,8 +158,8 @@ const AccountCard: React.FC<AccountCardProps> = ({
           </div>
 
           {/* BACK */}
-          <div ref={backRef} className="absolute inset-0 backface-hidden rotate-y-180 rounded-2xl shadow-xl text-white overflow-hidden"
-               style={{ background: palette.back }}>
+          <div ref={backRef} className="absolute inset-0 backface-hidden rotate-y-180 rounded-2xl shadow-xl overflow-hidden"
+               style={{ background: palette.back, color: palette.text }}>
             <div className="p-2.5 h-full flex flex-col gap-1">
               <div className="text-center">
                 <p className="font-roboto font-bold text-[11px] tracking-wider leading-none">#WalkMyWarmUp</p>
@@ -183,9 +188,16 @@ const AccountCard: React.FC<AccountCardProps> = ({
                           : isReward
                           ? 'border-dashed border-yellow-300/80 bg-yellow-300/10'
                           : isNext
-                          ? 'border-white bg-white/20 animate-pulse cursor-pointer'
-                          : 'border-white/40 bg-white/5'
+                          ? 'animate-pulse cursor-pointer'
+                          : ''
                       }`}
+                      style={
+                        stamped || isReward
+                          ? undefined
+                          : isNext
+                          ? { borderColor: 'currentColor', background: 'color-mix(in srgb, currentColor 20%, transparent)' }
+                          : { borderColor: 'color-mix(in srgb, currentColor 40%, transparent)', background: 'color-mix(in srgb, currentColor 5%, transparent)' }
+                      }
                     >
                       {stamped ? (
                         <span className="text-[7px] font-roboto font-bold leading-none text-center transform -rotate-12">
@@ -196,7 +208,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
                           FREE<br />SWIM
                         </span>
                       ) : isNext ? (
-                        <Footprints className="h-3 w-3 text-white" />
+                        <Footprints className="h-3 w-3" />
                       ) : (
                         <span className="text-[8px] opacity-50">{i + 1}</span>
                       )}
