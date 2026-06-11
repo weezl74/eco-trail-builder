@@ -68,13 +68,30 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
       </div>
 
       {/* Illustration */}
-      <div className="mx-4 mt-4 rounded-2xl overflow-hidden bg-[#1f1f1f]">
+      <div className="mx-4 mt-4 rounded-2xl overflow-hidden bg-[#1f1f1f] relative">
         <img
           src={badHomepageAsset.url}
           alt="A scene showing the impact of pollution and unsustainable choices"
           className="w-full h-auto block"
           loading="lazy"
         />
+        {/* Nelson overlay — bottom right, ~25% width */}
+        <div className="absolute bottom-2 right-2 w-1/4 aspect-square pointer-events-none">
+          <img
+            src={sheepBody.url}
+            alt=""
+            style={{ color: palette.front as string }}
+            className="absolute inset-0 w-full h-full object-contain drop-shadow-lg"
+            draggable={false}
+          />
+          <img
+            src={nelsonHead.url}
+            alt="Nelson the sheep"
+            className="absolute"
+            style={{ left: '50%', top: '-6%', width: '52%', transform: 'translateX(-50%)' }}
+            draggable={false}
+          />
+        </div>
       </div>
 
       {/* CTA */}
