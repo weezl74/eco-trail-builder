@@ -99,6 +99,7 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const [pois, setPois] = useState<POI[]>([]);
   const { pledged, addPledge, renewables, woolPoints, buyRenewable } = useSavings();
   const { t } = useTranslations();
+  const [walkOpen, setWalkOpen] = useState(false);
 
   useEffect(() => {
     let mounted = true;
