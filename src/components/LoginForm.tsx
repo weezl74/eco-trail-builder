@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff } from 'lucide-react';
 import { useTranslations } from '@/hooks/useTranslations';
+import { playGoodBaa, playBadBaa } from '@/lib/sounds';
 
 
 interface LoginFormProps {
