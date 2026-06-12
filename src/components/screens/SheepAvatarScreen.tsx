@@ -3,7 +3,7 @@ import { ArrowLeft, Lock, Leaf } from 'lucide-react';
 import { useSavings } from '@/hooks/useSavings';
 import { toast } from '@/hooks/use-toast';
 
-import sheepBody from '@/assets/sheep/SheepBody.svg.asset.json';
+import TintedSheepBody from '@/components/TintedSheepBody';
 import nelsonHead from '@/assets/sheep/NelsonHead.svg.asset.json';
 import barbHead from '@/assets/sheep/BarbHead.svg.asset.json';
 import raincoatNelson from '@/assets/sheep/RaincoatNelson.svg.asset.json';
@@ -185,13 +185,10 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           </div>
           <div className="flex items-center justify-center mb-3">
             <div className="relative w-64 h-64">
-              {/* Sheep body — tinted via currentColor */}
-              <img
-                src={sheepBody.url}
-                alt="Sheep body"
-                style={{ color: woolColor }}
-                className="absolute inset-0 w-full h-full object-contain select-none"
-                draggable={false}
+              {/* Sheep body — inline SVG recoloured to wool colour */}
+              <TintedSheepBody
+                color={woolColor}
+                className="absolute inset-0 w-full h-full [&>svg]:w-full [&>svg]:h-full select-none"
               />
               {/* Head — sized & positioned over the body */}
               <img

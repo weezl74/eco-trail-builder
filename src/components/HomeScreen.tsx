@@ -7,8 +7,8 @@ import NelsonMessagesScreen from './screens/NelsonMessagesScreen';
 import { useSavings } from '@/hooks/useSavings';
 import { useTranslations } from '@/hooks/useTranslations';
 import badHomepageAsset from '@/assets/final-bad-homepage.svg.asset.json';
-import sheepBody from '@/assets/sheep/SheepBody.svg.asset.json';
 import nelsonHead from '@/assets/sheep/NelsonHead.svg.asset.json';
+import TintedSheepBody from './TintedSheepBody';
 
 type Screen = 'home' | 'avatar' | 'calendar' | 'rewards' | 'messages';
 
@@ -75,12 +75,9 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
         />
         {/* Nelson overlay — bottom left */}
         <div className="absolute bottom-2 left-2 w-2/5 aspect-square pointer-events-none">
-          <img
-            src={sheepBody.url}
-            alt=""
-            style={{ color: woolColor }}
-            className="absolute inset-0 w-full h-full object-contain drop-shadow-lg"
-            draggable={false}
+          <TintedSheepBody
+            color={woolColor}
+            className="absolute inset-0 w-full h-full drop-shadow-lg [&>svg]:w-full [&>svg]:h-full [&>svg]:object-contain"
           />
           <img
             src={nelsonHead.url}

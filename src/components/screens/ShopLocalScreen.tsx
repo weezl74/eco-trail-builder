@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, Filter, Sun, Wind, Droplet, Thermometer } from 'lucide-react';
 import { useSavings, RenewableType, RENEWABLE_COSTS } from '@/hooks/useSavings';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useTranslations } from '@/hooks/useTranslations';
 import WalkMyWarmUpJourney from '@/components/WalkMyWarmUpJourney';
+import ShopLocalLeafletMap, { LeafletPoi } from '@/components/ShopLocalLeafletMap';
 
 type Category = 'libraries' | 'allotments' | 'leisure' | 'ev' | 'eco';
 type Saving = { money: number; co2: number; water: number };
@@ -73,11 +74,6 @@ type POI = {
   carbonAction: string | null;
 };
 
-const project = (lat: number, lng: number) => {
-  const x = ((lng - BBOX.minLng) / (BBOX.maxLng - BBOX.minLng)) * 100;
-  const y = ((BBOX.maxLat - lat) / (BBOX.maxLat - BBOX.minLat)) * 100;
-  return { x, y };
-};
 
 const pinId = (p: { id: number; category: Category }) => `${p.category}:${p.id}`;
 
@@ -149,12 +145,49 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
     if (ok) {
       toast({
         title: `${t('Pledged')}: ${p.name}`,
-        description: `${p.carbonAction ?? info.message} +£${info.delta.money} · ${info.delta.co2}kg CO₂e · ${info.delta.water}L · +25 ${t('wool')}`,
+        description: `+£${info.delta.money} · ${info.delta.co2}kg CO₂e · ${info.delta.water}L · +25 ${t('wool')}`,
       });
     } else {
       toast({ title: t('Already pledged'), description: p.name });
     }
   };
+
+  // Forward-looking blurb for the pin popup — never assumes the user has
+  // already visited the place or earned the carbon saving.
+  const inviteBlurb = (p: POI) => {
+    const info = CATEGORY_INFO[p.category];
+    if (p.category === 'leisure') {
+      return t('Join the #WalkMyWarmUp meet-up — walk in for your warm-up and skip the drive.');
+    }
+    return info.message;
+  };
+
+  const leafletPois: LeafletPoi[] = useMemo(
+    () =>
+      visible.map((p) => {
+        const info = CATEGORY_INFO[p.category];
+        const id = pinId(p);
+        const isPledged = pledged.includes(id);
+        const isLeisure = p.category === 'leisure';
+        return {
+          id,
+          name: p.name,
+          lat: p.lat,
+          lng: p.lng,
+          color: info.color,
+          blurb: inviteBlurb(p),
+          pledged: isPledged,
+          ctaLabel: isLeisure
+            ? t('Join #WalkMyWarmUp')
+            : isPledged
+            ? `✓ ${t('Pledged')}`
+            : t('Pledge to visit'),
+          onAction: () => (isLeisure ? setWalkOpen(true) : handlePledge(p)),
+        };
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [visible, pledged],
+  );
 
 
   // Cooling % from renewables placed
@@ -163,25 +196,8 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const hue = (cooling / 100) * 210;
   const overlayColor = `hsla(${hue}, 75%, 50%, ${0.18 + (cooling / 100) * 0.22})`;
 
-  const handleMapClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (mode !== 'cool' || !placing) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    const ok = buyRenewable(placing, x, y);
-    if (ok) {
-      toast({
-        title: `${t(RENEWABLE_META[placing].label)} ${t('placed')}`,
-        description: `-${RENEWABLE_COSTS[placing]} ${t('wool')}`,
-      });
-      setPlacing(null);
-    } else {
-      toast({
-        title: t('Not enough wool'),
-        description: `${t(RENEWABLE_META[placing].label)} ${RENEWABLE_COSTS[placing]} ${t('wool')}`,
-      });
-    }
-  };
+
+
 
   return (
     <div className="min-h-screen bg-white pb-24 relative">
@@ -307,12 +323,30 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
         </>
       )}
 
-      <div className="relative w-full h-screen" onClick={handleMapClick}>
-        <iframe
-          title="Caerphilly area map"
-          className="absolute inset-0 w-full h-full border-0"
-          src={`https://www.openstreetmap.org/export/embed.html?bbox=${BBOX.minLng},${BBOX.minLat},${BBOX.maxLng},${BBOX.maxLat}&layer=mapnik`}
-          style={mode === 'cool' ? { pointerEvents: 'none' } : undefined}
+      <div className="relative w-full h-screen">
+        <ShopLocalLeafletMap
+          bbox={BBOX}
+          pois={mode === 'local' ? leafletPois : []}
+          className="absolute inset-0 w-full h-full"
+          onMapClick={
+            mode === 'cool' && placing
+              ? (lat, lng, x, y) => {
+                  const ok = buyRenewable(placing, x, y);
+                  if (ok) {
+                    toast({
+                      title: `${t(RENEWABLE_META[placing].label)} ${t('placed')}`,
+                      description: `-${RENEWABLE_COSTS[placing]} ${t('wool')}`,
+                    });
+                    setPlacing(null);
+                  } else {
+                    toast({
+                      title: t('Not enough wool'),
+                      description: `${t(RENEWABLE_META[placing].label)} ${RENEWABLE_COSTS[placing]} ${t('wool')}`,
+                    });
+                  }
+                }
+              : undefined
+          }
         />
 
         {/* Warm→cool hue overlay (only in cool mode) */}
@@ -326,70 +360,8 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           />
         )}
 
-        {/* Local pins */}
-        {mode === 'local' && (
-          <div className="absolute inset-0 pointer-events-none">
-            {visible.map((p) => {
-              const { x, y } = project(p.lat, p.lng);
-              const info = CATEGORY_INFO[p.category];
-              const id = pinId(p);
-              const isPledged = pledged.includes(id);
-              const isLeisure = p.category === 'leisure';
-              return (
-                <div
-                  key={id}
-                  className="absolute -translate-x-1/2 -translate-y-full group pointer-events-auto"
-                  style={{ left: `${x}%`, top: `${y}%` }}
-                >
-                  <button
-                    onClick={() => isLeisure ? setWalkOpen(true) : handlePledge(p)}
-                    aria-label={isLeisure ? `${t('Join')} #WalkMyWarmUp` : `${t('Pledged')}: ${p.name}`}
-                    className="block"
-                  >
-                    <svg width="24" height="32" viewBox="0 0 22 30">
-                      <path
-                        d="M11 0C5 0 0 5 0 11c0 8 11 19 11 19s11-11 11-19C22 5 17 0 11 0z"
-                        fill={info.color}
-                        stroke="white"
-                        strokeWidth="1.5"
-                      />
-                      {isPledged ? (
-                        <g transform="translate(6,6)">
-                          <circle cx="5" cy="5" r="5" fill="white" />
-                          <path
-                            d="M2.5 5.2 L4.3 7 L7.7 3.6"
-                            stroke={info.color}
-                            strokeWidth="1.6"
-                            fill="none"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </g>
-                      ) : (
-                        <circle cx="11" cy="11" r="4" fill="white" />
-                      )}
-                    </svg>
-                  </button>
-                  <div className="absolute left-1/2 -translate-x-1/2 -top-2 -translate-y-full w-56 bg-black/90 text-white text-[11px] font-serif px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition pointer-events-none shadow-lg z-30">
-                    <div className="font-bold mb-1">{p.name}</div>
-                    <div>{p.carbonAction ?? info.message}</div>
-                    {isLeisure ? (
-                      <div className="mt-1 opacity-90 font-bold text-[#F4971D]">
-                        {t('Tap to join')} #WalkMyWarmUp
-                      </div>
-                    ) : (
-                      <div className="mt-1 opacity-80">
-                        {isPledged ? `✓ ${t('Pledged')}` : t('Tap to pledge')} · +£{info.delta.money} · {info.delta.co2}kg CO₂e · {info.delta.water}L
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Placed renewables (cool mode) */}
+        {/* Placed renewables (cool mode) — still tracked by % so they
+            scale with the screen overlay rather than the map tiles. */}
         {mode === 'cool' && (
           <div className="absolute inset-0 pointer-events-none">
             {renewables.map((r) => {

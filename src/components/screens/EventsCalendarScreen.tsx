@@ -8,12 +8,12 @@ interface Props { onBack: () => void }
 type Event = { date: string; title: string; place: string; tag: 'workshop' | 'cleanup' | 'market' | 'walk' };
 
 const EVENTS: Event[] = [
-  { date: '2026-05-22', title: 'Caerphilly Repair Café', place: 'Twyn Community Centre', tag: 'workshop' },
-  { date: '2026-06-01', title: 'Sirhowy Valley Litter Pick', place: 'Sirhowy Country Park', tag: 'cleanup' },
-  { date: '2026-06-08', title: 'Bargoed Farmers Market', place: 'Bargoed Town Square', tag: 'market' },
   { date: '2026-06-14', title: '#WalkMyWarmUp Group Walk', place: 'Heolddu Leisure Centre', tag: 'walk' },
+  { date: '2026-06-18', title: 'Caerphilly Repair Café', place: 'Twyn Community Centre', tag: 'workshop' },
   { date: '2026-06-21', title: 'Solstice Tree Planting', place: 'Penallta Parc', tag: 'workshop' },
+  { date: '2026-06-27', title: 'Bargoed Farmers Market', place: 'Bargoed Town Square', tag: 'market' },
   { date: '2026-07-05', title: 'Risca River Clean', place: 'Risca Riverside', tag: 'cleanup' },
+  { date: '2026-07-11', title: 'Sirhowy Valley Litter Pick', place: 'Sirhowy Country Park', tag: 'cleanup' },
   { date: '2026-07-19', title: 'Ystrad Mynach Green Fair', place: 'Ystrad Mynach Park', tag: 'market' },
 ];
 
@@ -93,11 +93,16 @@ const EventsCalendarScreen: React.FC<Props> = ({ onBack }) => {
       </div>
 
       <h2 className="font-serif font-bold text-lg mb-2">{t('Upcoming events')}</h2>
+      <p className="text-white/50 text-xs mb-2">{t('Tap an event to add it to your phone calendar.')}</p>
       <div className="space-y-2">
         {EVENTS.map((e, i) => {
           const d = new Date(e.date);
           return (
-            <div key={i} className="bg-[#1f1f1f] rounded-2xl p-3 flex items-center gap-3">
+            <button
+              key={i}
+              onClick={() => downloadIcs(e)}
+              className="w-full text-left bg-[#1f1f1f] rounded-2xl p-3 flex items-center gap-3 active:scale-[0.99] transition"
+            >
               <div className={`w-12 h-12 rounded-xl ${TAG_COLOR[e.tag]} flex flex-col items-center justify-center text-white font-serif font-bold`}>
                 <span className="text-[10px] uppercase">{d.toLocaleString('en',{month:'short'})}</span>
                 <span className="text-lg leading-none">{d.getDate()}</span>
@@ -106,12 +111,51 @@ const EventsCalendarScreen: React.FC<Props> = ({ onBack }) => {
                 <p className="font-serif font-bold">{e.title}</p>
                 <p className="text-xs text-white/60">{e.place}</p>
               </div>
-            </div>
+              <span className="text-[#f4971d] text-xs font-serif font-bold">{t('Add')}</span>
+            </button>
           );
         })}
       </div>
     </div>
   );
 };
+
+// Build & download an .ics file. On iOS / Android this hands off to the
+// native calendar import flow.
+const pad = (n: number) => String(n).padStart(2, '0');
+const toIcsDate = (d: Date) =>
+  `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}00Z`;
+
+function downloadIcs(e: Event) {
+  // Default: 10:00–12:00 local time on the event day
+  const start = new Date(`${e.date}T10:00:00`);
+  const end = new Date(`${e.date}T12:00:00`);
+  const uid = `${e.date}-${e.title.replace(/\W+/g, '-')}@caerphilly-eco`;
+  const ics = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Caerphilly Eco//EN',
+    'CALSCALE:GREGORIAN',
+    'BEGIN:VEVENT',
+    `UID:${uid}`,
+    `DTSTAMP:${toIcsDate(new Date())}`,
+    `DTSTART:${toIcsDate(start)}`,
+    `DTEND:${toIcsDate(end)}`,
+    `SUMMARY:${e.title}`,
+    `LOCATION:${e.place}`,
+    'END:VEVENT',
+    'END:VCALENDAR',
+  ].join('\r\n');
+
+  const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${e.title.replace(/\W+/g, '-').toLowerCase()}.ics`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
 
 export default EventsCalendarScreen;
