@@ -196,25 +196,8 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const hue = (cooling / 100) * 210;
   const overlayColor = `hsla(${hue}, 75%, 50%, ${0.18 + (cooling / 100) * 0.22})`;
 
-  const handleMapClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (mode !== 'cool' || !placing) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    const ok = buyRenewable(placing, x, y);
-    if (ok) {
-      toast({
-        title: `${t(RENEWABLE_META[placing].label)} ${t('placed')}`,
-        description: `-${RENEWABLE_COSTS[placing]} ${t('wool')}`,
-      });
-      setPlacing(null);
-    } else {
-      toast({
-        title: t('Not enough wool'),
-        description: `${t(RENEWABLE_META[placing].label)} ${RENEWABLE_COSTS[placing]} ${t('wool')}`,
-      });
-    }
-  };
+
+
 
   return (
     <div className="min-h-screen bg-white pb-24 relative">
