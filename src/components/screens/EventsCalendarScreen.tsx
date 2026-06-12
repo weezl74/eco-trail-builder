@@ -8,12 +8,12 @@ interface Props { onBack: () => void }
 type Event = { date: string; title: string; place: string; tag: 'workshop' | 'cleanup' | 'market' | 'walk' };
 
 const EVENTS: Event[] = [
-  { date: '2026-05-22', title: 'Caerphilly Repair Café', place: 'Twyn Community Centre', tag: 'workshop' },
-  { date: '2026-06-01', title: 'Sirhowy Valley Litter Pick', place: 'Sirhowy Country Park', tag: 'cleanup' },
-  { date: '2026-06-08', title: 'Bargoed Farmers Market', place: 'Bargoed Town Square', tag: 'market' },
   { date: '2026-06-14', title: '#WalkMyWarmUp Group Walk', place: 'Heolddu Leisure Centre', tag: 'walk' },
+  { date: '2026-06-18', title: 'Caerphilly Repair Café', place: 'Twyn Community Centre', tag: 'workshop' },
   { date: '2026-06-21', title: 'Solstice Tree Planting', place: 'Penallta Parc', tag: 'workshop' },
+  { date: '2026-06-27', title: 'Bargoed Farmers Market', place: 'Bargoed Town Square', tag: 'market' },
   { date: '2026-07-05', title: 'Risca River Clean', place: 'Risca Riverside', tag: 'cleanup' },
+  { date: '2026-07-11', title: 'Sirhowy Valley Litter Pick', place: 'Sirhowy Country Park', tag: 'cleanup' },
   { date: '2026-07-19', title: 'Ystrad Mynach Green Fair', place: 'Ystrad Mynach Park', tag: 'market' },
 ];
 
