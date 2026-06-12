@@ -185,13 +185,10 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           </div>
           <div className="flex items-center justify-center mb-3">
             <div className="relative w-64 h-64">
-              {/* Sheep body — tinted via currentColor */}
-              <img
-                src={sheepBody.url}
-                alt="Sheep body"
-                style={{ color: woolColor }}
-                className="absolute inset-0 w-full h-full object-contain select-none"
-                draggable={false}
+              {/* Sheep body — inline SVG recoloured to wool colour */}
+              <TintedSheepBody
+                color={woolColor}
+                className="absolute inset-0 w-full h-full [&>svg]:w-full [&>svg]:h-full select-none"
               />
               {/* Head — sized & positioned over the body */}
               <img
