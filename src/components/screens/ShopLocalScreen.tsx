@@ -74,11 +74,6 @@ type POI = {
   carbonAction: string | null;
 };
 
-const project = (lat: number, lng: number) => {
-  const x = ((lng - BBOX.minLng) / (BBOX.maxLng - BBOX.minLng)) * 100;
-  const y = ((BBOX.maxLat - lat) / (BBOX.maxLat - BBOX.minLat)) * 100;
-  return { x, y };
-};
 
 const pinId = (p: { id: number; category: Category }) => `${p.category}:${p.id}`;
 
