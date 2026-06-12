@@ -56,12 +56,14 @@ const TintedSheepBody: React.FC<Props> = ({ color, className, style }) => {
     );
   }
 
+  // The body of the sheep uses fill="currentColor"; the four legs use #DECAAD.
+  // Recolour both so the whole wool surface adopts the user's chosen colour.
   const recoloured = svg.replace(/#DECAAD/gi, color);
 
   return (
     <div
       className={className}
-      style={style}
+      style={{ color, ...style }}
       aria-hidden
       dangerouslySetInnerHTML={{ __html: recoloured }}
     />
