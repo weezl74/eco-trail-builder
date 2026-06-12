@@ -304,7 +304,7 @@ export default function CommunityStories() {
         ) : (
           <div className="space-y-4">
             {stories.map((story) => (
-              <div key={story.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div key={story.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow animate-in fade-in slide-in-from-top-2 duration-500">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10">
