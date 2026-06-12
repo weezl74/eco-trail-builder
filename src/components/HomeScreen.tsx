@@ -75,12 +75,9 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
         />
         {/* Nelson overlay — bottom left */}
         <div className="absolute bottom-2 left-2 w-2/5 aspect-square pointer-events-none">
-          <img
-            src={sheepBody.url}
-            alt=""
-            style={{ color: woolColor }}
-            className="absolute inset-0 w-full h-full object-contain drop-shadow-lg"
-            draggable={false}
+          <TintedSheepBody
+            color={woolColor}
+            className="absolute inset-0 w-full h-full drop-shadow-lg [&>svg]:w-full [&>svg]:h-full [&>svg]:object-contain"
           />
           <img
             src={nelsonHead.url}
