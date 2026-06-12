@@ -150,12 +150,49 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
     if (ok) {
       toast({
         title: `${t('Pledged')}: ${p.name}`,
-        description: `${p.carbonAction ?? info.message} +£${info.delta.money} · ${info.delta.co2}kg CO₂e · ${info.delta.water}L · +25 ${t('wool')}`,
+        description: `+£${info.delta.money} · ${info.delta.co2}kg CO₂e · ${info.delta.water}L · +25 ${t('wool')}`,
       });
     } else {
       toast({ title: t('Already pledged'), description: p.name });
     }
   };
+
+  // Forward-looking blurb for the pin popup — never assumes the user has
+  // already visited the place or earned the carbon saving.
+  const inviteBlurb = (p: POI) => {
+    const info = CATEGORY_INFO[p.category];
+    if (p.category === 'leisure') {
+      return t('Join the #WalkMyWarmUp meet-up — walk in for your warm-up and skip the drive.');
+    }
+    return info.message;
+  };
+
+  const leafletPois: LeafletPoi[] = useMemo(
+    () =>
+      visible.map((p) => {
+        const info = CATEGORY_INFO[p.category];
+        const id = pinId(p);
+        const isPledged = pledged.includes(id);
+        const isLeisure = p.category === 'leisure';
+        return {
+          id,
+          name: p.name,
+          lat: p.lat,
+          lng: p.lng,
+          color: info.color,
+          blurb: inviteBlurb(p),
+          pledged: isPledged,
+          ctaLabel: isLeisure
+            ? t('Join #WalkMyWarmUp')
+            : isPledged
+            ? `✓ ${t('Pledged')}`
+            : t('Pledge to visit'),
+          onAction: () => (isLeisure ? setWalkOpen(true) : handlePledge(p)),
+        };
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [visible, pledged],
+  );
 
 
   // Cooling % from renewables placed
