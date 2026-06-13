@@ -266,13 +266,12 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
 
               {/* Raincoat */}
               {has('raincoat') && (
-                <img
-                  src={raincoatNelson.url}
-                  alt=""
-                  className="absolute pointer-events-none select-none"
-                  style={{ left: '50%', top: '32%', width: '70%', transform: 'translateX(-50%)' }}
-                  draggable={false}
-                />
+                <div
+                  className="absolute pointer-events-none text-4xl text-center"
+                  style={{ left: '50%', top: '38%', transform: 'translateX(-50%)' }}
+                >
+                  🧥
+                </div>
               )}
 
               {/* Wellies */}
