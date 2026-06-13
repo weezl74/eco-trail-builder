@@ -165,6 +165,26 @@ All colors MUST be HSL.
   .rotate-y-180 { transform: rotateY(180deg); }
 }
 
+.community-feed::-webkit-scrollbar {
+  width: 8px;
+}
+.community-feed::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 9999px;
+}
+.community-feed::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 9999px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+.community-feed::-webkit-scrollbar-thumb:hover {
+  background-color: #ffffff;
+}
+.community-feed {
+  scrollbar-color: #ffffff rgba(255, 255, 255, 0.25);
+  scrollbar-width: thin;
+}
+
 @keyframes wave {
   0% { transform: rotate(-10deg); }
   50% { transform: rotate(20deg); }
