@@ -1,5 +1,39 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, TreePine } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import nelsonHead from '@/assets/sheep/NelsonHead.svg.asset.json';
+
+const OakTreeIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg viewBox="0 0 64 64" className={className} aria-hidden>
+    {/* Canopy - oak: rounded, lobed */}
+    <g fill="#3f8a3a">
+      <circle cx="32" cy="20" r="14" />
+      <circle cx="18" cy="26" r="11" />
+      <circle cx="46" cy="26" r="11" />
+      <circle cx="24" cy="34" r="10" />
+      <circle cx="40" cy="34" r="10" />
+      <circle cx="32" cy="32" r="12" />
+    </g>
+    {/* Trunk */}
+    <rect x="29" y="38" width="6" height="18" rx="1.5" fill="#6b4226" />
+    {/* Ground */}
+    <ellipse cx="32" cy="58" rx="14" ry="2.5" fill="#3a2a1a" opacity="0.35" />
+  </svg>
+);
+
+const WoolBallIcon: React.FC<{ color: string; className?: string }> = ({ color, className }) => (
+  <svg viewBox="0 0 64 64" className={className} aria-hidden>
+    <circle cx="32" cy="32" r="26" fill={color} stroke="#1f1f1f" strokeWidth="2" />
+    {/* Yarn strands */}
+    <g fill="none" stroke="#1f1f1f" strokeWidth="1.5" strokeLinecap="round" opacity="0.55">
+      <path d="M10 28 C 22 18, 42 18, 54 28" />
+      <path d="M8 36 C 22 24, 42 24, 56 36" />
+      <path d="M12 44 C 24 36, 40 36, 52 44" />
+      <path d="M18 52 C 26 46, 38 46, 46 52" />
+      <path d="M20 14 C 28 22, 36 22, 44 14" />
+    </g>
+  </svg>
+);
+
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useSavings } from '@/hooks/useSavings';
