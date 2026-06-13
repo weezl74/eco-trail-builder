@@ -64,8 +64,9 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
   const [mode, setMode] = useState<Mode>('wool');
   const [rows, setRows] = useState<Row[]>(woolFallback);
   const { toast } = useToast();
-  const { treesPlanted, treePoints, woolPoints, plantTree } = useSavings();
+  const { treesPlanted, treePoints, woolPoints, plantTree, woolColor } = useSavings();
   const { t } = useTranslations();
+
 
   useEffect(() => {
     (async () => {
