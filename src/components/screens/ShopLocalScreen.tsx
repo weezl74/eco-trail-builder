@@ -231,7 +231,7 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
       {mode === 'local' && (
         <button
           onClick={() => setShowFilter((s) => !s)}
-          className="absolute top-3 right-3 z-30 bg-white rounded-2xl px-4 py-2 shadow font-serif font-bold flex items-center gap-2"
+          className="fixed top-3 right-3 z-30 bg-white rounded-2xl px-4 py-2 shadow font-serif font-bold flex items-center gap-2"
         >
           <Filter className="h-4 w-4" />
           {t('Filter')} ({active.size})
@@ -239,7 +239,7 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
       )}
 
       {mode === 'local' && showFilter && (
-        <div className="absolute top-16 right-3 z-30 bg-white rounded-2xl shadow-lg p-3 w-64">
+        <div className="fixed top-16 right-3 z-30 bg-white rounded-2xl shadow-lg p-3 w-64">
           {CATEGORIES.map((c) => (
             <label key={c.id} className="flex items-center gap-3 py-2 cursor-pointer">
               <input
