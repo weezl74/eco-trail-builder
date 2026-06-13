@@ -6,8 +6,6 @@ import { toast } from '@/hooks/use-toast';
 import TintedSheepBody from '@/components/TintedSheepBody';
 import nelsonHead from '@/assets/sheep/NelsonHead.svg.asset.json';
 import barbHead from '@/assets/sheep/BarbHead.svg.asset.json';
-import raincoatNelson from '@/assets/sheep/RaincoatNelson.svg.asset.json';
-import flyingUmbrella from '@/assets/sheep/FlyingUmbrellaNelson.svg.asset.json';
 import { CARD_PALETTES, getPalette } from '@/lib/cardPalettes';
 import { useTranslations } from '@/hooks/useTranslations';
 import { playGoodBaa } from '@/lib/sounds';
@@ -201,13 +199,12 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
 
               {/* Umbrella — floats above the sheep */}
               {has('umbrella') && (
-                <img
-                  src={flyingUmbrella.url}
-                  alt=""
-                  className="absolute pointer-events-none select-none"
-                  style={{ left: '50%', top: '-22%', width: '55%', transform: 'translateX(-50%)' }}
-                  draggable={false}
-                />
+                <div
+                  className="absolute pointer-events-none text-5xl text-center"
+                  style={{ left: '50%', top: '-18%', transform: 'translateX(-50%)' }}
+                >
+                  ☂️
+                </div>
               )}
 
               {/* Top hat */}
@@ -267,13 +264,12 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
 
               {/* Raincoat */}
               {has('raincoat') && (
-                <img
-                  src={raincoatNelson.url}
-                  alt=""
-                  className="absolute pointer-events-none select-none"
-                  style={{ left: '50%', top: '32%', width: '70%', transform: 'translateX(-50%)' }}
-                  draggable={false}
-                />
+                <div
+                  className="absolute pointer-events-none text-4xl text-center"
+                  style={{ left: '50%', top: '38%', transform: 'translateX(-50%)' }}
+                >
+                  🧥
+                </div>
               )}
 
               {/* Wellies */}
