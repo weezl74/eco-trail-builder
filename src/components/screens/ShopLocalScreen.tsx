@@ -258,7 +258,7 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
       )}
 
       {mode === 'local' && (
-        <div className="absolute bottom-28 left-3 z-20 bg-white/95 rounded-2xl shadow p-2 flex flex-wrap gap-2 max-w-[90%]">
+        <div className="fixed bottom-28 left-3 z-20 bg-white/95 rounded-2xl shadow p-2 flex flex-wrap gap-2 max-w-[90%]">
           {CATEGORIES.filter((c) => active.has(c.id)).map((c) => (
             <div key={c.id} className="flex items-center gap-1 text-xs font-serif">
               <span className="w-3 h-3 rounded-full" style={{ background: c.color }} />
@@ -272,7 +272,7 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
       {mode === 'cool' && (
         <>
           {/* Thermometer */}
-          <div className="absolute top-20 right-3 z-30 bg-white/95 rounded-2xl shadow p-3 flex flex-col items-center w-16">
+          <div className="fixed top-20 right-3 z-30 bg-white/95 rounded-2xl shadow p-3 flex flex-col items-center w-16">
             <Thermometer className="h-5 w-5 text-black mb-1" />
             <div className="relative w-3 h-40 bg-gray-200 rounded-full overflow-hidden">
               <div
@@ -289,7 +289,7 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           </div>
 
           {/* Wool + buy bar */}
-          <div className="absolute bottom-28 left-3 right-3 z-30 bg-white/95 rounded-2xl shadow p-3">
+          <div className="fixed bottom-28 left-3 right-3 z-30 bg-white/95 rounded-2xl shadow p-3">
             <div className="flex items-center justify-between mb-2">
               <p className="font-serif font-bold text-sm">{t('Wool:')} {woolPoints}</p>
               <p className="font-serif text-xs opacity-70">
