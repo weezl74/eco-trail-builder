@@ -200,18 +200,18 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
 
 
   return (
-    <div className="min-h-screen bg-white pb-24 relative">
+    <div className="fixed inset-0 bg-white overflow-hidden">
       {onBack && (
         <button
           onClick={onBack}
-          className="absolute top-3 left-3 z-30 bg-white rounded-full p-2 shadow"
+          className="fixed top-3 left-3 z-30 bg-white rounded-full p-2 shadow"
         >
           <ArrowLeft className="h-5 w-5 text-black" />
         </button>
       )}
 
       {/* Mode toggle */}
-      <div className="absolute top-3 left-1/2 -translate-x-1/2 z-30 bg-white rounded-full shadow flex p-1 font-serif font-bold text-sm">
+      <div className="fixed top-3 left-1/2 -translate-x-1/2 z-30 bg-white rounded-full shadow flex p-1 font-serif font-bold text-sm">
         {(['local', 'cool'] as Mode[]).map((m) => (
           <button
             key={m}
@@ -231,7 +231,7 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
       {mode === 'local' && (
         <button
           onClick={() => setShowFilter((s) => !s)}
-          className="absolute top-3 right-3 z-30 bg-white rounded-2xl px-4 py-2 shadow font-serif font-bold flex items-center gap-2"
+          className="fixed top-3 right-3 z-30 bg-white rounded-2xl px-4 py-2 shadow font-serif font-bold flex items-center gap-2"
         >
           <Filter className="h-4 w-4" />
           {t('Filter')} ({active.size})
@@ -239,7 +239,7 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
       )}
 
       {mode === 'local' && showFilter && (
-        <div className="absolute top-16 right-3 z-30 bg-white rounded-2xl shadow-lg p-3 w-64">
+        <div className="fixed top-16 right-3 z-30 bg-white rounded-2xl shadow-lg p-3 w-64">
           {CATEGORIES.map((c) => (
             <label key={c.id} className="flex items-center gap-3 py-2 cursor-pointer">
               <input
@@ -258,7 +258,7 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
       )}
 
       {mode === 'local' && (
-        <div className="absolute bottom-28 left-3 z-20 bg-white/95 rounded-2xl shadow p-2 flex flex-wrap gap-2 max-w-[90%]">
+        <div className="fixed bottom-28 left-3 z-20 bg-white/95 rounded-2xl shadow p-2 flex flex-wrap gap-2 max-w-[90%]">
           {CATEGORIES.filter((c) => active.has(c.id)).map((c) => (
             <div key={c.id} className="flex items-center gap-1 text-xs font-serif">
               <span className="w-3 h-3 rounded-full" style={{ background: c.color }} />
@@ -272,7 +272,7 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
       {mode === 'cool' && (
         <>
           {/* Thermometer */}
-          <div className="absolute top-20 right-3 z-30 bg-white/95 rounded-2xl shadow p-3 flex flex-col items-center w-16">
+          <div className="fixed top-20 right-3 z-30 bg-white/95 rounded-2xl shadow p-3 flex flex-col items-center w-16">
             <Thermometer className="h-5 w-5 text-black mb-1" />
             <div className="relative w-3 h-40 bg-gray-200 rounded-full overflow-hidden">
               <div
@@ -289,7 +289,7 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           </div>
 
           {/* Wool + buy bar */}
-          <div className="absolute bottom-28 left-3 right-3 z-30 bg-white/95 rounded-2xl shadow p-3">
+          <div className="fixed bottom-28 left-3 right-3 z-30 bg-white/95 rounded-2xl shadow p-3">
             <div className="flex items-center justify-between mb-2">
               <p className="font-serif font-bold text-sm">{t('Wool:')} {woolPoints}</p>
               <p className="font-serif text-xs opacity-70">
@@ -323,7 +323,7 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
         </>
       )}
 
-      <div className="relative w-full h-screen">
+      <div className="absolute inset-0 w-full h-full">
         <ShopLocalLeafletMap
           bbox={BBOX}
           pois={mode === 'local' ? leafletPois : []}
