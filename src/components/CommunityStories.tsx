@@ -266,111 +266,95 @@ export default function CommunityStories() {
 
   if (!user) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('Community Stories')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground text-center py-8">
-            {t('Please sign in to view and share community stories.')}
-          </p>
-        </CardContent>
-      </Card>
+      <div className="bg-white rounded-2xl p-6 text-center text-muted-foreground">
+        {t('Please sign in to view and share community stories.')}
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t('Community Stories')}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {loading ? (
-          <div className="space-y-4">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="border rounded-lg p-4 animate-pulse">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="h-10 w-10 bg-muted rounded-full"></div>
-                  <div className="space-y-2">
-                    <div className="h-4 w-24 bg-muted rounded"></div>
-                    <div className="h-3 w-16 bg-muted rounded"></div>
-                  </div>
+    <div className="community-feed max-h-[60vh] overflow-y-auto pr-2 -mr-2">
+      {loading ? (
+        <div className="space-y-4">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="bg-white rounded-2xl p-4 animate-pulse shadow-sm">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="h-10 w-10 bg-muted rounded-full"></div>
+                <div className="space-y-2">
+                  <div className="h-4 w-24 bg-muted rounded"></div>
+                  <div className="h-3 w-16 bg-muted rounded"></div>
                 </div>
-                <div className="h-4 w-full bg-muted rounded mb-2"></div>
-                <div className="h-4 w-3/4 bg-muted rounded"></div>
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {stories.map((story) => (
-              <div key={story.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow animate-in fade-in slide-in-from-top-2 duration-500">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                        {story.profiles?.username?.substring(0, 2).toUpperCase() || "?"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-medium truncate">{story.profiles?.username || "Anonymous"}</p>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <span>{formatTimeAgo(story.created_at)}</span>
-                        <Badge variant="outline" className="text-xs flex items-center gap-1">
-                          {getRunTypeIcon(story.run_type)}
-                          {story.run_type}
-                        </Badge>
-                      </div>
+              <div className="h-4 w-full bg-muted rounded mb-2"></div>
+              <div className="h-4 w-3/4 bg-muted rounded"></div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {stories.map((story) => (
+            <div key={story.id} className="bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow animate-in fade-in slide-in-from-top-2 duration-500">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-10 w-10">
+                    <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                      {story.profiles?.username?.substring(0, 2).toUpperCase() || "?"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium truncate">{story.profiles?.username || "Anonymous"}</p>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <span>{formatTimeAgo(story.created_at)}</span>
+                      <Badge variant="outline" className="text-xs flex items-center gap-1">
+                        {getRunTypeIcon(story.run_type)}
+                        {story.run_type}
+                      </Badge>
                     </div>
                   </div>
-                  <Badge variant="secondary" className="text-xs">
-                    +{story.points_earned} pts
-                  </Badge>
                 </div>
-                
-                <h3 className="font-semibold mb-2">{story.title}</h3>
-                <p className="text-sm text-muted-foreground mb-3">{story.content}</p>
-                
-                {/* Story Image */}
-                {story.image_url && (
-                  <div className="mb-3">
-                    <img 
-                      src={story.image_url} 
-                      alt="Story image" 
-                      className="w-full h-48 object-cover rounded-md border"
-                      onError={(e) => {
-                        // Hide broken images
-                        e.currentTarget.style.display = 'none';
-                      }}
-                    />
-                  </div>
-                )}
-                
-                <div className="flex items-center justify-between">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    disabled={story.user_id === user?.id}
-                    onClick={() => handleToggleKudos(story.id, story.user_has_kudos)}
-                    className={`flex items-center gap-2 ${story.user_has_kudos ? 'text-red-500' : ''}`}
-                    title={story.user_id === user?.id ? "You can't kudos your own story" : 'Give one kudos'}
-                  >
-                    <Heart className={`h-4 w-4 ${story.user_has_kudos ? 'fill-current' : ''}`} />
-                    {story.kudos_count} {t('kudos')}
-                  </Button>
+                <Badge variant="secondary" className="text-xs">
+                  +{story.points_earned} pts
+                </Badge>
+              </div>
+
+              <h3 className="font-semibold mb-2">{story.title}</h3>
+              <p className="text-sm text-muted-foreground mb-3">{story.content}</p>
+
+              {story.image_url && (
+                <div className="mb-3">
+                  <img
+                    src={story.image_url}
+                    alt="Story image"
+                    className="w-full h-48 object-cover rounded-md border"
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                  />
                 </div>
+              )}
+
+              <div className="flex items-center justify-between">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  disabled={story.user_id === user?.id}
+                  onClick={() => handleToggleKudos(story.id, story.user_has_kudos)}
+                  className={`flex items-center gap-2 ${story.user_has_kudos ? 'text-red-500' : ''}`}
+                  title={story.user_id === user?.id ? "You can't kudos your own story" : 'Give one kudos'}
+                >
+                  <Heart className={`h-4 w-4 ${story.user_has_kudos ? 'fill-current' : ''}`} />
+                  {story.kudos_count} {t('kudos')}
+                </Button>
               </div>
-            ))}
-            
-            {stories.length === 0 && (
-              <div className="text-center py-8 text-muted-foreground">
-                <Heart className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>{t('No stories shared yet. Be the first to share your success!')}</p>
-              </div>
-            )}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+            </div>
+          ))}
+
+          {stories.length === 0 && (
+            <div className="bg-white rounded-2xl text-center py-8 text-muted-foreground">
+              <Heart className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p>{t('No stories shared yet. Be the first to share your success!')}</p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
