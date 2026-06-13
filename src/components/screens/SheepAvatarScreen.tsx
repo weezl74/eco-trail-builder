@@ -6,8 +6,6 @@ import { toast } from '@/hooks/use-toast';
 import TintedSheepBody from '@/components/TintedSheepBody';
 import nelsonHead from '@/assets/sheep/NelsonHead.svg.asset.json';
 import barbHead from '@/assets/sheep/BarbHead.svg.asset.json';
-import raincoatNelson from '@/assets/sheep/RaincoatNelson.svg.asset.json';
-import flyingUmbrella from '@/assets/sheep/FlyingUmbrellaNelson.svg.asset.json';
 import { CARD_PALETTES, getPalette } from '@/lib/cardPalettes';
 import { useTranslations } from '@/hooks/useTranslations';
 import { playGoodBaa } from '@/lib/sounds';
