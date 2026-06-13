@@ -200,18 +200,18 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
 
 
   return (
-    <div className="min-h-screen bg-white pb-24 relative">
+    <div className="fixed inset-0 bg-white overflow-hidden">
       {onBack && (
         <button
           onClick={onBack}
-          className="absolute top-3 left-3 z-30 bg-white rounded-full p-2 shadow"
+          className="fixed top-3 left-3 z-30 bg-white rounded-full p-2 shadow"
         >
           <ArrowLeft className="h-5 w-5 text-black" />
         </button>
       )}
 
       {/* Mode toggle */}
-      <div className="absolute top-3 left-1/2 -translate-x-1/2 z-30 bg-white rounded-full shadow flex p-1 font-serif font-bold text-sm">
+      <div className="fixed top-3 left-1/2 -translate-x-1/2 z-30 bg-white rounded-full shadow flex p-1 font-serif font-bold text-sm">
         {(['local', 'cool'] as Mode[]).map((m) => (
           <button
             key={m}
