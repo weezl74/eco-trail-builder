@@ -323,7 +323,7 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
         </>
       )}
 
-      <div className="relative w-full h-screen">
+      <div className="absolute inset-0 w-full h-full">
         <ShopLocalLeafletMap
           bbox={BBOX}
           pois={mode === 'local' ? leafletPois : []}
