@@ -201,13 +201,12 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
 
               {/* Umbrella — floats above the sheep */}
               {has('umbrella') && (
-                <img
-                  src={flyingUmbrella.url}
-                  alt=""
-                  className="absolute pointer-events-none select-none"
-                  style={{ left: '50%', top: '-22%', width: '55%', transform: 'translateX(-50%)' }}
-                  draggable={false}
-                />
+                <div
+                  className="absolute pointer-events-none text-5xl text-center"
+                  style={{ left: '50%', top: '-18%', transform: 'translateX(-50%)' }}
+                >
+                  ☂️
+                </div>
               )}
 
               {/* Top hat */}
