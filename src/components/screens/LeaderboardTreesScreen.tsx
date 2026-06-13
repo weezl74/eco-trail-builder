@@ -150,7 +150,7 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
       {mode === 'tree' && (
         <>
           <div className="flex justify-center my-6">
-            <TreePine className="h-28 w-28 text-green-700" strokeWidth={1.5} />
+            <OakTreeIcon className="h-28 w-28" />
           </div>
           <div className="bg-[#1f1f1f] rounded-2xl py-4 text-center text-white font-serif font-bold text-2xl mb-4">
             {t('Trees you have planted')}: {treesPlanted}
@@ -166,13 +166,20 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
       )}
 
       {mode === 'wool' && (
-        <div className="mt-6 bg-[#1f1f1f] rounded-2xl p-4 text-white font-serif">
-          <p className="font-bold text-lg mb-1">{t('Spend your wool')}</p>
-          <p className="text-sm opacity-80">
-            {t('Use wool points to customise your sheep on the Account tab, or cool the borough by placing solar farms and wind turbines on the Shop Local map.')}
-          </p>
-        </div>
+        <>
+          <div className="flex justify-center items-end gap-6 my-6">
+            <img src={nelsonHead.url} alt="Nelson" className="h-28 w-28 object-contain" />
+            <WoolBallIcon color={woolColor} className="h-24 w-24" />
+          </div>
+          <div className="mt-2 bg-[#1f1f1f] rounded-2xl p-4 text-white font-serif">
+            <p className="font-bold text-lg mb-1">{t('Spend your wool')}</p>
+            <p className="text-sm opacity-80">
+              {t('Use wool points to customise your sheep on the Account tab, or cool the borough by placing solar farms and wind turbines on the Shop Local map.')}
+            </p>
+          </div>
+        </>
       )}
+
     </div>
   );
 };
