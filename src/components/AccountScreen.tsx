@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import AccountCard from './AccountCard';
+import WoollyWallet from './WoollyWallet';
 import SheepAvatarScreen from './screens/SheepAvatarScreen';
 import AccountSubScreen, { Page as SubPage } from './screens/AccountSubScreen';
 import { supabase } from '@/integrations/supabase/client';
@@ -81,6 +82,8 @@ const AccountScreen: React.FC<AccountScreenProps> = ({
           rewards={rewards}
         />
       </div>
+
+      <WoollyWallet />
 
       {/* Quick action buttons removed — share now lives on the card itself */}
 
