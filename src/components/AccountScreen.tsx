@@ -71,8 +71,8 @@ const AccountScreen: React.FC<AccountScreenProps> = ({
 
   return (
     <div className="min-h-screen bg-[#f5a623] pb-24 px-4 pt-6">
-      {/* Carbon card placeholder uses the flippable card */}
-      <div className="mb-4">
+      {/* Carbon card with Woolly Wallet overlay */}
+      <WoollyWallet>
         <AccountCard
           name={name}
           memberSince={memberSince}
@@ -81,9 +81,8 @@ const AccountScreen: React.FC<AccountScreenProps> = ({
           badges={badges}
           rewards={rewards}
         />
-      </div>
+      </WoollyWallet>
 
-      <WoollyWallet />
 
       {/* Quick action buttons removed — share now lives on the card itself */}
 
