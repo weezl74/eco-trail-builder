@@ -12,6 +12,8 @@ export type LeafletPoi = {
   pledged: boolean;
   ctaLabel: string;
   onAction: () => void;
+  walletLabel?: string;
+  onAddToWallet?: () => void;
 };
 
 interface Props {
@@ -99,6 +101,9 @@ const ShopLocalLeafletMap: React.FC<Props> = ({ bbox, pois, className, onMapClic
         iconAnchor: [12, 32],
       });
       const marker = L.marker([p.lat, p.lng], { icon }).addTo(layer);
+      const walletBtn = p.onAddToWallet
+        ? `<button data-action="poi-wallet" style="background:white; color:#1f1f1f; border:1px solid #1f1f1f; border-radius:8px; padding:6px 10px; font-weight:700; font-family:inherit; cursor:pointer; width:100%; margin-top:6px;">${p.walletLabel ?? 'Add to wallet'}</button>`
+        : '';
       const popupHtml = `
         <div style="font-family: Georgia, serif; min-width: 180px;">
           <div style="font-weight:700; margin-bottom:4px;">${p.name}</div>
@@ -106,6 +111,7 @@ const ShopLocalLeafletMap: React.FC<Props> = ({ bbox, pois, className, onMapClic
           <button data-action="poi-cta" style="background:${p.color}; color:white; border:none; border-radius:8px; padding:6px 10px; font-weight:700; font-family:inherit; cursor:pointer; width:100%;">
             ${p.ctaLabel}
           </button>
+          ${walletBtn}
         </div>`;
       marker.bindPopup(popupHtml);
       marker.on('popupopen', (e) => {
@@ -115,6 +121,14 @@ const ShopLocalLeafletMap: React.FC<Props> = ({ bbox, pois, className, onMapClic
           btn.onclick = (ev) => {
             ev.stopPropagation();
             p.onAction();
+            marker.closePopup();
+          };
+        }
+        const wbtn = node?.querySelector('[data-action="poi-wallet"]') as HTMLButtonElement | null;
+        if (wbtn && p.onAddToWallet) {
+          wbtn.onclick = (ev) => {
+            ev.stopPropagation();
+            p.onAddToWallet?.();
             marker.closePopup();
           };
         }
