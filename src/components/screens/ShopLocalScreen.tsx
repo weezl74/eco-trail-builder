@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useTranslations } from '@/hooks/useTranslations';
 import WalkMyWarmUpJourney from '@/components/WalkMyWarmUpJourney';
 import ShopLocalLeafletMap, { LeafletPoi } from '@/components/ShopLocalLeafletMap';
+import { useWallet } from '@/hooks/useWallet';
 
 type Category = 'libraries' | 'allotments' | 'leisure' | 'ev' | 'eco';
 type Saving = { money: number; co2: number; water: number };
@@ -94,6 +95,7 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const [placing, setPlacing] = useState<RenewableType | null>(null);
   const [pois, setPois] = useState<POI[]>([]);
   const { pledged, addPledge, renewables, woolPoints, buyRenewable } = useSavings();
+  const { businesses: walletBusinesses, addBusiness } = useWallet();
   const { t } = useTranslations();
   const [walkOpen, setWalkOpen] = useState(false);
 
@@ -169,6 +171,8 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
         const id = pinId(p);
         const isPledged = pledged.includes(id);
         const isLeisure = p.category === 'leisure';
+        const inWallet = walletBusinesses.some((b) => b.id === id);
+        const reason = p.carbonAction || info.message;
         return {
           id,
           name: p.name,
@@ -183,10 +187,24 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
             ? `✓ ${t('Pledged')}`
             : t('Pledge to visit'),
           onAction: () => (isLeisure ? setWalkOpen(true) : handlePledge(p)),
+          walletLabel: inWallet ? `✓ ${t('In wallet')}` : t('Add to wallet'),
+          onAddToWallet: () => {
+            const ok = addBusiness({
+              id,
+              name: p.name,
+              category: info.label,
+              color: info.color,
+              reason,
+            });
+            toast({
+              title: ok ? t('Added to wallet') : t('Already in wallet'),
+              description: p.name,
+            });
+          },
         };
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [visible, pledged],
+    [visible, pledged, walletBusinesses],
   );
 
 
