@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useTranslations } from '@/hooks/useTranslations';
 import WalkMyWarmUpJourney from '@/components/WalkMyWarmUpJourney';
 import ShopLocalLeafletMap, { LeafletPoi } from '@/components/ShopLocalLeafletMap';
-import { useWallet } from '@/hooks/useWallet';
+import { useWalletBusinesses as useWallet } from '@/hooks/useWallet';
 
 type Category = 'libraries' | 'allotments' | 'leisure' | 'ev' | 'eco';
 type Saving = { money: number; co2: number; water: number };
