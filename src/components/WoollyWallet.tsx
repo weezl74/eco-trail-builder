@@ -136,6 +136,7 @@ const WoollyWallet: React.FC<Props> = ({ children }) => {
       });
     }
 
+    base.push(
       {
         id: 'free-swim',
         title: t('Free Swim'),
@@ -163,7 +164,8 @@ const WoollyWallet: React.FC<Props> = ({ children }) => {
           </div>
         ),
       },
-    ];
+    );
+
     const extras: DealtCard[] = items.map((it: WalletItem) => {
       if (it.kind === 'business') {
         return {
