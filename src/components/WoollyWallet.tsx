@@ -379,6 +379,14 @@ const WoollyWallet: React.FC<Props> = ({ children }) => {
         </div>
       )}
 
+      {showBinSetup && (
+        <BinDaySetup
+          initial={binCfg}
+          onCancel={() => setShowBinSetup(false)}
+          onSave={(c) => { saveBin(c); setShowBinSetup(false); toast({ title: t('Bin day saved') }); }}
+        />
+      )}
+
       <style>{`
         @keyframes wallet-deal {
           from { transform: translate(-20px, -30px) rotate(-6deg); opacity: 0; }
