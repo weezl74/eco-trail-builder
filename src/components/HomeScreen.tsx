@@ -9,6 +9,7 @@ import { useTranslations } from '@/hooks/useTranslations';
 import badHomepageAsset from '@/assets/final-bad-homepage.svg.asset.json';
 import nelsonHead from '@/assets/sheep/NelsonHead.svg.asset.json';
 import TintedSheepBody from './TintedSheepBody';
+import BinDayBanner from './BinDayBanner';
 
 type Screen = 'home' | 'avatar' | 'calendar' | 'rewards' | 'messages';
 
@@ -41,6 +42,9 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
           </button>
         </div>
       </div>
+
+      {/* Nelson's nighttime nudge — only shows on bin-eve after 6pm */}
+      <BinDayBanner />
 
       {/* Points balances */}
       <div className="mx-4 mt-3 grid grid-cols-2 gap-3">
