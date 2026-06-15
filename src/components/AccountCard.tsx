@@ -6,6 +6,8 @@ import { useSavings } from '@/hooks/useSavings';
 import { getPalette } from '@/lib/cardPalettes';
 import { useTranslations } from '@/hooks/useTranslations';
 import WalkMyWarmUpJourney from './WalkMyWarmUpJourney';
+import WoolStatement, { useWoolTransactions } from './WoolStatement';
+import { ChevronRight } from 'lucide-react';
 
 
 interface AccountCardProps {
@@ -28,7 +30,10 @@ const AccountCard: React.FC<AccountCardProps> = ({
   const [flipped, setFlipped] = useState(false);
   const [stampsEarned, setStampsEarned] = useState(2);
   const [scanOpen, setScanOpen] = useState(false);
+  const [statementOpen, setStatementOpen] = useState(false);
   const [sharing, setSharing] = useState(false);
+  const { txns } = useWoolTransactions();
+  const recent = [...txns].slice(-2).reverse();
   const frontRef = useRef<HTMLDivElement>(null);
   const backRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -140,6 +145,33 @@ const AccountCard: React.FC<AccountCardProps> = ({
                 </div>
               )}
 
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); setStatementOpen(true); }}
+                className="mt-1 rounded-lg px-2 py-1 text-left flex items-center gap-2 active:scale-[0.98] transition"
+                style={{ background: 'color-mix(in srgb, currentColor 14%, transparent)', border: '1px solid color-mix(in srgb, currentColor 25%, transparent)' }}
+                aria-label={t('Open wool statement')}
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="text-[8px] uppercase tracking-wider opacity-70 leading-none">{t('Recent')}</p>
+                  <div className="mt-0.5 space-y-0.5">
+                    {recent.length === 0 ? (
+                      <p className="text-[10px] opacity-80">{t('No activity yet')}</p>
+                    ) : (
+                      recent.map((r) => (
+                        <div key={r.id} className="flex items-center justify-between gap-2 text-[10px] leading-tight">
+                          <span className="truncate capitalize opacity-90">{r.label}</span>
+                          <span className={`font-bold shrink-0 ${r.delta > 0 ? 'text-green-300' : r.delta < 0 ? 'text-red-300' : ''}`}>
+                            {r.delta > 0 ? '+' : ''}{r.delta}
+                          </span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+                <ChevronRight className="h-3.5 w-3.5 opacity-70 shrink-0" />
+              </button>
+
               <div className="flex items-end justify-between">
                 <div>
                   <p className="text-xs opacity-80">{t('POINTS')}</p>
@@ -156,6 +188,8 @@ const AccountCard: React.FC<AccountCardProps> = ({
               </div>
             </div>
           </div>
+
+
 
           {/* BACK */}
           <div ref={backRef} className="absolute inset-0 backface-hidden rotate-y-180 rounded-2xl shadow-xl overflow-hidden"
@@ -224,6 +258,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
       </div>
 
       <WalkMyWarmUpJourney open={scanOpen} onOpenChange={setScanOpen} onEarned={earnStamp} />
+      <WoolStatement open={statementOpen} onOpenChange={setStatementOpen} />
 
       <p className="text-center text-xs text-white/80 mt-2">{t('Tap card to flip')}</p>
     </div>
