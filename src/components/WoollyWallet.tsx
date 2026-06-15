@@ -1,9 +1,11 @@
 import React, { useMemo, useRef, useState } from 'react';
-import { Wallet, ArrowDown, Waves, TreePine, MapPin, Plus, Lightbulb, X } from 'lucide-react';
+import { Wallet, ArrowDown, Waves, TreePine, MapPin, Plus, Lightbulb, X, Trash2, Recycle, ExternalLink } from 'lucide-react';
 import { useWallet, WalletItem } from '@/hooks/useWallet';
 import { useSavings } from '@/hooks/useSavings';
 import { useTranslations } from '@/hooks/useTranslations';
 import { useToast } from '@/hooks/use-toast';
+import { useBinDay, nextCollection } from '@/hooks/useBinDay';
+import BinDaySetup from './BinDaySetup';
 
 type DealtCard = {
   id: string;
