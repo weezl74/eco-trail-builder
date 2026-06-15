@@ -186,6 +186,10 @@ const AccountCard: React.FC<AccountCardProps> = ({
                   <p className="text-sm font-bold">{memberSince}</p>
                 </div>
               </div>
+            </div>
+          </div>
+
+
 
           {/* BACK */}
           <div ref={backRef} className="absolute inset-0 backface-hidden rotate-y-180 rounded-2xl shadow-xl overflow-hidden"
