@@ -258,6 +258,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
       </div>
 
       <WalkMyWarmUpJourney open={scanOpen} onOpenChange={setScanOpen} onEarned={earnStamp} />
+      <WoolStatement open={statementOpen} onOpenChange={setStatementOpen} />
 
       <p className="text-center text-xs text-white/80 mt-2">{t('Tap card to flip')}</p>
     </div>
