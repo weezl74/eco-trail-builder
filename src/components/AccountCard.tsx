@@ -6,6 +6,8 @@ import { useSavings } from '@/hooks/useSavings';
 import { getPalette } from '@/lib/cardPalettes';
 import { useTranslations } from '@/hooks/useTranslations';
 import WalkMyWarmUpJourney from './WalkMyWarmUpJourney';
+import WoolStatement, { useWoolTransactions } from './WoolStatement';
+import { ChevronRight } from 'lucide-react';
 
 
 interface AccountCardProps {
