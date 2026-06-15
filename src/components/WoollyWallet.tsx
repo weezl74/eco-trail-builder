@@ -1,9 +1,11 @@
 import React, { useMemo, useRef, useState } from 'react';
-import { Wallet, ArrowDown, Waves, TreePine, MapPin, Plus, Lightbulb, X } from 'lucide-react';
+import { Wallet, ArrowDown, Waves, TreePine, MapPin, Plus, Lightbulb, X, Trash2, Recycle, ExternalLink } from 'lucide-react';
 import { useWallet, WalletItem } from '@/hooks/useWallet';
 import { useSavings } from '@/hooks/useSavings';
 import { useTranslations } from '@/hooks/useTranslations';
 import { useToast } from '@/hooks/use-toast';
+import { useBinDay, nextCollection } from '@/hooks/useBinDay';
+import BinDaySetup from './BinDaySetup';
 
 type DealtCard = {
   id: string;
@@ -60,14 +62,81 @@ const WoollyWallet: React.FC<Props> = ({ children }) => {
   const { items, addPhoto, removeItem } = useWallet();
   const { treesPlanted } = useSavings();
   const { toast } = useToast();
+  const { config: binCfg, dismissed: binDismissed, save: saveBin, dismiss: dismissBin } = useBinDay();
   const [open, setOpen] = useState(false); // session-only; resets each visit
   const [index, setIndex] = useState(0);
+  const [showBinSetup, setShowBinSetup] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const [pendingPhoto, setPendingPhoto] = useState<string | null>(null);
   const [caption, setCaption] = useState('');
 
   const cards = useMemo<DealtCard[]>(() => {
-    const base: DealtCard[] = [
+    const base: DealtCard[] = [];
+
+    // #WhatWasteWhen — everyone gets this unless they've "Binned it"
+    if (!binDismissed) {
+      const upcoming = binCfg ? nextCollection(binCfg) : null;
+      const dateStr = upcoming
+        ? upcoming.date.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'short' })
+        : null;
+      base.push({
+        id: 'bin-day',
+        title: binCfg ? t('Next collection') : t('Set your bin day'),
+        subtitle: '#WhatWasteWhen',
+        gradient: 'from-[#0f4d2a] to-[#062815]',
+        icon: <Recycle className="h-5 w-5" />,
+        body: binCfg ? (
+          <div className="mt-3 bg-white/15 rounded-xl p-3 backdrop-blur space-y-2">
+            <p className="font-bold text-base">{dateStr}</p>
+            <div className="flex flex-wrap gap-1.5 text-[10px]">
+              <span className="bg-[#7b3f1d] px-2 py-1 rounded-full">{t('Recycling')}</span>
+              <span className="bg-[#166534] px-2 py-1 rounded-full">{t('Food & Garden')}</span>
+              {upcoming?.general && (
+                <span className="bg-black/60 px-2 py-1 rounded-full">{t('General')}</span>
+              )}
+            </div>
+            <p className="text-[10px] opacity-80">
+              {binCfg.nudge ? t('Nelson will nudge you the night before 🌙') : t('Nightly nudge off')}
+            </p>
+            <a
+              href="https://www.caerphilly.gov.uk/Services/Recycling-and-waste/Fly-tipping"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="inline-flex items-center gap-1 text-[10px] underline opacity-90"
+            >
+              {t('Report fly-tipping')} <ExternalLink className="h-3 w-3" />
+            </a>
+            <button
+              onClick={(e) => { e.stopPropagation(); setShowBinSetup(true); }}
+              className="block text-[10px] underline opacity-90"
+            >
+              {t('Edit')}
+            </button>
+          </div>
+        ) : (
+          <div className="mt-3 bg-white/15 rounded-xl p-3 backdrop-blur">
+            <p className="text-sm leading-snug mb-2">
+              {t('Tap to add your address and never miss a bin day.')}
+            </p>
+            <button
+              onClick={(e) => { e.stopPropagation(); setShowBinSetup(true); }}
+              className="text-[11px] font-bold bg-[#f4971d] text-black px-3 py-1.5 rounded-lg"
+            >
+              {t('Set up')}
+            </button>
+          </div>
+        ),
+        onRemove: () => {
+          if (confirm(t('Bin it for good? You won’t get bin-day nudges.'))) {
+            dismissBin();
+            setIndex(0);
+          }
+        },
+      });
+    }
+
+    base.push(
       {
         id: 'free-swim',
         title: t('Free Swim'),
@@ -95,7 +164,8 @@ const WoollyWallet: React.FC<Props> = ({ children }) => {
           </div>
         ),
       },
-    ];
+    );
+
     const extras: DealtCard[] = items.map((it: WalletItem) => {
       if (it.kind === 'business') {
         return {
@@ -125,7 +195,7 @@ const WoollyWallet: React.FC<Props> = ({ children }) => {
       };
     });
     return [...base, ...extras];
-  }, [items, treesPlanted, t, removeItem]);
+  }, [items, treesPlanted, t, removeItem, binCfg, binDismissed, dismissBin]);
 
   const handleToggle = () => {
     if (open) { setOpen(false); return; }
@@ -307,6 +377,14 @@ const WoollyWallet: React.FC<Props> = ({ children }) => {
             </div>
           </div>
         </div>
+      )}
+
+      {showBinSetup && (
+        <BinDaySetup
+          initial={binCfg}
+          onCancel={() => setShowBinSetup(false)}
+          onSave={(c) => { saveBin(c); setShowBinSetup(false); toast({ title: t('Bin day saved') }); }}
+        />
       )}
 
       <style>{`
