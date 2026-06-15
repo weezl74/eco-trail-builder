@@ -195,7 +195,7 @@ const WoollyWallet: React.FC<Props> = ({ children }) => {
       };
     });
     return [...base, ...extras];
-  }, [items, treesPlanted, t, removeItem]);
+  }, [items, treesPlanted, t, removeItem, binCfg, binDismissed, dismissBin]);
 
   const handleToggle = () => {
     if (open) { setOpen(false); return; }
