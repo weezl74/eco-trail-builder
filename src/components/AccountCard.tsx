@@ -153,7 +153,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
                 aria-label={t('Open wool statement')}
               >
                 <div className="flex-1 min-w-0">
-                  <p className="text-[8px] uppercase tracking-wider opacity-70 leading-none">{t('Recent')}</p>
+                  <p className="text-[8px] uppercase tracking-wider opacity-70 leading-none">{t('Recent transactions')}</p>
                   <div className="mt-0.5 space-y-0.5">
                     {recent.length === 0 ? (
                       <p className="text-[10px] opacity-80">{t('No activity yet')}</p>
