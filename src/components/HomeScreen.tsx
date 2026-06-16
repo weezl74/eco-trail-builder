@@ -85,10 +85,10 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
       </div>
 
       {/* CTA */}
-      <div className="mx-4 mt-3 flex justify-center">
+      <div className="mx-4 mt-2 flex justify-center">
         <button
           onClick={onGoToPledges}
-          className="bg-[#f5a623] hover:bg-[#e69517] active:scale-95 transition text-black font-serif font-bold text-base rounded-2xl px-8 py-3 shadow-lg w-full max-w-sm"
+          className="bg-[#f5a623] hover:bg-[#e69517] active:scale-95 transition text-black font-serif font-bold text-base rounded-xl px-8 py-2.5 shadow-lg w-full max-w-sm"
         >
           {t('Save Me More')}
         </button>
