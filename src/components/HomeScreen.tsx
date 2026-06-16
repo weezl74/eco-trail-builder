@@ -23,7 +23,7 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
   if (screen === 'messages') return <NelsonMessagesScreen onBack={() => setScreen('home')} />;
 
   return (
-    <div className="min-h-screen bg-black pb-24 flex flex-col">
+    <div className="h-screen bg-black pb-24 flex flex-col overflow-hidden">
       {/* Pill of icons */}
       <div className="pt-4 flex justify-center">
         <div className="bg-[#f5a623] rounded-full px-5 py-2 flex items-center gap-5 shadow-lg">
