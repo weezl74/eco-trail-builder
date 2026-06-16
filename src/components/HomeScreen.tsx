@@ -14,7 +14,7 @@ type Screen = 'home' | 'avatar' | 'calendar' | 'rewards' | 'messages';
 
 const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges }) => {
   const [screen, setScreen] = useState<Screen>('home');
-  const { savings, pledged, woolPoints, treePoints, woolColor } = useSavings();
+  const { savings, pledged, woolPoints, treePoints, woolColor, accessories } = useSavings();
   const { t } = useTranslations();
 
   if (screen === 'avatar') return <SheepAvatarScreen onBack={() => setScreen('home')} />;
