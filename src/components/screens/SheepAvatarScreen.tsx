@@ -160,106 +160,12 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
             >Barb</button>
           </div>
           <div className="flex items-center justify-center mb-3">
-            <div className="relative w-64 h-64">
-              {/* Sheep body — inline SVG recoloured to wool colour */}
-              <TintedSheepBody
-                color={woolColor}
-                className="absolute inset-0 w-full h-full [&>svg]:w-full [&>svg]:h-full select-none"
-              />
-              {/* Head — sized & positioned over the body */}
-              <img
-                src={head === 'nelson' ? nelsonHead.url : barbHead.url}
-                alt={head === 'nelson' ? 'Nelson head' : 'Barb head'}
-                className="absolute select-none pointer-events-none"
-                style={{ left: '50%', top: '-6%', width: '52%', transform: 'translateX(-50%)' }}
-                draggable={false}
-              />
-
-              {/* Umbrella — floats above the sheep */}
-              {has('umbrella') && (
-                <div
-                  className="absolute pointer-events-none text-5xl text-center"
-                  style={{ left: '50%', top: '-18%', transform: 'translateX(-50%)' }}
-                >
-                  ☂️
-                </div>
-              )}
-
-              {/* Top hat */}
-              {has('tophat') && (
-                <div
-                  className="absolute pointer-events-none text-3xl text-center"
-                  style={{ left: '50%', top: '-2%', transform: 'translateX(-50%)' }}
-                >
-                  🎩
-                </div>
-              )}
-
-              {/* Sun hat */}
-              {has('sunhat') && (
-                <div
-                  className="absolute pointer-events-none text-3xl text-center"
-                  style={{ left: '50%', top: '0%', transform: 'translateX(-50%)' }}
-                >
-                  👒
-                </div>
-              )}
-
-              {/* Sunglasses — across the eyes */}
-              {has('sunglasses') && (
-                <div
-                  className="absolute pointer-events-none flex items-center gap-[2px]"
-                  style={{ left: '50%', top: '11%', width: '22%', transform: 'translateX(-50%)' }}
-                >
-                  <div className="flex-1 aspect-[2/1] rounded-sm bg-black" />
-                  <div className="flex-1 aspect-[2/1] rounded-sm bg-black" />
-                </div>
-              )}
-
-              {/* Scarf */}
-              {has('scarf') && (
-                <div
-                  className="absolute pointer-events-none text-2xl text-center"
-                  style={{ left: '50%', top: '24%', transform: 'translateX(-50%)' }}
-                >
-                  🧣
-                </div>
-              )}
-
-              {/* Bow tie */}
-              {has('bowtie') && (
-                <div
-                  className="absolute pointer-events-none"
-                  style={{ left: '50%', top: '22%', width: '12%', transform: 'translateX(-50%)' }}
-                >
-                  <svg viewBox="0 0 40 20" className="w-full">
-                    <polygon points="0,2 20,10 0,18" fill="#dc2626" />
-                    <polygon points="40,2 20,10 40,18" fill="#dc2626" />
-                    <circle cx="20" cy="10" r="3" fill="#7a0d0d" />
-                  </svg>
-                </div>
-              )}
-
-              {/* Raincoat */}
-              {has('raincoat') && (
-                <div
-                  className="absolute pointer-events-none text-4xl text-center"
-                  style={{ left: '50%', top: '38%', transform: 'translateX(-50%)' }}
-                >
-                  🧥
-                </div>
-              )}
-
-              {/* Wellies */}
-              {has('wellies') && (
-                <div
-                  className="absolute pointer-events-none text-2xl text-center"
-                  style={{ left: '50%', top: '78%', transform: 'translateX(-50%)' }}
-                >
-                  🥾
-                </div>
-              )}
-            </div>
+            <NelsonAvatar
+              woolColor={woolColor}
+              accessories={accessories}
+              head={head}
+              className="w-64 h-64 select-none"
+            />
           </div>
 
           <div className="bg-[#3a3a3a] rounded-2xl p-3 mb-3">
