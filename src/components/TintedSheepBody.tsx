@@ -56,9 +56,10 @@ const TintedSheepBody: React.FC<Props> = ({ color, className, style }) => {
     );
   }
 
-  // The body of the sheep uses fill="currentColor"; the four legs use #DECAAD.
-  // Recolour both so the whole wool surface adopts the user's chosen colour.
-  const recoloured = svg.replace(/#DECAAD/gi, color);
+  // The body of the sheep uses fill="currentColor" — this is the wool.
+  // The four legs / armbands use #DECAAD and must stay their natural colour,
+  // so we deliberately do NOT recolour them.
+  const recoloured = svg;
 
   return (
     <div
