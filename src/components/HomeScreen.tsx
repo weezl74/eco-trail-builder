@@ -77,19 +77,11 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
           loading="lazy"
         />
         {/* Nelson overlay — bottom left */}
-        <div className="absolute bottom-2 left-2 w-2/5 aspect-square pointer-events-none">
-          <TintedSheepBody
-            color={woolColor}
-            className="absolute inset-0 w-full h-full drop-shadow-lg [&>svg]:w-full [&>svg]:h-full [&>svg]:object-contain"
-          />
-          <img
-            src={nelsonHead.url}
-            alt="Nelson the sheep"
-            className="absolute"
-            style={{ left: '50%', top: '-14%', width: '70%', transform: 'translateX(-50%)' }}
-            draggable={false}
-          />
-        </div>
+        <NelsonAvatar
+          woolColor={woolColor}
+          accessories={accessories}
+          className="absolute bottom-2 left-2 w-2/5 aspect-square pointer-events-none"
+        />
       </div>
 
       {/* CTA */}
