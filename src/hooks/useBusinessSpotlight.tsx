@@ -8,9 +8,6 @@ export interface BusinessCardRow {
   tagline: string | null;
   sector: string | null;
   website: string | null;
-  phone: string | null;
-  address: string | null;
-  postcode: string | null;
   logo_url: string | null;
   pen_portrait: string | null;
   climate_goals: string | null;
@@ -24,10 +21,9 @@ export const useBusinessSpotlight = () => {
   useEffect(() => {
     let active = true;
     (async () => {
-      const { data } = await supabase
-        .from('business_cards')
-        .select('*')
-        .eq('status', 'approved')
+      const { data } = await (supabase as any)
+        .from('business_cards_public')
+        .select('id,user_id,business_name,tagline,sector,website,logo_url,pen_portrait,climate_goals,offer_to_residents,offer_to_businesses')
         .order('created_at', { ascending: false })
         .limit(20);
       if (!active) return;
