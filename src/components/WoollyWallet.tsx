@@ -64,7 +64,8 @@ const WoollyWallet: React.FC<Props> = ({ children }) => {
   const { treesPlanted } = useSavings();
   const { toast } = useToast();
   const { config: binCfg, dismissed: binDismissed, save: saveBin, dismiss: dismissBin } = useBinDay();
-  const [open, setOpen] = useState(false); // session-only; resets each visit
+  const { cards: spotlightCards } = useBusinessSpotlight();
+  const [open, setOpen] = useState(false);
   const [index, setIndex] = useState(0);
   const [showBinSetup, setShowBinSetup] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
