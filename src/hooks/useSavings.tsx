@@ -74,7 +74,7 @@ export const useSavings = () => {
   }, [userId]);
 
   const addPledge = useCallback((id: string, delta: Saving) => {
-    const s = read();
+    const s = read(userId);
     if (s.pledged.includes(id)) return false;
     const next: State = {
       ...s,
@@ -87,12 +87,12 @@ export const useSavings = () => {
       woolPoints: s.woolPoints + 25,
       treePoints: s.treePoints + 10,
     };
-    write(next);
+    write(next, userId);
     return true;
-  }, []);
+  }, [userId]);
 
   const buyRenewable = useCallback((type: RenewableType, x: number, y: number) => {
-    const s = read();
+    const s = read(userId);
     const cost = RENEWABLE_COSTS[type];
     if (s.woolPoints < cost) return false;
     const next: State = {
@@ -103,34 +103,34 @@ export const useSavings = () => {
         { id: `${type}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, type, x, y },
       ],
     };
-    write(next);
+    write(next, userId);
     return true;
-  }, []);
+  }, [userId]);
 
   const buyAccessory = useCallback((id: string, cost: number) => {
-    const s = read();
+    const s = read(userId);
     if (s.accessories.includes(id)) return true;
     if (s.woolPoints < cost) return false;
-    write({ ...s, woolPoints: s.woolPoints - cost, accessories: [...s.accessories, id] });
+    write({ ...s, woolPoints: s.woolPoints - cost, accessories: [...s.accessories, id] }, userId);
     return true;
-  }, []);
+  }, [userId]);
 
   const plantTree = useCallback((cost = 100) => {
-    const s = read();
+    const s = read(userId);
     if (s.treePoints < cost) return false;
-    write({ ...s, treePoints: s.treePoints - cost, treesPlanted: s.treesPlanted + 1 });
+    write({ ...s, treePoints: s.treePoints - cost, treesPlanted: s.treesPlanted + 1 }, userId);
     return true;
-  }, []);
+  }, [userId]);
 
   const setCardColor = useCallback((color: string) => {
-    const s = read();
-    write({ ...s, cardColor: color });
-  }, []);
+    const s = read(userId);
+    write({ ...s, cardColor: color }, userId);
+  }, [userId]);
 
   const setWoolColor = useCallback((color: string) => {
-    const s = read();
-    write({ ...s, woolColor: color });
-  }, []);
+    const s = read(userId);
+    write({ ...s, woolColor: color }, userId);
+  }, [userId]);
 
   return {
     ...state,
