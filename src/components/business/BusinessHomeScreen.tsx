@@ -23,7 +23,7 @@ const BusinessHomeScreen: React.FC<{ onGoToActions: () => void }> = ({ onGoToAct
   }, [user]);
 
   return (
-    <div className="h-screen overflow-hidden bg-black pb-24 px-4 pt-6 flex flex-col">
+    <div className="h-[calc(100svh-5rem)] max-h-[calc(100svh-5rem)] overflow-hidden bg-black pb-3 px-4 pt-6 flex flex-col">
       <div className="bg-[#f5a623] rounded-2xl p-4 shadow-lg flex items-center gap-3 mb-4">
         <Building2 className="h-7 w-7 text-black" />
         <div>

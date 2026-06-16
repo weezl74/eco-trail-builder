@@ -20,8 +20,8 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ activeTab, onTabCha
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#8a8a8a] border-t border-black/20">
-      <div className="flex">
+    <div className="fixed bottom-0 left-0 right-0 z-50 h-20 bg-[#8a8a8a] border-t border-black/20">
+      <div className="flex h-full">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
