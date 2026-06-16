@@ -19,7 +19,7 @@ type Pledge = {
   category: string | null;
 };
 
-const PledgesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
+const PledgesScreen: React.FC<{ onBack?: () => void; userGroup?: 'resident' | 'business' }> = ({ onBack, userGroup = 'resident' }) => {
   const [tab, setTab] = useState<Tab>('all');
   const [pledges, setPledges] = useState<Pledge[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,7 +33,7 @@ const PledgesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
       const { data, error } = await supabase
         .from('pledges')
         .select('id,title,description,co2_saved,money_saved,water_saved,wool_points,tag,key,category')
-        .eq('user_group', 'resident')
+        .eq('user_group', userGroup)
         .order('id', { ascending: true });
       if (!mounted) return;
       if (error) console.error('Failed to load pledges', error);
@@ -41,7 +41,7 @@ const PledgesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
       setLoading(false);
     })();
     return () => { mounted = false; };
-  }, []);
+  }, [userGroup]);
 
   const activate = (p: Pledge) => {
     if (activated[p.key]) return;

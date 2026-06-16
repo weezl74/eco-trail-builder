@@ -1,10 +1,11 @@
 import React, { useMemo, useRef, useState } from 'react';
-import { Wallet, ArrowDown, Waves, TreePine, MapPin, Plus, Lightbulb, X, Trash2, Recycle, ExternalLink } from 'lucide-react';
+import { Wallet, ArrowDown, Waves, TreePine, MapPin, Plus, Lightbulb, X, Trash2, Recycle, ExternalLink, Building2 } from 'lucide-react';
 import { useWallet, WalletItem } from '@/hooks/useWallet';
 import { useSavings } from '@/hooks/useSavings';
 import { useTranslations } from '@/hooks/useTranslations';
 import { useToast } from '@/hooks/use-toast';
 import { useBinDay, nextCollection } from '@/hooks/useBinDay';
+import { useBusinessSpotlight } from '@/hooks/useBusinessSpotlight';
 import BinDaySetup from './BinDaySetup';
 
 type DealtCard = {
@@ -63,7 +64,8 @@ const WoollyWallet: React.FC<Props> = ({ children }) => {
   const { treesPlanted } = useSavings();
   const { toast } = useToast();
   const { config: binCfg, dismissed: binDismissed, save: saveBin, dismiss: dismissBin } = useBinDay();
-  const [open, setOpen] = useState(false); // session-only; resets each visit
+  const { cards: spotlightCards } = useBusinessSpotlight();
+  const [open, setOpen] = useState(false);
   const [index, setIndex] = useState(0);
   const [showBinSetup, setShowBinSetup] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -194,8 +196,43 @@ const WoollyWallet: React.FC<Props> = ({ children }) => {
         onRemove: () => { removeItem(it.id); setIndex(0); },
       };
     });
-    return [...base, ...extras];
-  }, [items, treesPlanted, t, removeItem, binCfg, binDismissed, dismissBin]);
+    const spotlights: DealtCard[] = spotlightCards.map((c) => ({
+      id: `biz-${c.id}`,
+      title: c.business_name,
+      subtitle: c.sector ? `${t('Business spotlight')} · ${t(c.sector)}` : t('Business spotlight'),
+      gradient: 'from-[#f4971d] to-[#7c2d12]',
+      icon: <Building2 className="h-5 w-5" />,
+      body: (
+        <div className="mt-3 bg-white/15 rounded-xl p-3 backdrop-blur space-y-2">
+          {c.tagline && <p className="text-sm italic leading-snug">"{c.tagline}"</p>}
+          {c.offer_to_residents && (
+            <div>
+              <p className="text-[10px] uppercase tracking-wider opacity-80">{t('For residents')}</p>
+              <p className="text-xs leading-snug">{c.offer_to_residents}</p>
+            </div>
+          )}
+          {c.offer_to_businesses && (
+            <div>
+              <p className="text-[10px] uppercase tracking-wider opacity-80">{t('For businesses')}</p>
+              <p className="text-xs leading-snug">{c.offer_to_businesses}</p>
+            </div>
+          )}
+          {c.website && (
+            <a
+              href={c.website.startsWith('http') ? c.website : `https://${c.website}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="inline-flex items-center gap-1 text-[10px] underline opacity-90"
+            >
+              {t('Visit')} <ExternalLink className="h-3 w-3" />
+            </a>
+          )}
+        </div>
+      ),
+    }));
+    return [...base, ...extras, ...spotlights];
+  }, [items, treesPlanted, t, removeItem, binCfg, binDismissed, dismissBin, spotlightCards]);
 
   const handleToggle = () => {
     if (open) { setOpen(false); return; }

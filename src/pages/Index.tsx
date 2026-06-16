@@ -5,9 +5,12 @@ import AuthChoice from "@/components/AuthChoice";
 import LoginForm from "@/components/LoginForm";
 import RegisterForm, { RegistrationDetails } from "@/components/RegisterForm";
 import SimplifiedApp from "@/components/SimplifiedApp";
+import BusinessOnboarding from "@/components/business/BusinessOnboarding";
+import BusinessApp from "@/components/business/BusinessApp";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
-type Stage = "landing" | "language" | "auth" | "login" | "register" | "app";
+type Stage = "landing" | "language" | "auth" | "login" | "register" | "app" | "business-onboarding" | "business-app";
 
 const Index = () => {
   const [stage, setStage] = useState<Stage>("landing");
@@ -21,24 +24,63 @@ const Index = () => {
   const { user, loading } = useAuth();
   const [bootChecked, setBootChecked] = useState(false);
 
-  // On first mount, if a valid session exists, skip straight to the app
+  // Decide between resident-app and business-app based on profiles.account_type
+  const routeAuthenticated = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("profiles")
+      .select("account_type")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (data?.account_type === "business") {
+      // If they have no card yet, route them to onboarding
+      const { data: card } = await supabase
+        .from("business_cards")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      setStage(card ? "business-app" : "business-onboarding");
+    } else {
+      setStage("app");
+    }
+  };
+
   useEffect(() => {
     if (loading) return;
     if (!bootChecked) {
-      if (user) setStage("app");
+      if (user) routeAuthenticated();
       setBootChecked(true);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, user, bootChecked]);
 
-  // After login/register success, advance to app
   useEffect(() => {
-    if (user && (stage === "login" || stage === "register" || stage === "auth")) {
-      setStage("app");
+    if (user && (stage === "login" || stage === "auth")) {
+      routeAuthenticated();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, stage]);
 
   if (loading && !bootChecked) {
     return <div className="min-h-screen bg-[#f5a623]" />;
+  }
+
+  if (stage === "business-app") {
+    return (
+      <BusinessApp
+        onSignOut={() => setStage("landing")}
+        onEditCard={() => setStage("business-onboarding")}
+      />
+    );
+  }
+
+  if (stage === "business-onboarding") {
+    return (
+      <BusinessOnboarding
+        editMode={!!user}
+        onComplete={() => setStage("business-app")}
+      />
+    );
   }
 
   if (stage === "app") {
@@ -53,18 +95,18 @@ const Index = () => {
   if (stage === "register") {
     return (
       <RegisterForm
-        onComplete={(details: RegistrationDetails) => {
+        onComplete={(details: RegistrationDetails, isBusiness: boolean) => {
           try {
             localStorage.setItem("registration_details", JSON.stringify(details));
           } catch {}
-          setStage("app");
+          setStage(isBusiness ? "business-onboarding" : "app");
         }}
       />
     );
   }
 
   if (stage === "login") {
-    return <LoginForm onSuccess={() => setStage("app")} />;
+    return <LoginForm onSuccess={() => routeAuthenticated()} />;
   }
 
   if (stage === "auth") {
