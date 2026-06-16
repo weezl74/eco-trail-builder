@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { useAuth } from '@/hooks/useAuth';
 
 export type Saving = { money: number; co2: number; water: number };
 export type RenewableType = 'solar' | 'wind' | 'mine_water';
@@ -16,41 +17,37 @@ type State = {
   woolColor: string;
 };
 
-const KEY = 'eco_state_v2';
+const BASE_KEY = 'eco_state_v2';
 const EVT = 'eco_state_update';
 
+// Fresh defaults for newly registered users — no inherited points, no accessories,
+// stock cream wool so they see the uncustomised Nelson.
 const DEFAULT: State = {
-  savings: { money: 515, co2: 1417, water: 0 },
+  savings: { money: 0, co2: 0, water: 0 },
   pledged: [],
-  woolPoints: 250,
-  treePoints: 120,
-  treesPlanted: 4,
+  woolPoints: 0,
+  treePoints: 0,
+  treesPlanted: 0,
   renewables: [],
   accessories: [],
   cardColor: 'midnight',
   woolColor: '#e8d9b8',
 };
 
-const RESET_KEY = 'eco_accessories_reset_v1';
-const read = (): State => {
+const keyFor = (userId?: string | null) => (userId ? `${BASE_KEY}:${userId}` : BASE_KEY);
+
+const read = (userId?: string | null): State => {
   try {
-    const raw = localStorage.getItem(KEY);
+    const raw = localStorage.getItem(keyFor(userId));
     if (!raw) return DEFAULT;
-    const parsed = { ...DEFAULT, ...(JSON.parse(raw) as Partial<State>) };
-    // One-time reset of accessories (user requested clean slate)
-    if (!localStorage.getItem(RESET_KEY)) {
-      parsed.accessories = [];
-      localStorage.setItem(KEY, JSON.stringify(parsed));
-      localStorage.setItem(RESET_KEY, '1');
-    }
-    return parsed;
+    return { ...DEFAULT, ...(JSON.parse(raw) as Partial<State>) };
   } catch {
     return DEFAULT;
   }
 };
 
-const write = (s: State) => {
-  localStorage.setItem(KEY, JSON.stringify(s));
+const write = (s: State, userId?: string | null) => {
+  localStorage.setItem(keyFor(userId), JSON.stringify(s));
   window.dispatchEvent(new Event(EVT));
 };
 
@@ -61,20 +58,23 @@ export const RENEWABLE_COSTS: Record<RenewableType, number> = {
 };
 
 export const useSavings = () => {
-  const [state, setState] = useState<State>(() => read());
+  const { user } = useAuth();
+  const userId = user?.id ?? null;
+  const [state, setState] = useState<State>(() => read(userId));
 
   useEffect(() => {
-    const sync = () => setState(read());
+    setState(read(userId));
+    const sync = () => setState(read(userId));
     window.addEventListener(EVT, sync);
     window.addEventListener('storage', sync);
     return () => {
       window.removeEventListener(EVT, sync);
       window.removeEventListener('storage', sync);
     };
-  }, []);
+  }, [userId]);
 
   const addPledge = useCallback((id: string, delta: Saving) => {
-    const s = read();
+    const s = read(userId);
     if (s.pledged.includes(id)) return false;
     const next: State = {
       ...s,
@@ -87,12 +87,12 @@ export const useSavings = () => {
       woolPoints: s.woolPoints + 25,
       treePoints: s.treePoints + 10,
     };
-    write(next);
+    write(next, userId);
     return true;
-  }, []);
+  }, [userId]);
 
   const buyRenewable = useCallback((type: RenewableType, x: number, y: number) => {
-    const s = read();
+    const s = read(userId);
     const cost = RENEWABLE_COSTS[type];
     if (s.woolPoints < cost) return false;
     const next: State = {
@@ -103,34 +103,34 @@ export const useSavings = () => {
         { id: `${type}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, type, x, y },
       ],
     };
-    write(next);
+    write(next, userId);
     return true;
-  }, []);
+  }, [userId]);
 
   const buyAccessory = useCallback((id: string, cost: number) => {
-    const s = read();
+    const s = read(userId);
     if (s.accessories.includes(id)) return true;
     if (s.woolPoints < cost) return false;
-    write({ ...s, woolPoints: s.woolPoints - cost, accessories: [...s.accessories, id] });
+    write({ ...s, woolPoints: s.woolPoints - cost, accessories: [...s.accessories, id] }, userId);
     return true;
-  }, []);
+  }, [userId]);
 
   const plantTree = useCallback((cost = 100) => {
-    const s = read();
+    const s = read(userId);
     if (s.treePoints < cost) return false;
-    write({ ...s, treePoints: s.treePoints - cost, treesPlanted: s.treesPlanted + 1 });
+    write({ ...s, treePoints: s.treePoints - cost, treesPlanted: s.treesPlanted + 1 }, userId);
     return true;
-  }, []);
+  }, [userId]);
 
   const setCardColor = useCallback((color: string) => {
-    const s = read();
-    write({ ...s, cardColor: color });
-  }, []);
+    const s = read(userId);
+    write({ ...s, cardColor: color }, userId);
+  }, [userId]);
 
   const setWoolColor = useCallback((color: string) => {
-    const s = read();
-    write({ ...s, woolColor: color });
-  }, []);
+    const s = read(userId);
+    write({ ...s, woolColor: color }, userId);
+  }, [userId]);
 
   return {
     ...state,
