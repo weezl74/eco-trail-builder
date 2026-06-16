@@ -95,10 +95,9 @@ const Index = () => {
   if (stage === "register") {
     return (
       <RegisterForm
-        onComplete={(details: RegistrationDetails, isBusiness: boolean) => {
-          try {
-            localStorage.setItem("registration_details", JSON.stringify(details));
-          } catch {}
+        onComplete={(_details: RegistrationDetails, isBusiness: boolean) => {
+          // PII (name, email, postcode, phone, age) is persisted server-side in the
+          // profile via the auth trigger — do not echo it back into browser storage.
           setStage(isBusiness ? "business-onboarding" : "app");
         }}
       />
