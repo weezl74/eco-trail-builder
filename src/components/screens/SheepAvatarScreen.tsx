@@ -3,22 +3,19 @@ import { ArrowLeft, Lock, Leaf } from 'lucide-react';
 import { useSavings } from '@/hooks/useSavings';
 import { toast } from '@/hooks/use-toast';
 
-import TintedSheepBody from '@/components/TintedSheepBody';
-import nelsonHead from '@/assets/sheep/NelsonHead.svg.asset.json';
-import barbHead from '@/assets/sheep/BarbHead.svg.asset.json';
+import NelsonAvatar from '@/components/NelsonAvatar';
 import { CARD_PALETTES, getPalette } from '@/lib/cardPalettes';
 import { useTranslations } from '@/hooks/useTranslations';
 import { playGoodBaa } from '@/lib/sounds';
 
 type AccessoryId =
-  | 'sunglasses'
-  | 'tophat'
-  | 'bowtie'
-  | 'umbrella'
-  | 'wellies'
-  | 'scarf'
-  | 'sunhat'
-  | 'raincoat';
+  // SVG parts (new)
+  | 'cap' | 'pirateHat' | 'mohawk'
+  | 'glasses' | 'starGlasses'
+  | 'stubble' | 'sideburns' | 'mustache' | 'longBeard' | 'fluffy'
+  | 'hornsF' | 'hornsB'
+  // legacy emoji
+  | 'umbrella' | 'wellies' | 'scarf' | 'sunhat' | 'raincoat' | 'bowtie';
 
 type Accessory = {
   id: AccessoryId;
@@ -29,70 +26,51 @@ type Accessory = {
 };
 
 const ACCESSORIES: Accessory[] = [
-  {
-    id: 'sunglasses',
-    label: 'Sunglasses',
-    emoji: '🕶️',
-    cost: 40,
-    carbonNote:
-      'Heatwaves in Wales are now 5× more likely than 50 years ago — sunny days are getting longer and hotter.',
-  },
-  {
-    id: 'sunhat',
-    label: 'Sun Hat',
-    emoji: '👒',
-    cost: 35,
-    carbonNote:
-      '2022 was the UK\'s hottest year on record — 40°C was reached for the first time ever.',
-  },
-  {
-    id: 'umbrella',
-    label: 'Umbrella',
-    emoji: '☂️',
-    cost: 45,
-    carbonNote:
-      'A 1°C warmer planet holds about 8% more water in the air — so when it rains, it pours much harder.',
-  },
-  {
-    id: 'raincoat',
-    label: 'Raincoat',
-    emoji: '🧥',
-    cost: 55,
-    carbonNote:
-      'Flash floods in Wales have roughly tripled since 2000 as storms grow more intense.',
-  },
-  {
-    id: 'wellies',
-    label: 'Wellies',
-    emoji: '🥾',
-    cost: 50,
-    carbonNote:
-      'UK winter rainfall is up 17% since 1990 — wellies are basically climate kit now.',
-  },
-  {
-    id: 'scarf',
-    label: 'Scarf',
-    emoji: '🧣',
-    cost: 30,
-    carbonNote:
-      'Layering up lets you turn the thermostat down 1°C — saving around 300kg of CO₂ a year per home.',
-  },
-  {
-    id: 'tophat',
-    label: 'Top Hat',
-    emoji: '🎩',
-    cost: 60,
-    carbonNote:
-      'Caerphilly\'s frosty days have halved since the 1960s — warmer winters are reshaping our seasons.',
-  },
-  {
-    id: 'bowtie',
-    label: 'Bow Tie',
-    emoji: '🎀',
-    cost: 30,
-    carbonNote:
-      'Dressing smart for less: one second-hand outfit saves around 25kg of CO₂ versus buying new.',
-  },
+  // Hats
+  { id: 'cap', label: 'Cap', emoji: '🧢', cost: 40,
+    carbonNote: 'Sun protection matters: UV index days above 7 in Wales have risen sharply over the past 30 years.' },
+  { id: 'pirateHat', label: 'Pirate Hat', emoji: '🏴‍☠️', cost: 70,
+    carbonNote: 'Rising seas are already eroding parts of the Welsh coast — by 1mm a year on average.' },
+  { id: 'mohawk', label: 'Mohawk', emoji: '🦔', cost: 55,
+    carbonNote: 'Wild hair, wild planet — UK hedgehog numbers have fallen 75% since 2000. Re-wild your garden.' },
+
+  // Facial hair
+  { id: 'stubble', label: 'Stubble', emoji: '🧔', cost: 25,
+    carbonNote: 'A standard razor lasts ~5 weeks. Switching to a safety razor saves ~30 plastic cartridges a year.' },
+  { id: 'sideburns', label: 'Sideburns', emoji: '🧔‍♂️', cost: 35,
+    carbonNote: 'Skipping a daily shave saves ~8 litres of hot water — about 1.5 kg of CO₂ a year.' },
+  { id: 'mustache', label: 'Moustache', emoji: '👨', cost: 40,
+    carbonNote: 'Movember-style: small grooming swaps add up. Bar soap beats bottled by ~30g CO₂ per wash.' },
+  { id: 'longBeard', label: 'Long Beard', emoji: '🧙', cost: 60,
+    carbonNote: 'Beard oil in glass not plastic? You\'ll cut ~12g of single-use plastic per refill.' },
+  { id: 'fluffy', label: 'Fluffy', emoji: '🐑', cost: 45,
+    carbonNote: 'Wool is naturally insulating — UK sheep wool keeps lofts warm and saves ~£200/yr on heating.' },
+
+  // Glasses
+  { id: 'glasses', label: 'Glasses', emoji: '👓', cost: 40,
+    carbonNote: 'Heatwaves in Wales are now 5× more likely than 50 years ago — protect your eyes from glare.' },
+  { id: 'starGlasses', label: 'Star Glasses', emoji: '🤩', cost: 55,
+    carbonNote: 'Star-quality climate action: switching to LED bulbs cuts lighting CO₂ by ~80%.' },
+
+  // Horns
+  { id: 'hornsF', label: 'Horns (Front)', emoji: '🐏', cost: 50,
+    carbonNote: 'Welsh mountain sheep have grazed these hills for 4,000 years — keep our uplands wild.' },
+  { id: 'hornsB', label: 'Horns (Back)', emoji: '🐂', cost: 50,
+    carbonNote: 'Rewilded uplands store ~3× more carbon than intensively grazed land.' },
+
+  // Legacy emoji accessories — kept for variety
+  { id: 'sunhat', label: 'Sun Hat', emoji: '👒', cost: 35,
+    carbonNote: '2022 was the UK\'s hottest year on record — 40°C was reached for the first time ever.' },
+  { id: 'umbrella', label: 'Umbrella', emoji: '☂️', cost: 45,
+    carbonNote: 'A 1°C warmer planet holds about 8% more water in the air — so when it rains, it pours much harder.' },
+  { id: 'raincoat', label: 'Raincoat', emoji: '🧥', cost: 55,
+    carbonNote: 'Flash floods in Wales have roughly tripled since 2000 as storms grow more intense.' },
+  { id: 'wellies', label: 'Wellies', emoji: '🥾', cost: 50,
+    carbonNote: 'UK winter rainfall is up 17% since 1990 — wellies are basically climate kit now.' },
+  { id: 'scarf', label: 'Scarf', emoji: '🧣', cost: 30,
+    carbonNote: 'Layering up lets you turn the thermostat down 1°C — saving around 300kg of CO₂ a year per home.' },
+  { id: 'bowtie', label: 'Bow Tie', emoji: '🎀', cost: 30,
+    carbonNote: 'Dressing smart for less: one second-hand outfit saves around 25kg of CO₂ versus buying new.' },
 ];
 
 type Tab = 'avatar' | 'card';
@@ -182,106 +160,12 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
             >Barb</button>
           </div>
           <div className="flex items-center justify-center mb-3">
-            <div className="relative w-64 h-64">
-              {/* Sheep body — inline SVG recoloured to wool colour */}
-              <TintedSheepBody
-                color={woolColor}
-                className="absolute inset-0 w-full h-full [&>svg]:w-full [&>svg]:h-full select-none"
-              />
-              {/* Head — sized & positioned over the body */}
-              <img
-                src={head === 'nelson' ? nelsonHead.url : barbHead.url}
-                alt={head === 'nelson' ? 'Nelson head' : 'Barb head'}
-                className="absolute select-none pointer-events-none"
-                style={{ left: '50%', top: '-6%', width: '52%', transform: 'translateX(-50%)' }}
-                draggable={false}
-              />
-
-              {/* Umbrella — floats above the sheep */}
-              {has('umbrella') && (
-                <div
-                  className="absolute pointer-events-none text-5xl text-center"
-                  style={{ left: '50%', top: '-18%', transform: 'translateX(-50%)' }}
-                >
-                  ☂️
-                </div>
-              )}
-
-              {/* Top hat */}
-              {has('tophat') && (
-                <div
-                  className="absolute pointer-events-none text-3xl text-center"
-                  style={{ left: '50%', top: '-2%', transform: 'translateX(-50%)' }}
-                >
-                  🎩
-                </div>
-              )}
-
-              {/* Sun hat */}
-              {has('sunhat') && (
-                <div
-                  className="absolute pointer-events-none text-3xl text-center"
-                  style={{ left: '50%', top: '0%', transform: 'translateX(-50%)' }}
-                >
-                  👒
-                </div>
-              )}
-
-              {/* Sunglasses — across the eyes */}
-              {has('sunglasses') && (
-                <div
-                  className="absolute pointer-events-none flex items-center gap-[2px]"
-                  style={{ left: '50%', top: '11%', width: '22%', transform: 'translateX(-50%)' }}
-                >
-                  <div className="flex-1 aspect-[2/1] rounded-sm bg-black" />
-                  <div className="flex-1 aspect-[2/1] rounded-sm bg-black" />
-                </div>
-              )}
-
-              {/* Scarf */}
-              {has('scarf') && (
-                <div
-                  className="absolute pointer-events-none text-2xl text-center"
-                  style={{ left: '50%', top: '24%', transform: 'translateX(-50%)' }}
-                >
-                  🧣
-                </div>
-              )}
-
-              {/* Bow tie */}
-              {has('bowtie') && (
-                <div
-                  className="absolute pointer-events-none"
-                  style={{ left: '50%', top: '22%', width: '12%', transform: 'translateX(-50%)' }}
-                >
-                  <svg viewBox="0 0 40 20" className="w-full">
-                    <polygon points="0,2 20,10 0,18" fill="#dc2626" />
-                    <polygon points="40,2 20,10 40,18" fill="#dc2626" />
-                    <circle cx="20" cy="10" r="3" fill="#7a0d0d" />
-                  </svg>
-                </div>
-              )}
-
-              {/* Raincoat */}
-              {has('raincoat') && (
-                <div
-                  className="absolute pointer-events-none text-4xl text-center"
-                  style={{ left: '50%', top: '38%', transform: 'translateX(-50%)' }}
-                >
-                  🧥
-                </div>
-              )}
-
-              {/* Wellies */}
-              {has('wellies') && (
-                <div
-                  className="absolute pointer-events-none text-2xl text-center"
-                  style={{ left: '50%', top: '78%', transform: 'translateX(-50%)' }}
-                >
-                  🥾
-                </div>
-              )}
-            </div>
+            <NelsonAvatar
+              woolColor={woolColor}
+              accessories={accessories}
+              head={head}
+              className="w-64 h-64 select-none"
+            />
           </div>
 
           <div className="bg-[#3a3a3a] rounded-2xl p-3 mb-3">

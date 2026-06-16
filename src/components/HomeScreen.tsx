@@ -7,15 +7,14 @@ import NelsonMessagesScreen from './screens/NelsonMessagesScreen';
 import { useSavings } from '@/hooks/useSavings';
 import { useTranslations } from '@/hooks/useTranslations';
 import badHomepageAsset from '@/assets/final-bad-homepage.svg.asset.json';
-import nelsonHead from '@/assets/sheep/NelsonHead.svg.asset.json';
-import TintedSheepBody from './TintedSheepBody';
+import NelsonAvatar from './NelsonAvatar';
 import BinDayBanner from './BinDayBanner';
 
 type Screen = 'home' | 'avatar' | 'calendar' | 'rewards' | 'messages';
 
 const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges }) => {
   const [screen, setScreen] = useState<Screen>('home');
-  const { savings, pledged, woolPoints, treePoints, woolColor } = useSavings();
+  const { savings, pledged, woolPoints, treePoints, woolColor, accessories } = useSavings();
   const { t } = useTranslations();
 
   if (screen === 'avatar') return <SheepAvatarScreen onBack={() => setScreen('home')} />;
@@ -78,19 +77,11 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
           loading="lazy"
         />
         {/* Nelson overlay — bottom left */}
-        <div className="absolute bottom-2 left-2 w-2/5 aspect-square pointer-events-none">
-          <TintedSheepBody
-            color={woolColor}
-            className="absolute inset-0 w-full h-full drop-shadow-lg [&>svg]:w-full [&>svg]:h-full [&>svg]:object-contain"
-          />
-          <img
-            src={nelsonHead.url}
-            alt="Nelson the sheep"
-            className="absolute"
-            style={{ left: '50%', top: '-14%', width: '70%', transform: 'translateX(-50%)' }}
-            draggable={false}
-          />
-        </div>
+        <NelsonAvatar
+          woolColor={woolColor}
+          accessories={accessories}
+          className="absolute bottom-2 left-2 w-2/5 aspect-square pointer-events-none"
+        />
       </div>
 
       {/* CTA */}
