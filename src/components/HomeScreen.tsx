@@ -69,7 +69,7 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
       </div>
 
       {/* Illustration */}
-      <div className="mx-4 mt-3 rounded-2xl overflow-hidden bg-[#1f1f1f] relative flex-1 min-h-0 max-h-[42dvh]">
+      <div className="mx-4 mt-3 rounded-2xl overflow-hidden bg-[#1f1f1f] relative flex-1 min-h-0 max-h-[34svh]">
         <img
           src={badHomepageAsset.url}
           alt="A scene showing the impact of pollution and unsustainable choices"
