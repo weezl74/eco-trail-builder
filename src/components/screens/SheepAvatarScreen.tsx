@@ -3,9 +3,7 @@ import { ArrowLeft, Lock, Leaf } from 'lucide-react';
 import { useSavings } from '@/hooks/useSavings';
 import { toast } from '@/hooks/use-toast';
 
-import TintedSheepBody from '@/components/TintedSheepBody';
-import nelsonHead from '@/assets/sheep/NelsonHead.svg.asset.json';
-import barbHead from '@/assets/sheep/BarbHead.svg.asset.json';
+import NelsonAvatar from '@/components/NelsonAvatar';
 import { CARD_PALETTES, getPalette } from '@/lib/cardPalettes';
 import { useTranslations } from '@/hooks/useTranslations';
 import { playGoodBaa } from '@/lib/sounds';
