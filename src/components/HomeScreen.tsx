@@ -76,11 +76,11 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
           className="w-full h-full object-cover block"
           loading="lazy"
         />
-        {/* Nelson overlay — bottom left */}
+        {/* Nelson overlay — raised so he remains visible above the CTA */}
         <NelsonAvatar
           woolColor={woolColor}
           accessories={accessories}
-          className="absolute bottom-2 left-2 w-2/5 aspect-square pointer-events-none"
+          className="absolute bottom-16 left-2 w-2/5 aspect-square pointer-events-none"
         />
       </div>
 
