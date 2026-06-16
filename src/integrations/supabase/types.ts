@@ -14,6 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
+      business_cards: {
+        Row: {
+          address: string | null
+          business_name: string
+          climate_goals: string | null
+          created_at: string
+          id: string
+          latitude: number | null
+          logo_url: string | null
+          longitude: number | null
+          offer_to_businesses: string | null
+          offer_to_residents: string | null
+          pen_portrait: string | null
+          phone: string | null
+          postcode: string | null
+          sector: string | null
+          status: string
+          tagline: string | null
+          updated_at: string
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          business_name: string
+          climate_goals?: string | null
+          created_at?: string
+          id?: string
+          latitude?: number | null
+          logo_url?: string | null
+          longitude?: number | null
+          offer_to_businesses?: string | null
+          offer_to_residents?: string | null
+          pen_portrait?: string | null
+          phone?: string | null
+          postcode?: string | null
+          sector?: string | null
+          status?: string
+          tagline?: string | null
+          updated_at?: string
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          business_name?: string
+          climate_goals?: string | null
+          created_at?: string
+          id?: string
+          latitude?: number | null
+          logo_url?: string | null
+          longitude?: number | null
+          offer_to_businesses?: string | null
+          offer_to_residents?: string | null
+          pen_portrait?: string | null
+          phone?: string | null
+          postcode?: string | null
+          sector?: string | null
+          status?: string
+          tagline?: string | null
+          updated_at?: string
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       map_locations: {
         Row: {
           carbon_action: string | null
@@ -118,6 +184,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_type: string
           address: string | null
           age: string | null
           avatar_level: number
@@ -136,6 +203,7 @@ export type Database = {
           username: string | null
         }
         Insert: {
+          account_type?: string
           address?: string | null
           age?: string | null
           avatar_level?: number
@@ -154,6 +222,7 @@ export type Database = {
           username?: string | null
         }
         Update: {
+          account_type?: string
           address?: string | null
           age?: string | null
           avatar_level?: number
