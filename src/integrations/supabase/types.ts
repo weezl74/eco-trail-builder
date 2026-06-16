@@ -462,7 +462,57 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      business_cards_public: {
+        Row: {
+          business_name: string | null
+          climate_goals: string | null
+          created_at: string | null
+          id: string | null
+          logo_url: string | null
+          offer_to_businesses: string | null
+          offer_to_residents: string | null
+          pen_portrait: string | null
+          sector: string | null
+          status: string | null
+          tagline: string | null
+          updated_at: string | null
+          user_id: string | null
+          website: string | null
+        }
+        Insert: {
+          business_name?: string | null
+          climate_goals?: string | null
+          created_at?: string | null
+          id?: string | null
+          logo_url?: string | null
+          offer_to_businesses?: string | null
+          offer_to_residents?: string | null
+          pen_portrait?: string | null
+          sector?: string | null
+          status?: string | null
+          tagline?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          website?: string | null
+        }
+        Update: {
+          business_name?: string | null
+          climate_goals?: string | null
+          created_at?: string | null
+          id?: string | null
+          logo_url?: string | null
+          offer_to_businesses?: string | null
+          offer_to_residents?: string | null
+          pen_portrait?: string | null
+          sector?: string | null
+          status?: string | null
+          tagline?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_leaderboard: {
