@@ -195,36 +195,72 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
         const id = pinId(p);
         const isPledged = pledged.includes(id);
         const isLeisure = p.category === 'leisure';
+        const isBusiness = p.category === 'business';
         const inWallet = walletBusinesses.some((b) => b.id === id);
         const reason = p.carbonAction || info.message;
+        const sectorMeta = isBusiness ? getSector(p.sectorIcon) : null;
+        const color = sectorMeta?.color ?? info.color;
+        const blurb = isBusiness
+          ? (p.rewardText
+              ? `${t('Loyalty card')}: ${p.rewardText} (${p.stampsRequired ?? 6} ${t('stamps')})`
+              : t('Tap to add this business loyalty card to your wallet.'))
+          : (isLeisure
+              ? t('Join the #WalkMyWarmUp meet-up — walk in for your warm-up and skip the drive.')
+              : info.message);
         return {
           id,
           name: p.name,
           lat: p.lat,
           lng: p.lng,
-          color: info.color,
-          blurb: inviteBlurb(p),
-          pledged: isPledged,
-          ctaLabel: isLeisure
-            ? t('Join #WalkMyWarmUp')
-            : isPledged
-            ? `✓ ${t('Pledged')}`
-            : t('Pledge to visit'),
-          onAction: () => (isLeisure ? setWalkOpen(true) : handlePledge(p)),
-          walletLabel: inWallet ? `✓ ${t('In wallet')}` : t('Add to wallet'),
-          onAddToWallet: () => {
-            const ok = addBusiness({
-              id,
-              name: p.name,
-              category: info.label,
-              color: info.color,
-              reason,
-            });
-            toast({
-              title: ok ? t('Added to wallet') : t('Already in wallet'),
-              description: p.name,
-            });
+          color,
+          blurb,
+          pledged: isBusiness ? false : isPledged,
+          ctaLabel: isBusiness
+            ? (inWallet ? `✓ ${t('Loyalty card in wallet')}` : t('Add loyalty card to wallet'))
+            : isLeisure
+              ? t('Join #WalkMyWarmUp')
+              : isPledged
+                ? `✓ ${t('Pledged')}`
+                : t('Pledge to visit'),
+          onAction: () => {
+            if (isBusiness) {
+              const ok = addBusiness({
+                id,
+                name: p.name,
+                category: sectorMeta?.label ?? info.label,
+                color,
+                reason: p.rewardText || reason,
+                businessCardId: p.businessCardId,
+                sectorIcon: p.sectorIcon,
+                stampsRequired: p.stampsRequired ?? 6,
+                rewardText: p.rewardText ?? undefined,
+              });
+              toast({
+                title: ok ? t('Loyalty card added') : t('Already in wallet'),
+                description: p.name,
+              });
+              return;
+            }
+            isLeisure ? setWalkOpen(true) : handlePledge(p);
           },
+          walletLabel: isBusiness
+            ? undefined
+            : (inWallet ? `✓ ${t('In wallet')}` : t('Add to wallet')),
+          onAddToWallet: isBusiness
+            ? undefined
+            : () => {
+                const ok = addBusiness({
+                  id,
+                  name: p.name,
+                  category: info.label,
+                  color: info.color,
+                  reason,
+                });
+                toast({
+                  title: ok ? t('Added to wallet') : t('Already in wallet'),
+                  description: p.name,
+                });
+              },
         };
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
