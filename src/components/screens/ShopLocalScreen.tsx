@@ -46,6 +46,12 @@ const CATEGORY_INFO: Record<
     message: 'Invest your pound locally to keep supply-chain travel emissions low.',
     delta: { money: 18, co2: 14, water: 25 },
   },
+  business: {
+    label: 'Local Businesses',
+    color: '#f4971d',
+    message: 'Tap to add this business loyalty card to your wallet.',
+    delta: { money: 0, co2: 0, water: 0 },
+  },
 };
 
 const CATEGORIES = (Object.keys(CATEGORY_INFO) as Category[]).map((id) => ({
