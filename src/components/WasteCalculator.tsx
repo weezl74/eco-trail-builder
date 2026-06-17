@@ -187,17 +187,44 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
     }
   };
 
-  const loadSprintData = () => {
+  const loadSprintData = async () => {
     if (!user) return;
-    
     try {
-      const stored = localStorage.getItem('userSprints');
-      if (stored) {
-        const sprintData = JSON.parse(stored);
-        if (sprintData.userId === user.id && sprintData.sprints) {
-          setSprints(sprintData.sprints);
+      // warm from cache
+      try {
+        const cached = localStorage.getItem(`cloudrow:user_sprints:waste_calculator:${user.id}`);
+        if (cached) setSprints(JSON.parse(cached));
+      } catch {}
+      const { data } = await supabase
+        .from('user_sprints')
+        .select('data')
+        .eq('user_id', user.id)
+        .eq('sprint_key', 'waste_calculator')
+        .maybeSingle();
+      if (data?.data) {
+        const list = (data.data as any).list;
+        if (Array.isArray(list)) {
+          setSprints(list);
+          try { localStorage.setItem(`cloudrow:user_sprints:waste_calculator:${user.id}`, JSON.stringify(list)); } catch {}
+          return;
         }
       }
+      // legacy migration from device-wide 'userSprints'
+      try {
+        const legacy = localStorage.getItem('userSprints');
+        if (legacy) {
+          const sd = JSON.parse(legacy);
+          if (sd.userId === user.id && Array.isArray(sd.sprints)) {
+            await supabase.from('user_sprints').upsert(
+              { user_id: user.id, sprint_key: 'waste_calculator', data: { list: sd.sprints } as any },
+              { onConflict: 'user_id,sprint_key' },
+            );
+            setSprints(sd.sprints);
+            try { localStorage.setItem(`cloudrow:user_sprints:waste_calculator:${user.id}`, JSON.stringify(sd.sprints)); } catch {}
+            localStorage.removeItem('userSprints');
+          }
+        }
+      } catch {}
     } catch (error) {
       console.error('Error loading sprint data:', error);
     }
