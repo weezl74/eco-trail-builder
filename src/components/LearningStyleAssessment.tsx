@@ -104,8 +104,8 @@ const LearningStyleAssessment = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Store assessment data and navigate to toolkit
-      localStorage.setItem('learningPreferences', JSON.stringify(assessmentData));
+      // Save preferences to cloud (per-user) then continue.
+      void setLearningPreferences(assessmentData);
       navigate('/toolkit');
     }
   };
