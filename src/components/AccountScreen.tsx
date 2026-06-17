@@ -94,7 +94,7 @@ const AccountScreen: React.FC<AccountScreenProps> = ({
       </Section>
 
       <Section title={t('Support')}>
-        <Row label={t('About Nurture')} onClick={() => setSubPage('about')} />
+        <Row label={t('About Nelson')} onClick={() => setSubPage('about')} />
         <Row label={t('Terms and Conditions')} onClick={() => setSubPage('terms')} />
         <Row label={t('Contact Us')} onClick={() => setSubPage('contact')} />
       </Section>

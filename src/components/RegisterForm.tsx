@@ -163,7 +163,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onComplete }) => {
               onClick={(e) => e.stopPropagation()}
               className="text-blue-400 underline"
             >
-              Nurture App's Terms of Service
+              Nelson App's Terms of Service
             </a>{' '}
             <span className="font-bold">and</span>{' '}
             <a

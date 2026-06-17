@@ -100,7 +100,7 @@ const Privacy: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { t } = useTranslations();
   return (
     <Shell title={t('Privacy Settings')} onBack={onBack}>
-      <p>{t('Your personal data is stored securely on Lovable Cloud and is only ever used to power your Nurture experience. We never sell your data.')}</p>
+      <p>{t('Your personal data is stored securely on Lovable Cloud and is only ever used to power your Nelson experience. We never sell your data.')}</p>
       <p>{t('Your name, footprint and points appear on the community leaderboard so other Caerphilly residents can cheer you on. To remove yourself from the leaderboard, contact us via the Contact Us page.')}</p>
     </Shell>
   );
@@ -163,8 +163,8 @@ const ChangePassword: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 const About: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { t } = useTranslations();
   return (
-    <Shell title={t('About Nurture')} onBack={onBack}>
-      <p>{t('Nurture is a community sustainability app for residents of Caerphilly. Calculate your carbon footprint, pledge greener actions, earn points and customise your sheep avatar as your neighbourhood cools down together.')}</p>
+    <Shell title={t('About Nelson')} onBack={onBack}>
+      <p>{t('Nelson is a community sustainability app for residents of Caerphilly. Calculate your carbon footprint, pledge greener actions, earn points and customise your sheep avatar as your neighbourhood cools down together.')}</p>
       <p>{t('Made with ❤️ for the Caerphilly borough.')}</p>
     </Shell>
   );
@@ -174,7 +174,7 @@ const Terms: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { t } = useTranslations();
   return (
     <Shell title={t('Terms and Conditions')} onBack={onBack}>
-      <p>{t('Read the full Nurture App terms and privacy policy on our website.')}</p>
+      <p>{t('Read the full Nelson App terms and privacy policy on our website.')}</p>
       <a
         href="https://ccbc-decarb.github.io/privacy-policy/"
         target="_blank"
