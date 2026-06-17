@@ -340,6 +340,51 @@ export type Database = {
         }
         Relationships: []
       }
+      user_bin_day: {
+        Row: {
+          created_at: string
+          data: Json
+          dismissed: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json
+          dismissed?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          dismissed?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_calc_categories: {
+        Row: {
+          completed: Json
+          created_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed?: Json
+          created_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed?: Json
+          created_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_pledges: {
         Row: {
           action: string
@@ -363,6 +408,30 @@ export type Database = {
           completed_at?: string
           id?: string
           points_earned?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_preferences: {
+        Row: {
+          created_at: string
+          learning_preferences: Json | null
+          sheep_head: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          learning_preferences?: Json | null
+          sheep_head?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          learning_preferences?: Json | null
+          sheep_head?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -424,6 +493,54 @@ export type Database = {
         }
         Relationships: []
       }
+      user_sprints: {
+        Row: {
+          created_at: string
+          data: Json
+          id: string
+          sprint_key: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json
+          id?: string
+          sprint_key: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          id?: string
+          sprint_key?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_state: {
+        Row: {
+          created_at: string
+          data: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_stories: {
         Row: {
           content: string
@@ -455,6 +572,57 @@ export type Database = {
           points_earned?: number
           run_type?: string
           title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_walk_stamps: {
+        Row: {
+          created_at: string
+          data: Json
+          stamps: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json
+          stamps?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          stamps?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_wallet: {
+        Row: {
+          business_id: string
+          created_at: string
+          data: Json
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          data?: Json
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          data?: Json
+          id?: string
           updated_at?: string
           user_id?: string
         }
