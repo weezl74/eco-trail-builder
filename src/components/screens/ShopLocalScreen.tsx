@@ -7,8 +7,9 @@ import { useTranslations } from '@/hooks/useTranslations';
 import WalkMyWarmUpJourney from '@/components/WalkMyWarmUpJourney';
 import ShopLocalLeafletMap, { LeafletPoi } from '@/components/ShopLocalLeafletMap';
 import { useWalletBusinesses as useWallet } from '@/hooks/useWallet';
+import { getSector } from '@/lib/sectorIcons';
 
-type Category = 'libraries' | 'allotments' | 'leisure' | 'ev' | 'eco';
+type Category = 'libraries' | 'allotments' | 'leisure' | 'ev' | 'eco' | 'business';
 type Saving = { money: number; co2: number; water: number };
 
 const CATEGORY_INFO: Record<
