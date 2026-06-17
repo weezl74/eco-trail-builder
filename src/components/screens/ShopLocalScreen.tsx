@@ -114,15 +114,13 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   useEffect(() => {
     let mounted = true;
     (async () => {
-      const { data, error } = await supabase
-        .from('map_locations')
-        .select('id, title, latitude, longitude, category, carbon_action');
+      const [locRes, bizRes] = await Promise.all([
+        supabase.from('map_locations').select('id, title, latitude, longitude, category, carbon_action'),
+        supabase.from('business_cards_public').select('id, business_name, latitude, longitude, sector_icon, reward_text, stamps_required, offer_to_residents'),
+      ]);
       if (!mounted) return;
-      if (error) {
-        console.error('Failed to load map locations', error);
-        return;
-      }
-      const mapped: POI[] = (data ?? [])
+      if (locRes.error) console.error('Failed to load map locations', locRes.error);
+      const mapped: POI[] = (locRes.data ?? [])
         .map((r) => {
           const cat = DB_CATEGORY_MAP[r.category ?? ''];
           if (!cat || r.latitude == null || r.longitude == null) return null;
@@ -136,7 +134,21 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           } as POI;
         })
         .filter((p): p is POI => p !== null);
-      setPois(mapped);
+      const businessPois: POI[] = (bizRes.data ?? [])
+        .filter((b) => b.latitude != null && b.longitude != null)
+        .map((b) => ({
+          id: b.id,
+          name: b.business_name,
+          category: 'business' as Category,
+          lat: Number(b.latitude),
+          lng: Number(b.longitude),
+          carbonAction: b.offer_to_residents ?? null,
+          businessCardId: b.id,
+          sectorIcon: b.sector_icon ?? undefined,
+          rewardText: b.reward_text,
+          stampsRequired: b.stamps_required,
+        }));
+      setPois([...mapped, ...businessPois]);
     })();
     return () => {
       mounted = false;
