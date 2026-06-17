@@ -59,6 +59,17 @@ const sprintTypes = [
   }
 ];
 
+const SPRINT_KEY = 'sprint_challenges';
+const CACHE_KEY = (uid: string) => `cloudrow:user_sprints:${SPRINT_KEY}:${uid}`;
+const LEGACY_KEY = (uid: string) => `sprints_${uid}`;
+
+const hydrate = (raw: any[]): Sprint[] =>
+  raw.map((s: any) => ({
+    ...s,
+    startedAt: s.startedAt ? new Date(s.startedAt) : undefined,
+    completedAt: s.completedAt ? new Date(s.completedAt) : undefined,
+  }));
+
 export default function SprintChallenges() {
   const [activeSprints, setActiveSprints] = useState<Sprint[]>([]);
   const [loading, setLoading] = useState(true);
@@ -71,20 +82,56 @@ export default function SprintChallenges() {
     }
   }, [user]);
 
+  const persistSprints = (sprints: Sprint[]) => {
+    setActiveSprints(sprints);
+    if (!user) return;
+    try { localStorage.setItem(CACHE_KEY(user.id), JSON.stringify(sprints)); } catch {}
+    void supabase.from('user_sprints').upsert(
+      { user_id: user.id, sprint_key: SPRINT_KEY, data: { list: sprints } as any },
+      { onConflict: 'user_id,sprint_key' },
+    );
+  };
+
   const loadActiveSprints = async () => {
     if (!user) return;
-    
     try {
-      // Load active sprints from local storage for now
-      const stored = localStorage.getItem(`sprints_${user.id}`);
-      if (stored) {
-        const sprints = JSON.parse(stored).map((s: any) => ({
-          ...s,
-          startedAt: s.startedAt ? new Date(s.startedAt) : undefined,
-          completedAt: s.completedAt ? new Date(s.completedAt) : undefined
-        }));
-        setActiveSprints(sprints);
+      // warm from cache
+      try {
+        const cached = localStorage.getItem(CACHE_KEY(user.id));
+        if (cached) setActiveSprints(hydrate(JSON.parse(cached)));
+      } catch {}
+
+      const { data } = await supabase
+        .from('user_sprints')
+        .select('data')
+        .eq('user_id', user.id)
+        .eq('sprint_key', SPRINT_KEY)
+        .maybeSingle();
+
+      if (data?.data) {
+        const list = (data.data as any).list as any[] | undefined;
+        if (Array.isArray(list)) {
+          const sprints = hydrate(list);
+          setActiveSprints(sprints);
+          try { localStorage.setItem(CACHE_KEY(user.id), JSON.stringify(sprints)); } catch {}
+          return;
+        }
       }
+
+      // legacy migration
+      try {
+        const legacy = localStorage.getItem(LEGACY_KEY(user.id));
+        if (legacy) {
+          const sprints = hydrate(JSON.parse(legacy));
+          await supabase.from('user_sprints').upsert(
+            { user_id: user.id, sprint_key: SPRINT_KEY, data: { list: sprints } as any },
+            { onConflict: 'user_id,sprint_key' },
+          );
+          setActiveSprints(sprints);
+          try { localStorage.setItem(CACHE_KEY(user.id), JSON.stringify(sprints)); } catch {}
+          localStorage.removeItem(LEGACY_KEY(user.id));
+        }
+      } catch {}
     } catch (error) {
       console.error('Error loading sprints:', error);
     } finally {
@@ -104,14 +151,10 @@ export default function SprintChallenges() {
         duration: sprintType.duration,
         points: sprintType.points,
         startedAt: new Date(),
-        isActive: true
+        isActive: true,
       };
 
-      const updatedSprints = [...activeSprints, newSprint];
-      setActiveSprints(updatedSprints);
-      
-      // Save to local storage
-      localStorage.setItem(`sprints_${user.id}`, JSON.stringify(updatedSprints));
+      persistSprints([...activeSprints, newSprint]);
 
       toast({
         title: "Sprint Started!",
@@ -122,7 +165,7 @@ export default function SprintChallenges() {
       toast({
         title: "Error",
         description: "Failed to start sprint. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
@@ -134,14 +177,13 @@ export default function SprintChallenges() {
       const sprint = activeSprints.find(s => s.id === sprintId);
       if (!sprint) return;
 
-      const updatedSprints = activeSprints.map(s => 
-        s.id === sprintId 
+      const updatedSprints = activeSprints.map(s =>
+        s.id === sprintId
           ? { ...s, completedAt: new Date(), isActive: false }
           : s
       );
-      
-      setActiveSprints(updatedSprints);
-      localStorage.setItem(`sprints_${user.id}`, JSON.stringify(updatedSprints));
+
+      persistSprints(updatedSprints);
 
       // Award points (in a real app, this would update the database)
       toast({
