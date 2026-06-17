@@ -538,12 +538,12 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
       );
       setSprints(updatedSprints);
       
-      // Update localStorage
-      const sprintData = {
-        sprints: updatedSprints,
-        userId: user.id
-      };
-      localStorage.setItem('userSprints', JSON.stringify(sprintData));
+      // Persist updated sprint list to cloud (with offline cache).
+      try { localStorage.setItem(`cloudrow:user_sprints:waste_calculator:${user.id}`, JSON.stringify(updatedSprints)); } catch {}
+      void supabase.from('user_sprints').upsert(
+        { user_id: user.id, sprint_key: 'waste_calculator', data: { list: updatedSprints } as any },
+        { onConflict: 'user_id,sprint_key' },
+      );
       
       setUserProfile(prev => ({
         ...prev,
