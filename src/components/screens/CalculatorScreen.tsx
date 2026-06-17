@@ -144,7 +144,7 @@ const CalculatorScreen: React.FC = () => {
 
     toast({
       title: pointsAwarded > 0 ? `+${pointsAwarded} ${t('points!')}` : t('Score updated'),
-      description: `${active ? t(active.label) : ''}: ${agg[categoryId] || 0} kg CO₂${wasFirstTime ? ' • ' + t('Carbon Counter badge earned!') : ''}`,
+      description: `${active ? t(active.label) : ''}: ${((agg[categoryId] || 0) / 1000).toFixed(2)} ${t('tonnes CO₂e/year')}${wasFirstTime ? ' • ' + t('Carbon Counter badge earned!') : ''}`,
     });
     setActive(null);
   };
