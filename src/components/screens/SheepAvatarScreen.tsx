@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Lock, Leaf } from 'lucide-react';
 import { useSavings } from '@/hooks/useSavings';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { toast } from '@/hooks/use-toast';
 
 import NelsonAvatar from '@/components/NelsonAvatar';
