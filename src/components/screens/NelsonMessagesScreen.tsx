@@ -11,7 +11,7 @@ const MESSAGES: Msg[] = [
   { id: '1', title: 'New: #WalkMyWarmUp', body: "Baaa! You can now earn a free swim by walking or cycling to your leisure centre. Tap Challenges to start your journey.", date: '2026-06-10', unread: true },
   { id: '2', title: 'Quizzes are live', body: 'Test your green knowledge — a fresh quiz drops every week. Find them under Challenges → Quizzes.', date: '2026-06-08', unread: true },
   { id: '3', title: 'Allotment map updated', body: 'I have spread the allotment pins across the borough so you can find your nearest plot more easily.', date: '2026-06-05' },
-  { id: '4', title: 'Welcome to Nurture', body: 'Glad to have you in the flock. Make your first pledge to start saving £, CO₂e and water.', date: '2026-06-01' },
+  { id: '4', title: 'Welcome to Nelson', body: 'Glad to have you in the flock. Make your first pledge to start saving £, CO₂e and water.', date: '2026-06-01' },
 ];
 
 const NelsonMessagesScreen: React.FC<Props> = ({ onBack }) => {
