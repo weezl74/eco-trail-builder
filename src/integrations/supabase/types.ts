@@ -29,7 +29,10 @@ export type Database = {
           pen_portrait: string | null
           phone: string | null
           postcode: string | null
+          reward_text: string | null
           sector: string | null
+          sector_icon: string | null
+          stamps_required: number
           status: string
           tagline: string | null
           updated_at: string
@@ -50,7 +53,10 @@ export type Database = {
           pen_portrait?: string | null
           phone?: string | null
           postcode?: string | null
+          reward_text?: string | null
           sector?: string | null
+          sector_icon?: string | null
+          stamps_required?: number
           status?: string
           tagline?: string | null
           updated_at?: string
@@ -71,7 +77,10 @@ export type Database = {
           pen_portrait?: string | null
           phone?: string | null
           postcode?: string | null
+          reward_text?: string | null
           sector?: string | null
+          sector_icon?: string | null
+          stamps_required?: number
           status?: string
           tagline?: string | null
           updated_at?: string
@@ -364,6 +373,51 @@ export type Database = {
         }
         Relationships: []
       }
+      user_business_stamps: {
+        Row: {
+          business_card_id: string
+          created_at: string
+          id: string
+          redeemed_at: string | null
+          stamps: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_card_id: string
+          created_at?: string
+          id?: string
+          redeemed_at?: string | null
+          stamps?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_card_id?: string
+          created_at?: string
+          id?: string
+          redeemed_at?: string | null
+          stamps?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_business_stamps_business_card_id_fkey"
+            columns: ["business_card_id"]
+            isOneToOne: false
+            referencedRelation: "business_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_business_stamps_business_card_id_fkey"
+            columns: ["business_card_id"]
+            isOneToOne: false
+            referencedRelation: "business_cards_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_calc_categories: {
         Row: {
           completed: Json
@@ -636,11 +690,16 @@ export type Database = {
           climate_goals: string | null
           created_at: string | null
           id: string | null
+          latitude: number | null
           logo_url: string | null
+          longitude: number | null
           offer_to_businesses: string | null
           offer_to_residents: string | null
           pen_portrait: string | null
+          reward_text: string | null
           sector: string | null
+          sector_icon: string | null
+          stamps_required: number | null
           status: string | null
           tagline: string | null
           updated_at: string | null
@@ -652,11 +711,16 @@ export type Database = {
           climate_goals?: string | null
           created_at?: string | null
           id?: string | null
+          latitude?: number | null
           logo_url?: string | null
+          longitude?: number | null
           offer_to_businesses?: string | null
           offer_to_residents?: string | null
           pen_portrait?: string | null
+          reward_text?: string | null
           sector?: string | null
+          sector_icon?: string | null
+          stamps_required?: number | null
           status?: string | null
           tagline?: string | null
           updated_at?: string | null
@@ -668,11 +732,16 @@ export type Database = {
           climate_goals?: string | null
           created_at?: string | null
           id?: string | null
+          latitude?: number | null
           logo_url?: string | null
+          longitude?: number | null
           offer_to_businesses?: string | null
           offer_to_residents?: string | null
           pen_portrait?: string | null
+          reward_text?: string | null
           sector?: string | null
+          sector_icon?: string | null
+          stamps_required?: number | null
           status?: string | null
           tagline?: string | null
           updated_at?: string | null

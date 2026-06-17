@@ -7,8 +7,9 @@ import { useTranslations } from '@/hooks/useTranslations';
 import WalkMyWarmUpJourney from '@/components/WalkMyWarmUpJourney';
 import ShopLocalLeafletMap, { LeafletPoi } from '@/components/ShopLocalLeafletMap';
 import { useWalletBusinesses as useWallet } from '@/hooks/useWallet';
+import { getSector } from '@/lib/sectorIcons';
 
-type Category = 'libraries' | 'allotments' | 'leisure' | 'ev' | 'eco';
+type Category = 'libraries' | 'allotments' | 'leisure' | 'ev' | 'eco' | 'business';
 type Saving = { money: number; co2: number; water: number };
 
 const CATEGORY_INFO: Record<
@@ -45,6 +46,12 @@ const CATEGORY_INFO: Record<
     message: 'Invest your pound locally to keep supply-chain travel emissions low.',
     delta: { money: 18, co2: 14, water: 25 },
   },
+  business: {
+    label: 'Local Businesses',
+    color: '#f4971d',
+    message: 'Tap to add this business loyalty card to your wallet.',
+    delta: { money: 0, co2: 0, water: 0 },
+  },
 };
 
 const CATEGORIES = (Object.keys(CATEGORY_INFO) as Category[]).map((id) => ({
@@ -67,16 +74,21 @@ const DB_CATEGORY_MAP: Record<string, Category> = {
 const BBOX = { minLng: -3.30, minLat: 51.55, maxLng: -3.05, maxLat: 51.72 };
 
 type POI = {
-  id: number;
+  id: number | string;
   name: string;
   category: Category;
   lat: number;
   lng: number;
   carbonAction: string | null;
+  // For business pins only
+  businessCardId?: string;
+  sectorIcon?: string;
+  rewardText?: string | null;
+  stampsRequired?: number | null;
 };
 
 
-const pinId = (p: { id: number; category: Category }) => `${p.category}:${p.id}`;
+const pinId = (p: { id: number | string; category: Category }) => `${p.category}:${p.id}`;
 
 type Mode = 'local' | 'cool';
 
@@ -102,15 +114,13 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   useEffect(() => {
     let mounted = true;
     (async () => {
-      const { data, error } = await supabase
-        .from('map_locations')
-        .select('id, title, latitude, longitude, category, carbon_action');
+      const [locRes, bizRes] = await Promise.all([
+        supabase.from('map_locations').select('id, title, latitude, longitude, category, carbon_action'),
+        supabase.from('business_cards_public').select('id, business_name, latitude, longitude, sector_icon, reward_text, stamps_required, offer_to_residents'),
+      ]);
       if (!mounted) return;
-      if (error) {
-        console.error('Failed to load map locations', error);
-        return;
-      }
-      const mapped: POI[] = (data ?? [])
+      if (locRes.error) console.error('Failed to load map locations', locRes.error);
+      const mapped: POI[] = (locRes.data ?? [])
         .map((r) => {
           const cat = DB_CATEGORY_MAP[r.category ?? ''];
           if (!cat || r.latitude == null || r.longitude == null) return null;
@@ -124,7 +134,21 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           } as POI;
         })
         .filter((p): p is POI => p !== null);
-      setPois(mapped);
+      const businessPois: POI[] = (bizRes.data ?? [])
+        .filter((b) => b.latitude != null && b.longitude != null)
+        .map((b) => ({
+          id: b.id,
+          name: b.business_name,
+          category: 'business' as Category,
+          lat: Number(b.latitude),
+          lng: Number(b.longitude),
+          carbonAction: b.offer_to_residents ?? null,
+          businessCardId: b.id,
+          sectorIcon: b.sector_icon ?? undefined,
+          rewardText: b.reward_text,
+          stampsRequired: b.stamps_required,
+        }));
+      setPois([...mapped, ...businessPois]);
     })();
     return () => {
       mounted = false;
@@ -171,36 +195,72 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
         const id = pinId(p);
         const isPledged = pledged.includes(id);
         const isLeisure = p.category === 'leisure';
+        const isBusiness = p.category === 'business';
         const inWallet = walletBusinesses.some((b) => b.id === id);
         const reason = p.carbonAction || info.message;
+        const sectorMeta = isBusiness ? getSector(p.sectorIcon) : null;
+        const color = sectorMeta?.color ?? info.color;
+        const blurb = isBusiness
+          ? (p.rewardText
+              ? `${t('Loyalty card')}: ${p.rewardText} (${p.stampsRequired ?? 6} ${t('stamps')})`
+              : t('Tap to add this business loyalty card to your wallet.'))
+          : (isLeisure
+              ? t('Join the #WalkMyWarmUp meet-up — walk in for your warm-up and skip the drive.')
+              : info.message);
         return {
           id,
           name: p.name,
           lat: p.lat,
           lng: p.lng,
-          color: info.color,
-          blurb: inviteBlurb(p),
-          pledged: isPledged,
-          ctaLabel: isLeisure
-            ? t('Join #WalkMyWarmUp')
-            : isPledged
-            ? `✓ ${t('Pledged')}`
-            : t('Pledge to visit'),
-          onAction: () => (isLeisure ? setWalkOpen(true) : handlePledge(p)),
-          walletLabel: inWallet ? `✓ ${t('In wallet')}` : t('Add to wallet'),
-          onAddToWallet: () => {
-            const ok = addBusiness({
-              id,
-              name: p.name,
-              category: info.label,
-              color: info.color,
-              reason,
-            });
-            toast({
-              title: ok ? t('Added to wallet') : t('Already in wallet'),
-              description: p.name,
-            });
+          color,
+          blurb,
+          pledged: isBusiness ? false : isPledged,
+          ctaLabel: isBusiness
+            ? (inWallet ? `✓ ${t('Loyalty card in wallet')}` : t('Add loyalty card to wallet'))
+            : isLeisure
+              ? t('Join #WalkMyWarmUp')
+              : isPledged
+                ? `✓ ${t('Pledged')}`
+                : t('Pledge to visit'),
+          onAction: () => {
+            if (isBusiness) {
+              const ok = addBusiness({
+                id,
+                name: p.name,
+                category: sectorMeta?.label ?? info.label,
+                color,
+                reason: p.rewardText || reason,
+                businessCardId: p.businessCardId,
+                sectorIcon: p.sectorIcon,
+                stampsRequired: p.stampsRequired ?? 6,
+                rewardText: p.rewardText ?? undefined,
+              });
+              toast({
+                title: ok ? t('Loyalty card added') : t('Already in wallet'),
+                description: p.name,
+              });
+              return;
+            }
+            isLeisure ? setWalkOpen(true) : handlePledge(p);
           },
+          walletLabel: isBusiness
+            ? undefined
+            : (inWallet ? `✓ ${t('In wallet')}` : t('Add to wallet')),
+          onAddToWallet: isBusiness
+            ? undefined
+            : () => {
+                const ok = addBusiness({
+                  id,
+                  name: p.name,
+                  category: info.label,
+                  color: info.color,
+                  reason,
+                });
+                toast({
+                  title: ok ? t('Added to wallet') : t('Already in wallet'),
+                  description: p.name,
+                });
+              },
         };
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps

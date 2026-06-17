@@ -10,6 +10,11 @@ export type WalletBusiness = {
   color: string;
   reason: string;
   addedAt: number;
+  // Optional loyalty card payload (added when a business_card is added from the map)
+  businessCardId?: string;
+  sectorIcon?: string;
+  stampsRequired?: number;
+  rewardText?: string;
 };
 
 export type WalletPhoto = {
