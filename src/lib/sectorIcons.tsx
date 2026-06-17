@@ -9,7 +9,7 @@ export type SectorKey =
   | 'manufacturing' | 'health' | 'education' | 'arts'
   | 'transport' | 'agriculture' | 'other';
 
-export const SECTORS: { key: SectorKey; label: string; Icon: React.ComponentType<{ className?: string }>; color: string }[] = [
+export const SECTORS: { key: SectorKey; label: string; Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>; color: string }[] = [
   { key: 'hospitality',  label: 'Hospitality',           Icon: Coffee,        color: '#b45309' },
   { key: 'retail',       label: 'Retail',                Icon: ShoppingBag,   color: '#7c3aed' },
   { key: 'professional', label: 'Professional services', Icon: Briefcase,     color: '#0f766e' },
