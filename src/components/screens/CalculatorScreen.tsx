@@ -144,7 +144,7 @@ const CalculatorScreen: React.FC = () => {
 
     toast({
       title: pointsAwarded > 0 ? `+${pointsAwarded} ${t('points!')}` : t('Score updated'),
-      description: `${active ? t(active.label) : ''}: ${agg[categoryId] || 0} kg CO₂${wasFirstTime ? ' • ' + t('Carbon Counter badge earned!') : ''}`,
+      description: `${active ? t(active.label) : ''}: ${((agg[categoryId] || 0) / 1000).toFixed(2)} ${t('tonnes CO₂e/year')}${wasFirstTime ? ' • ' + t('Carbon Counter badge earned!') : ''}`,
     });
     setActive(null);
   };
@@ -161,24 +161,25 @@ const CalculatorScreen: React.FC = () => {
         {CATEGORIES.map((c) => {
           const Icon = c.Icon;
           const score = scores[c.id] || 0;
+          const tonnes = (score / 1000).toFixed(2);
           return (
             <button
               key={c.id}
               onClick={() => setActive(c)}
               className="flex flex-col items-center"
             >
-              <span className="font-serif font-bold text-white text-lg mb-2">{t(c.label)}</span>
-              <div
-                className="w-full aspect-square rounded-2xl bg-white p-1.5 shadow-md"
-              >
+              <div className="w-full aspect-square rounded-2xl bg-white p-1.5 shadow-md">
                 <div
-                  className="w-full h-full rounded-xl flex items-center justify-center"
+                  className="w-full h-full rounded-xl flex flex-col items-center justify-between py-2"
                   style={{ backgroundColor: c.bg }}
                 >
-                  <Icon className="w-14 h-14 text-white" />
+                  <span className="font-serif font-bold text-white text-sm leading-tight">{t(c.label)}</span>
+                  <Icon className="w-10 h-10 text-white" />
+                  <span className="text-white font-bold text-[10px] leading-tight text-center px-1">
+                    {tonnes} {t('tonnes CO₂e/year')}
+                  </span>
                 </div>
               </div>
-              <span className="text-white font-bold mt-1">{score}</span>
             </button>
           );
         })}
