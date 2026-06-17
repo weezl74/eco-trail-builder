@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, Eye, Volume2, Brain, Heart, Users, Lightbulb } f
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 
 interface AssessmentData {
   learningStyle: 'visual' | 'auditory' | 'mixed' | null;
@@ -14,6 +15,7 @@ interface AssessmentData {
 const LearningStyleAssessment = () => {
   console.log('🚀 LearningStyleAssessment component is rendering!');
   const navigate = useNavigate();
+  const { setLearningPreferences } = useUserPreferences();
   const [currentStep, setCurrentStep] = useState(0);
   const [assessmentData, setAssessmentData] = useState<AssessmentData>({
     learningStyle: null,
@@ -102,8 +104,8 @@ const LearningStyleAssessment = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Store assessment data and navigate to toolkit
-      localStorage.setItem('learningPreferences', JSON.stringify(assessmentData));
+      // Save preferences to cloud (per-user) then continue.
+      void setLearningPreferences(assessmentData);
       navigate('/toolkit');
     }
   };

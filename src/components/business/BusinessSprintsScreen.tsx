@@ -3,6 +3,7 @@ import { ArrowLeft, Check } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from '@/hooks/useTranslations';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SprintTemplate {
   id: string;
@@ -31,7 +32,9 @@ const TEMPLATES: SprintTemplate[] = [
 ];
 
 const POINTS_PER_DAY = 25;
-const storageKey = (uid: string) => `nurture.biz.sprints.${uid}`;
+const SPRINT_KEY = 'business';
+const LEGACY_KEY = (uid: string) => `nurture.biz.sprints.${uid}`;
+const CACHE_KEY = (uid: string) => `cloudrow:user_sprints:${SPRINT_KEY}:${uid}`;
 
 const BusinessSprintsScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const { user } = useAuth();
@@ -42,11 +45,43 @@ const BusinessSprintsScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =>
   const [now, setNow] = useState(Date.now());
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) { setSprints([]); return; }
+    let cancelled = false;
     try {
-      const raw = localStorage.getItem(storageKey(user.id));
-      if (raw) setSprints(JSON.parse(raw));
+      const cached = localStorage.getItem(CACHE_KEY(user.id));
+      if (cached) setSprints(JSON.parse(cached));
     } catch {}
+    (async () => {
+      const { data } = await supabase
+        .from('user_sprints')
+        .select('data')
+        .eq('user_id', user.id)
+        .eq('sprint_key', SPRINT_KEY)
+        .maybeSingle();
+      if (cancelled) return;
+      if (data?.data) {
+        const list = (data.data as any).list as ActiveSprint[] | undefined;
+        if (Array.isArray(list)) {
+          setSprints(list);
+          try { localStorage.setItem(CACHE_KEY(user.id), JSON.stringify(list)); } catch {}
+          return;
+        }
+      }
+      try {
+        const raw = localStorage.getItem(LEGACY_KEY(user.id));
+        if (raw) {
+          const list = JSON.parse(raw) as ActiveSprint[];
+          await supabase.from('user_sprints').upsert(
+            { user_id: user.id, sprint_key: SPRINT_KEY, data: { list } as any },
+            { onConflict: 'user_id,sprint_key' },
+          );
+          setSprints(list);
+          try { localStorage.setItem(CACHE_KEY(user.id), JSON.stringify(list)); } catch {}
+          localStorage.removeItem(LEGACY_KEY(user.id));
+        }
+      } catch {}
+    })();
+    return () => { cancelled = true; };
   }, [user]);
 
   useEffect(() => {
@@ -56,7 +91,13 @@ const BusinessSprintsScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =>
 
   const persist = (next: ActiveSprint[]) => {
     setSprints(next);
-    if (user) localStorage.setItem(storageKey(user.id), JSON.stringify(next));
+    if (user) {
+      try { localStorage.setItem(CACHE_KEY(user.id), JSON.stringify(next)); } catch {}
+      void supabase.from('user_sprints').upsert(
+        { user_id: user.id, sprint_key: SPRINT_KEY, data: { list: next } as any },
+        { onConflict: 'user_id,sprint_key' },
+      );
+    }
   };
 
   const start = (tmpl: SprintTemplate, duration: 7 | 14 | 30) => {

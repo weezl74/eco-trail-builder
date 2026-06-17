@@ -61,21 +61,62 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
     if (user) {
       loadUserData();
       loadSprintData();
-      
-      // Load category completion states from localStorage
-      const savedCategories = localStorage.getItem(`completedCategories_${user.id}`);
-      if (savedCategories) {
-        setCompletedCategories(JSON.parse(savedCategories));
-      }
+      loadCompletedCategories();
     }
   }, [user]);
 
-  // Save category completion states to localStorage
+  // Save category completion states to cloud (per-user)
   useEffect(() => {
     if (user) {
-      localStorage.setItem(`completedCategories_${user.id}`, JSON.stringify(completedCategories));
+      try {
+        localStorage.setItem(
+          `cloudrow:user_calc_categories:${user.id}`,
+          JSON.stringify(completedCategories),
+        );
+      } catch {}
+      void supabase
+        .from('user_calc_categories')
+        .upsert(
+          { user_id: user.id, completed: completedCategories as any },
+          { onConflict: 'user_id' },
+        );
     }
   }, [completedCategories, user]);
+
+  const loadCompletedCategories = async () => {
+    if (!user) return;
+    try {
+      const cached = localStorage.getItem(`cloudrow:user_calc_categories:${user.id}`);
+      if (cached) setCompletedCategories(JSON.parse(cached));
+    } catch {}
+    const { data } = await supabase
+      .from('user_calc_categories')
+      .select('completed')
+      .eq('user_id', user.id)
+      .maybeSingle();
+    if (data?.completed && Array.isArray(data.completed)) {
+      setCompletedCategories(data.completed as string[]);
+      try {
+        localStorage.setItem(
+          `cloudrow:user_calc_categories:${user.id}`,
+          JSON.stringify(data.completed),
+        );
+      } catch {}
+    } else {
+      // legacy migration
+      try {
+        const legacy = localStorage.getItem(`completedCategories_${user.id}`);
+        if (legacy) {
+          const list = JSON.parse(legacy) as string[];
+          await supabase
+            .from('user_calc_categories')
+            .upsert({ user_id: user.id, completed: list as any }, { onConflict: 'user_id' });
+          setCompletedCategories(list);
+          localStorage.removeItem(`completedCategories_${user.id}`);
+        }
+      } catch {}
+    }
+  };
 
   const loadUserData = async () => {
     if (!user) return;
@@ -146,17 +187,44 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
     }
   };
 
-  const loadSprintData = () => {
+  const loadSprintData = async () => {
     if (!user) return;
-    
     try {
-      const stored = localStorage.getItem('userSprints');
-      if (stored) {
-        const sprintData = JSON.parse(stored);
-        if (sprintData.userId === user.id && sprintData.sprints) {
-          setSprints(sprintData.sprints);
+      // warm from cache
+      try {
+        const cached = localStorage.getItem(`cloudrow:user_sprints:waste_calculator:${user.id}`);
+        if (cached) setSprints(JSON.parse(cached));
+      } catch {}
+      const { data } = await supabase
+        .from('user_sprints')
+        .select('data')
+        .eq('user_id', user.id)
+        .eq('sprint_key', 'waste_calculator')
+        .maybeSingle();
+      if (data?.data) {
+        const list = (data.data as any).list;
+        if (Array.isArray(list)) {
+          setSprints(list);
+          try { localStorage.setItem(`cloudrow:user_sprints:waste_calculator:${user.id}`, JSON.stringify(list)); } catch {}
+          return;
         }
       }
+      // legacy migration from device-wide 'userSprints'
+      try {
+        const legacy = localStorage.getItem('userSprints');
+        if (legacy) {
+          const sd = JSON.parse(legacy);
+          if (sd.userId === user.id && Array.isArray(sd.sprints)) {
+            await supabase.from('user_sprints').upsert(
+              { user_id: user.id, sprint_key: 'waste_calculator', data: { list: sd.sprints } as any },
+              { onConflict: 'user_id,sprint_key' },
+            );
+            setSprints(sd.sprints);
+            try { localStorage.setItem(`cloudrow:user_sprints:waste_calculator:${user.id}`, JSON.stringify(sd.sprints)); } catch {}
+            localStorage.removeItem('userSprints');
+          }
+        }
+      } catch {}
     } catch (error) {
       console.error('Error loading sprint data:', error);
     }
@@ -439,14 +507,15 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
       costSaving
     };
     
-    setSprints(prev => [...prev, newSprint]);
-    
-    // Store sprint data in localStorage for persistence
-    const sprintData = {
-      sprints: [...sprints, newSprint],
-      userId: user.id
-    };
-    localStorage.setItem('userSprints', JSON.stringify(sprintData));
+    const nextSprints = [...sprints, newSprint];
+    setSprints(nextSprints);
+
+    // Persist sprint data per-user to cloud (with offline cache).
+    try { localStorage.setItem(`cloudrow:user_sprints:waste_calculator:${user.id}`, JSON.stringify(nextSprints)); } catch {}
+    void supabase.from('user_sprints').upsert(
+      { user_id: user.id, sprint_key: 'waste_calculator', data: { list: nextSprints } as any },
+      { onConflict: 'user_id,sprint_key' },
+    );
   };
 
   const completeSprint = async (id: string) => {
@@ -469,12 +538,12 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
       );
       setSprints(updatedSprints);
       
-      // Update localStorage
-      const sprintData = {
-        sprints: updatedSprints,
-        userId: user.id
-      };
-      localStorage.setItem('userSprints', JSON.stringify(sprintData));
+      // Persist updated sprint list to cloud (with offline cache).
+      try { localStorage.setItem(`cloudrow:user_sprints:waste_calculator:${user.id}`, JSON.stringify(updatedSprints)); } catch {}
+      void supabase.from('user_sprints').upsert(
+        { user_id: user.id, sprint_key: 'waste_calculator', data: { list: updatedSprints } as any },
+        { onConflict: 'user_id,sprint_key' },
+      );
       
       setUserProfile(prev => ({
         ...prev,

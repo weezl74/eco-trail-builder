@@ -37,6 +37,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const signOut = async () => {
+    // Clear per-user local caches so the next account on this device
+    // doesn't briefly see the previous user's data. Cloud rows are kept
+    // so the data returns when this user logs back in.
+    try {
+      const keys: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('cloudrow:')) keys.push(k);
+      }
+      keys.forEach((k) => localStorage.removeItem(k));
+    } catch {}
     await supabase.auth.signOut();
   };
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Lock, Leaf } from 'lucide-react';
 import { useSavings } from '@/hooks/useSavings';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { toast } from '@/hooks/use-toast';
 
 import NelsonAvatar from '@/components/NelsonAvatar';
@@ -78,12 +79,9 @@ type Tab = 'avatar' | 'card';
 const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const [tab, setTab] = useState<Tab>('avatar');
   const [openNote, setOpenNote] = useState<AccessoryId | null>(null);
-  const [head, setHead] = useState<'nelson' | 'barb'>(() => {
-    try { return (localStorage.getItem('sheepHead') as 'nelson' | 'barb') || 'nelson'; } catch { return 'nelson'; }
-  });
+  const { sheepHead: head, setSheepHead } = useUserPreferences();
   const pickHead = (h: 'nelson' | 'barb') => {
-    setHead(h);
-    try { localStorage.setItem('sheepHead', h); } catch { /* ignore */ }
+    void setSheepHead(h);
   };
   const { woolPoints, accessories, buyAccessory, cardColor, setCardColor, woolColor, setWoolColor } = useSavings();
   const palette = getPalette(cardColor);
