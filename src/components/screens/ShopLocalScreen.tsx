@@ -74,16 +74,21 @@ const DB_CATEGORY_MAP: Record<string, Category> = {
 const BBOX = { minLng: -3.30, minLat: 51.55, maxLng: -3.05, maxLat: 51.72 };
 
 type POI = {
-  id: number;
+  id: number | string;
   name: string;
   category: Category;
   lat: number;
   lng: number;
   carbonAction: string | null;
+  // For business pins only
+  businessCardId?: string;
+  sectorIcon?: string;
+  rewardText?: string | null;
+  stampsRequired?: number | null;
 };
 
 
-const pinId = (p: { id: number; category: Category }) => `${p.category}:${p.id}`;
+const pinId = (p: { id: number | string; category: Category }) => `${p.category}:${p.id}`;
 
 type Mode = 'local' | 'cool';
 
