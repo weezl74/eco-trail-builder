@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, Eye, Volume2, Brain, Heart, Users, Lightbulb } f
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 
 interface AssessmentData {
   learningStyle: 'visual' | 'auditory' | 'mixed' | null;
