@@ -170,6 +170,24 @@ const WoollyWallet: React.FC<Props> = ({ children }) => {
 
     const extras: DealtCard[] = items.map((it: WalletItem) => {
       if (it.kind === 'business') {
+        const isLoyalty = !!it.businessCardId && !!it.stampsRequired;
+        if (isLoyalty) {
+          return {
+            id: it.id,
+            title: it.name,
+            subtitle: `${it.category} · ${t('Loyalty card')}`,
+            gradient: 'from-[#f4971d] to-[#7c2d12]',
+            icon: <MapPin className="h-5 w-5" style={{ color: it.color }} />,
+            body: (
+              <LoyaltyCardBody
+                businessCardId={it.businessCardId!}
+                stampsRequired={it.stampsRequired!}
+                rewardText={it.rewardText || it.reason}
+              />
+            ),
+            onRemove: () => { removeItem(it.id); setIndex(0); },
+          };
+        }
         return {
           id: it.id,
           title: it.name,
