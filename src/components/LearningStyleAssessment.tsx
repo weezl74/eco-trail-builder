@@ -15,6 +15,7 @@ interface AssessmentData {
 const LearningStyleAssessment = () => {
   console.log('🚀 LearningStyleAssessment component is rendering!');
   const navigate = useNavigate();
+  const { setLearningPreferences } = useUserPreferences();
   const [currentStep, setCurrentStep] = useState(0);
   const [assessmentData, setAssessmentData] = useState<AssessmentData>({
     learningStyle: null,
