@@ -1,4 +1,5 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
 export type Saving = { money: number; co2: number; water: number };
@@ -17,7 +18,8 @@ type State = {
   woolColor: string;
 };
 
-const BASE_KEY = 'eco_state_v2';
+const LEGACY_BASE = 'eco_state_v2';
+const CACHE_BASE = 'cloudrow:user_state:data';
 const EVT = 'eco_state_update';
 
 // Fresh defaults for newly registered users — no inherited points, no accessories,
@@ -34,37 +36,84 @@ const DEFAULT: State = {
   woolColor: '#e8d9b8',
 };
 
-const keyFor = (userId?: string | null) => (userId ? `${BASE_KEY}:${userId}` : BASE_KEY);
-
-const read = (userId?: string | null): State => {
-  try {
-    const raw = localStorage.getItem(keyFor(userId));
-    if (!raw) return DEFAULT;
-    return { ...DEFAULT, ...(JSON.parse(raw) as Partial<State>) };
-  } catch {
-    return DEFAULT;
-  }
-};
-
-const write = (s: State, userId?: string | null) => {
-  localStorage.setItem(keyFor(userId), JSON.stringify(s));
-  window.dispatchEvent(new Event(EVT));
-};
-
 export const RENEWABLE_COSTS: Record<RenewableType, number> = {
   solar: 50,
   wind: 80,
   mine_water: 120,
 };
 
+const cacheKey = (uid: string) => `${CACHE_BASE}:${uid}`;
+const legacyKey = (uid: string) => `${LEGACY_BASE}:${uid}`;
+
+const readCache = (uid: string | null): State => {
+  if (!uid) return DEFAULT;
+  try {
+    const raw = localStorage.getItem(cacheKey(uid));
+    if (raw) return { ...DEFAULT, ...(JSON.parse(raw) as Partial<State>) };
+    // one-off migration from legacy device-local key
+    const legacy = localStorage.getItem(legacyKey(uid));
+    if (legacy) return { ...DEFAULT, ...(JSON.parse(legacy) as Partial<State>) };
+  } catch {}
+  return DEFAULT;
+};
+
+const writeCache = (uid: string | null, s: State) => {
+  if (!uid) return;
+  try {
+    localStorage.setItem(cacheKey(uid), JSON.stringify(s));
+  } catch {}
+};
+
 export const useSavings = () => {
   const { user } = useAuth();
   const userId = user?.id ?? null;
-  const [state, setState] = useState<State>(() => read(userId));
+  const [state, setState] = useState<State>(() => readCache(userId));
+  const latest = useRef(state);
+  latest.current = state;
 
+  // Load from cloud on user change.
   useEffect(() => {
-    setState(read(userId));
-    const sync = () => setState(read(userId));
+    let cancelled = false;
+    if (!userId) {
+      setState(DEFAULT);
+      return;
+    }
+    setState(readCache(userId));
+    (async () => {
+      const { data } = await supabase
+        .from('user_state')
+        .select('data')
+        .eq('user_id', userId)
+        .maybeSingle();
+      if (cancelled) return;
+      if (data && data.data) {
+        const merged = { ...DEFAULT, ...(data.data as Partial<State>) };
+        setState(merged);
+        writeCache(userId, merged);
+      } else {
+        // No row yet — if we have a legacy localStorage blob, push it up once.
+        try {
+          const legacy = localStorage.getItem(legacyKey(userId));
+          if (legacy) {
+            const merged = { ...DEFAULT, ...(JSON.parse(legacy) as Partial<State>) };
+            await supabase
+              .from('user_state')
+              .upsert({ user_id: userId, data: merged as any }, { onConflict: 'user_id' });
+            setState(merged);
+            writeCache(userId, merged);
+            localStorage.removeItem(legacyKey(userId));
+          }
+        } catch {}
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+
+  // Cross-tab / cross-component sync.
+  useEffect(() => {
+    const sync = () => setState(readCache(userId));
     window.addEventListener(EVT, sync);
     window.addEventListener('storage', sync);
     return () => {
@@ -73,64 +122,92 @@ export const useSavings = () => {
     };
   }, [userId]);
 
-  const addPledge = useCallback((id: string, delta: Saving) => {
-    const s = read(userId);
-    if (s.pledged.includes(id)) return false;
-    const next: State = {
-      ...s,
-      pledged: [...s.pledged, id],
-      savings: {
-        money: s.savings.money + delta.money,
-        co2: s.savings.co2 + delta.co2,
-        water: s.savings.water + delta.water,
-      },
-      woolPoints: s.woolPoints + 25,
-      treePoints: s.treePoints + 10,
-    };
-    write(next, userId);
-    return true;
-  }, [userId]);
+  const persist = useCallback(
+    async (next: State) => {
+      setState(next);
+      writeCache(userId, next);
+      window.dispatchEvent(new Event(EVT));
+      if (!userId) return;
+      await supabase
+        .from('user_state')
+        .upsert({ user_id: userId, data: next as any }, { onConflict: 'user_id' });
+    },
+    [userId],
+  );
 
-  const buyRenewable = useCallback((type: RenewableType, x: number, y: number) => {
-    const s = read(userId);
-    const cost = RENEWABLE_COSTS[type];
-    if (s.woolPoints < cost) return false;
-    const next: State = {
-      ...s,
-      woolPoints: s.woolPoints - cost,
-      renewables: [
-        ...s.renewables,
-        { id: `${type}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, type, x, y },
-      ],
-    };
-    write(next, userId);
-    return true;
-  }, [userId]);
+  const addPledge = useCallback(
+    (id: string, delta: Saving) => {
+      const s = latest.current;
+      if (s.pledged.includes(id)) return false;
+      const next: State = {
+        ...s,
+        pledged: [...s.pledged, id],
+        savings: {
+          money: s.savings.money + delta.money,
+          co2: s.savings.co2 + delta.co2,
+          water: s.savings.water + delta.water,
+        },
+        woolPoints: s.woolPoints + 25,
+        treePoints: s.treePoints + 10,
+      };
+      void persist(next);
+      return true;
+    },
+    [persist],
+  );
 
-  const buyAccessory = useCallback((id: string, cost: number) => {
-    const s = read(userId);
-    if (s.accessories.includes(id)) return true;
-    if (s.woolPoints < cost) return false;
-    write({ ...s, woolPoints: s.woolPoints - cost, accessories: [...s.accessories, id] }, userId);
-    return true;
-  }, [userId]);
+  const buyRenewable = useCallback(
+    (type: RenewableType, x: number, y: number) => {
+      const s = latest.current;
+      const cost = RENEWABLE_COSTS[type];
+      if (s.woolPoints < cost) return false;
+      void persist({
+        ...s,
+        woolPoints: s.woolPoints - cost,
+        renewables: [
+          ...s.renewables,
+          { id: `${type}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, type, x, y },
+        ],
+      });
+      return true;
+    },
+    [persist],
+  );
 
-  const plantTree = useCallback((cost = 100) => {
-    const s = read(userId);
-    if (s.treePoints < cost) return false;
-    write({ ...s, treePoints: s.treePoints - cost, treesPlanted: s.treesPlanted + 1 }, userId);
-    return true;
-  }, [userId]);
+  const buyAccessory = useCallback(
+    (id: string, cost: number) => {
+      const s = latest.current;
+      if (s.accessories.includes(id)) return true;
+      if (s.woolPoints < cost) return false;
+      void persist({ ...s, woolPoints: s.woolPoints - cost, accessories: [...s.accessories, id] });
+      return true;
+    },
+    [persist],
+  );
 
-  const setCardColor = useCallback((color: string) => {
-    const s = read(userId);
-    write({ ...s, cardColor: color }, userId);
-  }, [userId]);
+  const plantTree = useCallback(
+    (cost = 100) => {
+      const s = latest.current;
+      if (s.treePoints < cost) return false;
+      void persist({ ...s, treePoints: s.treePoints - cost, treesPlanted: s.treesPlanted + 1 });
+      return true;
+    },
+    [persist],
+  );
 
-  const setWoolColor = useCallback((color: string) => {
-    const s = read(userId);
-    write({ ...s, woolColor: color }, userId);
-  }, [userId]);
+  const setCardColor = useCallback(
+    (color: string) => {
+      void persist({ ...latest.current, cardColor: color });
+    },
+    [persist],
+  );
+
+  const setWoolColor = useCallback(
+    (color: string) => {
+      void persist({ ...latest.current, woolColor: color });
+    },
+    [persist],
+  );
 
   return {
     ...state,
