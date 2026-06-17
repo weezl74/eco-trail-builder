@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useBinDay, nextCollection } from '@/hooks/useBinDay';
 import { useBusinessSpotlight } from '@/hooks/useBusinessSpotlight';
 import BinDaySetup from './BinDaySetup';
+import LoyaltyCardBody from './LoyaltyCardBody';
 
 type DealtCard = {
   id: string;
