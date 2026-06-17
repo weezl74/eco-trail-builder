@@ -507,14 +507,15 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
       costSaving
     };
     
-    setSprints(prev => [...prev, newSprint]);
-    
-    // Store sprint data in localStorage for persistence
-    const sprintData = {
-      sprints: [...sprints, newSprint],
-      userId: user.id
-    };
-    localStorage.setItem('userSprints', JSON.stringify(sprintData));
+    const nextSprints = [...sprints, newSprint];
+    setSprints(nextSprints);
+
+    // Persist sprint data per-user to cloud (with offline cache).
+    try { localStorage.setItem(`cloudrow:user_sprints:waste_calculator:${user.id}`, JSON.stringify(nextSprints)); } catch {}
+    void supabase.from('user_sprints').upsert(
+      { user_id: user.id, sprint_key: 'waste_calculator', data: { list: nextSprints } as any },
+      { onConflict: 'user_id,sprint_key' },
+    );
   };
 
   const completeSprint = async (id: string) => {
