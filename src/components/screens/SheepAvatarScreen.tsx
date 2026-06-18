@@ -9,6 +9,26 @@ import { CARD_PALETTES, getPalette } from '@/lib/cardPalettes';
 import { useTranslations } from '@/hooks/useTranslations';
 import { playGoodBaa } from '@/lib/sounds';
 
+import glassesImg from '@/assets/accessories/glasses.svg.asset.json';
+import starGlassesImg from '@/assets/accessories/starGlasses.svg.asset.json';
+import pirateHatImg from '@/assets/accessories/pirateHat.svg.asset.json';
+import bowtieImg from '@/assets/accessories/bowtie.svg.asset.json';
+import stubbleImg from '@/assets/accessories/stubble.svg.asset.json';
+import raincoatImg from '@/assets/accessories/raincoat.svg.asset.json';
+import longBeardImg from '@/assets/accessories/longBeard.svg.asset.json';
+import mohawkImg from '@/assets/accessories/mohawk.png.asset.json';
+
+const ACCESSORY_IMAGES: Partial<Record<string, string>> = {
+  glasses: (glassesImg as { url: string }).url,
+  starGlasses: (starGlassesImg as { url: string }).url,
+  pirateHat: (pirateHatImg as { url: string }).url,
+  bowtie: (bowtieImg as { url: string }).url,
+  stubble: (stubbleImg as { url: string }).url,
+  raincoat: (raincoatImg as { url: string }).url,
+  longBeard: (longBeardImg as { url: string }).url,
+  mohawk: (mohawkImg as { url: string }).url,
+};
+
 type AccessoryId =
   // SVG parts (new)
   | 'cap' | 'pirateHat' | 'mohawk'
@@ -206,7 +226,16 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                       owned ? 'bg-[#F4971D] text-black' : afford ? 'bg-white text-black' : 'bg-white/30 text-white'
                     }`}
                   >
-                    <span className="text-xl leading-none">{a.emoji}</span>
+                    {ACCESSORY_IMAGES[a.id] ? (
+                      <img
+                        src={ACCESSORY_IMAGES[a.id]!}
+                        alt={a.label}
+                        className="h-10 w-10 object-contain"
+                        draggable={false}
+                      />
+                    ) : (
+                      <span className="text-xl leading-none">{a.emoji}</span>
+                    )}
                     <span className="leading-tight text-center">{t(a.label)}</span>
                     <span className="flex items-center gap-1 text-[10px]">
                       {!owned && !afford && <Lock className="h-3 w-3" />}
