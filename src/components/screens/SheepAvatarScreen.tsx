@@ -19,14 +19,14 @@ import longBeardImg from '@/assets/accessories/longBeard.svg.asset.json';
 import mohawkImg from '@/assets/accessories/mohawk.png.asset.json';
 
 const ACCESSORY_IMAGES: Partial<Record<string, string>> = {
-  glasses: glassesImg.url,
-  starGlasses: starGlassesImg.url,
-  pirateHat: pirateHatImg.url,
-  bowtie: bowtieImg.url,
-  stubble: stubbleImg.url,
-  raincoat: raincoatImg.url,
-  longBeard: longBeardImg.url,
-  mohawk: mohawkImg.url,
+  glasses: (glassesImg as { url: string }).url,
+  starGlasses: (starGlassesImg as { url: string }).url,
+  pirateHat: (pirateHatImg as { url: string }).url,
+  bowtie: (bowtieImg as { url: string }).url,
+  stubble: (stubbleImg as { url: string }).url,
+  raincoat: (raincoatImg as { url: string }).url,
+  longBeard: (longBeardImg as { url: string }).url,
+  mohawk: (mohawkImg as { url: string }).url,
 };
 
 type AccessoryId =
