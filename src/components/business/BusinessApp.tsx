@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import BottomNavigation from '@/components/BottomNavigation';
 import { BusinessCarbonReport } from '@/components/BusinessCarbonReport';
-import { BusinessCommunity } from '@/components/BusinessCommunity';
+import CommunityScreen from '@/components/CommunityScreen';
 import BusinessHomeScreen from './BusinessHomeScreen';
 import BusinessActionsScreen from './BusinessActionsScreen';
 import BusinessAccountScreen from './BusinessAccountScreen';
@@ -30,7 +30,7 @@ const BusinessApp: React.FC<Props> = ({ onSignOut, onEditCard }) => {
       case 'community':
         return (
           <div className="min-h-screen bg-background pb-24">
-            <BusinessCommunity />
+            <CommunityScreen isBusiness />
           </div>
         );
       case 'account':

@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from '@/hooks/useTranslations';
 
-const categories = [
+const baseCategories = [
   {
     id: 'food',
     label: 'Land Use & Food',
@@ -37,13 +37,46 @@ const categories = [
   },
 ];
 
+const businessCategories = [
+  {
+    id: 'tree-planting',
+    label: 'Tree Planting',
+    sub: 'Organise or sponsor tree planting initiatives',
+    items: [
+      { tag: '#PlantATree', text: 'Sponsored 100 native saplings for the local woodland.' },
+      { tag: '#TeamPlantDay', text: 'Closed the office for a team tree-planting day.' },
+      { tag: '#RewildOurPatch', text: 'Adopted a rewilding patch near our premises.' },
+    ],
+  },
+  {
+    id: 'sponsorship',
+    label: 'Event Sponsorship',
+    sub: 'Sponsor community sustainability events',
+    items: [
+      { tag: '#GreenEvent', text: 'Sponsored a zero-waste community fair.' },
+      { tag: '#FundTheFix', text: 'Sponsored a local Repair Café for the year.' },
+    ],
+  },
+  {
+    id: 'donations',
+    label: 'Donations & In-Kind',
+    sub: 'Donate goods, services or funds',
+    items: [
+      { tag: '#GiveBack', text: 'Donated surplus stock to a local community group.' },
+      { tag: '#ProBono', text: 'Provided pro-bono services to a sustainability charity.' },
+    ],
+  },
+];
+
 interface Props {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   onPosted?: () => void;
+  isBusiness?: boolean;
 }
 
-const AddStoryDialog: React.FC<Props> = ({ open, onOpenChange, onPosted }) => {
+const AddStoryDialog: React.FC<Props> = ({ open, onOpenChange, onPosted, isBusiness = false }) => {
+  const categories = isBusiness ? [...baseCategories, ...businessCategories] : baseCategories;
   const [catId, setCatId] = useState(categories[0].id);
   const [submittingTag, setSubmittingTag] = useState<string | null>(null);
   const [usedTags, setUsedTags] = useState<Set<string>>(new Set());

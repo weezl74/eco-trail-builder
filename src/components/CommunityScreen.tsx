@@ -7,9 +7,10 @@ import communityPledgeIcon from '@/assets/svg/community-pledge.svg.asset.json';
 
 interface CommunityScreenProps {
   userPoints?: number;
+  isBusiness?: boolean;
 }
 
-const CommunityScreen: React.FC<CommunityScreenProps> = () => {
+const CommunityScreen: React.FC<CommunityScreenProps> = ({ isBusiness = false }) => {
   const [view, setView] = useState<'main' | 'leaderboard'>('main');
   const [addOpen, setAddOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -53,6 +54,7 @@ const CommunityScreen: React.FC<CommunityScreenProps> = () => {
         open={addOpen}
         onOpenChange={setAddOpen}
         onPosted={() => setRefreshKey((k) => k + 1)}
+        isBusiness={isBusiness}
       />
     </div>
   );
