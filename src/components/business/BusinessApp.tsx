@@ -30,7 +30,7 @@ const BusinessApp: React.FC<Props> = ({ onSignOut, onEditCard }) => {
       case 'community':
         return (
           <div className="min-h-screen bg-background pb-24">
-            <BusinessCommunity />
+            <CommunityScreen isBusiness />
           </div>
         );
       case 'account':
