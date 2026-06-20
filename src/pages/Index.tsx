@@ -46,7 +46,7 @@ const Index = () => {
   }, [loading, user, bootChecked]);
 
   useEffect(() => {
-    if (user && (stage === "login" || stage === "auth")) {
+    if (user) {
       routeAuthenticated();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
