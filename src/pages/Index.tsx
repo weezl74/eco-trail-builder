@@ -27,18 +27,16 @@ const Index = () => {
   // Decide between resident-app and business-app based on profiles.account_type
   const routeAuthenticated = async () => {
     if (!user) return;
-    const { data } = await supabase
-      .from("profiles")
-      .select("account_type")
-      .eq("user_id", user.id)
-      .maybeSingle();
+
+    const res = await fetch(
+      `https://caerphilly-api-dev01.azurewebsites.net/api/getProfile/me/profile?user_id=${user.id}`,
+    );
+
+    const data = await res.json();
+
     if (data?.account_type === "business") {
       // If they have no card yet, route them to onboarding
-      const { data: card } = await supabase
-        .from("business_cards")
-        .select("id")
-        .eq("user_id", user.id)
-        .maybeSingle();
+      const { data: card } = await supabase.from("business_cards").select("id").eq("user_id", user.id).maybeSingle();
       setStage(card ? "business-app" : "business-onboarding");
     } else {
       setStage("app");
@@ -66,30 +64,15 @@ const Index = () => {
   }
 
   if (stage === "business-app") {
-    return (
-      <BusinessApp
-        onSignOut={() => setStage("landing")}
-        onEditCard={() => setStage("business-onboarding")}
-      />
-    );
+    return <BusinessApp onSignOut={() => setStage("landing")} onEditCard={() => setStage("business-onboarding")} />;
   }
 
   if (stage === "business-onboarding") {
-    return (
-      <BusinessOnboarding
-        editMode={!!user}
-        onComplete={() => setStage("business-app")}
-      />
-    );
+    return <BusinessOnboarding editMode={!!user} onComplete={() => setStage("business-app")} />;
   }
 
   if (stage === "app") {
-    return (
-      <SimplifiedApp
-        onBackToLanding={() => setStage("landing")}
-        language={language}
-      />
-    );
+    return <SimplifiedApp onBackToLanding={() => setStage("landing")} language={language} />;
   }
 
   if (stage === "register") {
@@ -109,11 +92,7 @@ const Index = () => {
   }
 
   if (stage === "auth") {
-    return (
-      <AuthChoice
-        onSelect={(choice) => setStage(choice === "register" ? "register" : "login")}
-      />
-    );
+    return <AuthChoice onSelect={(choice) => setStage(choice === "register" ? "register" : "login")} />;
   }
 
   if (stage === "language") {
@@ -121,7 +100,9 @@ const Index = () => {
       <LanguageSelect
         onSelect={(lang) => {
           setLanguage(lang);
-          try { localStorage.setItem("app_language", lang); } catch {}
+          try {
+            localStorage.setItem("app_language", lang);
+          } catch {}
           setStage("auth");
         }}
       />
