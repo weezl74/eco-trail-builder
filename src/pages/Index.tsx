@@ -34,8 +34,6 @@ const Index = () => {
 
     const data = await res.json();
     setStage("app");
-
-    }
   };
 
   useEffect(() => {
