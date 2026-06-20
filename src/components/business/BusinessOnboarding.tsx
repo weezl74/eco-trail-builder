@@ -313,66 +313,29 @@ const BusinessOnboarding: React.FC<Props> = ({ onComplete, editMode }) => {
         </p>
       )}
 
-      {/* ===== Extras below the card ===== */}
-      <div className="mt-5 space-y-3">
-        <div className="bg-white/5 rounded-2xl p-3">
-          <label className="block text-white/80 text-xs font-bold mb-1">{t('Pen portrait')}</label>
-          <textarea
-            value={form.pen_portrait}
-            onChange={(e) => set('pen_portrait', e.target.value)}
-            rows={3}
-            placeholder={t('A short paragraph about your business and why low carbon matters to you.')}
-            className="w-full bg-white/10 text-white rounded-lg px-3 py-2 text-sm outline-none placeholder:text-white/40"
-          />
-        </div>
+      {/* Missing-field hint */}
+      {!canSubmit && (
+        <p className="mt-4 text-center text-[11px] text-white/70">
+          {!form.business_name.trim() && <span className="mr-2">• {t('Add business name')}</span>}
+          {!form.sector_icon && <span className="mr-2">• {t('Tap the icon to choose a sector')}</span>}
+          {!form.postcode.trim() && <span>• {t('Add postcode')}</span>}
+        </p>
+      )}
 
-        <div className="bg-white/5 rounded-2xl p-3">
-          <label className="block text-white/80 text-xs font-bold mb-1">{t('Climate goals')}</label>
-          <textarea
-            value={form.climate_goals}
-            onChange={(e) => set('climate_goals', e.target.value)}
-            rows={2}
-            placeholder={t('e.g. Net zero by 2030; halve packaging by 2027.')}
-            className="w-full bg-white/10 text-white rounded-lg px-3 py-2 text-sm outline-none placeholder:text-white/40"
-          />
-        </div>
-
-        <div className="bg-white/5 rounded-2xl p-3">
-          <label className="block text-white/80 text-xs font-bold mb-1">{t('Offer to residents')}</label>
-          <textarea
-            value={form.offer_to_residents}
-            onChange={(e) => set('offer_to_residents', e.target.value)}
-            rows={2}
-            placeholder={t('e.g. 10% off for anyone who arrives by foot, bike or bus.')}
-            className="w-full bg-white/10 text-white rounded-lg px-3 py-2 text-sm outline-none placeholder:text-white/40"
-          />
-        </div>
-
-        <div className="bg-white/5 rounded-2xl p-3">
-          <label className="block text-white/80 text-xs font-bold mb-1">{t('Offer to businesses')}</label>
-          <textarea
-            value={form.offer_to_businesses}
-            onChange={(e) => set('offer_to_businesses', e.target.value)}
-            rows={2}
-            placeholder={t('e.g. Free 30-min carbon advice call.')}
-            className="w-full bg-white/10 text-white rounded-lg px-3 py-2 text-sm outline-none placeholder:text-white/40"
-          />
-        </div>
-
-        <div className="bg-white/5 rounded-2xl p-3">
-          <label className="block text-white/80 text-xs font-bold mb-2">
-            {t('Loyalty stamps required')}: <span className="text-[#f4971d]">{form.stamps_required}</span>
-          </label>
-          <input
-            type="range"
-            min={3}
-            max={12}
-            value={form.stamps_required}
-            onChange={(e) => set('stamps_required', Number(e.target.value))}
-            className="w-full accent-[#f4971d]"
-          />
-          <p className="text-[10px] text-white/50 mt-1">{t('How many visits before residents earn your reward.')}</p>
-        </div>
+      {/* Loyalty stamp count — quick stepper, kept on-card via dot preview */}
+      <div className="mt-4 flex items-center justify-center gap-3 text-white/80 text-xs">
+        <span>{t('Stamps for reward')}:</span>
+        <button
+          type="button"
+          onClick={() => set('stamps_required', Math.max(3, form.stamps_required - 1))}
+          className="w-7 h-7 rounded-full bg-white/15 text-white"
+        >−</button>
+        <span className="text-[#f4971d] font-bold w-5 text-center">{form.stamps_required}</span>
+        <button
+          type="button"
+          onClick={() => set('stamps_required', Math.min(12, form.stamps_required + 1))}
+          className="w-7 h-7 rounded-full bg-white/15 text-white"
+        >+</button>
       </div>
 
       {/* ===== Sector picker overlay ===== */}
