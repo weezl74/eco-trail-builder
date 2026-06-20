@@ -413,6 +413,16 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
               })}
             </div>
           </div>
+
+          {/* Nelson "bring him home" button */}
+          <button
+            onClick={() => setShowJourney(true)}
+            className="fixed bottom-64 right-3 z-[1000] w-16 h-16 rounded-full bg-[#f5a623] shadow-lg border-2 border-white flex items-center justify-center active:scale-95 transition"
+            aria-label="Find Nelson"
+            title={t('Bring Nelson home')}
+          >
+            <img src={actLocal.url} alt="" className="w-11 h-11" />
+          </button>
         </>
       )}
 
