@@ -865,7 +865,7 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
               userRenewables={userRenewables}
               totalPoints={userProfile?.total_points || 0}
               currentFootprint={footprint}
-              onPurchaseRenewable={handleRenewablePurchase}
+              onPlaceRenewable={handlePlaceRenewable}
             />
           </div>
         )}
