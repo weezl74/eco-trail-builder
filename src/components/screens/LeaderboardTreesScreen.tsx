@@ -1,10 +1,22 @@
+
 import React, { useEffect, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import nelsonHead from '@/assets/sheep/NelsonHead.svg.asset.json';
 
+import { useToast } from '@/hooks/use-toast';
+import { useSavings } from '@/hooks/useSavings';
+import { useTranslations } from '@/hooks/useTranslations';
+
+type Mode = 'wool' | 'tree';
+
+interface Row {
+  name: string;
+  points: number;
+}
+
+// ✅ Icons unchanged
 const OakTreeIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="0 0 64 64" className={className} aria-hidden>
-    {/* Canopy - oak: rounded, lobed */}
     <g fill="#3f8a3a">
       <circle cx="32" cy="20" r="14" />
       <circle cx="18" cy="26" r="11" />
@@ -13,9 +25,7 @@ const OakTreeIcon: React.FC<{ className?: string }> = ({ className }) => (
       <circle cx="40" cy="34" r="10" />
       <circle cx="32" cy="32" r="12" />
     </g>
-    {/* Trunk */}
     <rect x="29" y="38" width="6" height="18" rx="1.5" fill="#6b4226" />
-    {/* Ground */}
     <ellipse cx="32" cy="58" rx="14" ry="2.5" fill="#3a2a1a" opacity="0.35" />
   </svg>
 );
@@ -23,7 +33,6 @@ const OakTreeIcon: React.FC<{ className?: string }> = ({ className }) => (
 const WoolBallIcon: React.FC<{ color: string; className?: string }> = ({ color, className }) => (
   <svg viewBox="0 0 64 64" className={className} aria-hidden>
     <circle cx="32" cy="32" r="26" fill={color} stroke="#1f1f1f" strokeWidth="2" />
-    {/* Yarn strands */}
     <g fill="none" stroke="#1f1f1f" strokeWidth="1.5" strokeLinecap="round" opacity="0.55">
       <path d="M10 28 C 22 18, 42 18, 54 28" />
       <path d="M8 36 C 22 24, 42 24, 56 36" />
@@ -34,71 +43,44 @@ const WoolBallIcon: React.FC<{ color: string; className?: string }> = ({ color, 
   </svg>
 );
 
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { useSavings } from '@/hooks/useSavings';
-import { useTranslations } from '@/hooks/useTranslations';
-
-type Mode = 'wool' | 'tree';
-interface Row { name: string; points: number }
-
-const woolFallback: Row[] = [
-  { name: 'Louise Woolley', points: 3000 },
-  { name: 'Alicia', points: 2250 },
-  { name: 'JoshGE', points: 1000 },
-  { name: 'Huw', points: 500 },
-  { name: 'Portia', points: 450 },
-  { name: 'Rozanna', points: 400 },
-  { name: 'Katy', points: 375 },
-];
-
-const treeFallback: Row[] = [
-  { name: 'Rowan Adams', points: 500 },
-  { name: 'Cwm Bakery', points: 179 },
-  { name: 'Daniel Cooke', points: 162 },
-  { name: 'Crafty Legs Events', points: 117 },
-  { name: 'Josh', points: 100 },
-];
-
 const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const [mode, setMode] = useState<Mode>('wool');
-  const [rows, setRows] = useState<Row[]>(woolFallback);
+  const [rows, setRows] = useState<Row[]>([]);
+
   const { toast } = useToast();
   const { treesPlanted, treePoints, woolPoints, plantTree, woolColor } = useSavings();
   const { t } = useTranslations();
 
-
+  // ✅ Clean, real, user-only leaderboard
   useEffect(() => {
-    (async () => {
-      const { data } = await supabase.rpc('get_leaderboard', { _limit: 20 });
-      const real: Row[] = (data || []).map((d: any) => ({
-        name: d.display_name || d.username || 'User',
-        points: d.total_points ?? 0,
-      }));
-      const fallback = mode === 'wool' ? woolFallback : treeFallback;
-      const merged = [...real, ...fallback].reduce<Row[]>((acc, r) => {
-        if (!acc.find((x) => x.name.toLowerCase() === r.name.toLowerCase())) acc.push(r);
-        return acc;
-      }, []);
-      merged.sort((a, b) => b.points - a.points);
-      setRows(merged);
-    })();
-  }, [mode]);
+    const myRow: Row = {
+      name: 'You',
+      points: mode === 'wool' ? woolPoints : treePoints,
+    };
 
-  const board = rows;
+    setRows([myRow]);
+  }, [mode, woolPoints, treePoints]);
+
   const heading = mode === 'wool' ? t('WOOL POINTS') : t('TREE POINTS');
   const myPoints = mode === 'wool' ? woolPoints : treePoints;
 
   const join = () => {
     if (plantTree(100)) {
-      toast({ title: t('Joined the Tree Queue!'), description: t('A tree will be planted on your behalf.') });
+      toast({
+        title: t('Joined the Tree Queue!'),
+        description: t('A tree will be planted on your behalf.')
+      });
     } else {
-      toast({ title: t('Not enough Tree Points'), description: t('100 Tree Points required.') });
+      toast({
+        title: t('Not enough Tree Points'),
+        description: t('100 Tree Points required.')
+      });
     }
   };
 
   return (
     <div className="min-h-screen bg-[#f5a623] pb-24 px-4 pt-4">
+
       {onBack && (
         <button onClick={onBack} className="text-black mb-2 flex items-center gap-1 font-serif font-bold">
           <ArrowLeft className="h-5 w-5" /> {t('Back')}
@@ -118,70 +100,3 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
             onClick={() => setMode(m)}
             className={`rounded-full py-2 transition ${
               mode === m ? 'bg-[#f5a623] text-black' : 'text-white'
-            }`}
-          >
-            {m === 'wool' ? t('Wool Points') : t('Tree Points')}
-          </button>
-        ))}
-      </div>
-
-      <p className="text-center text-black font-serif font-bold mt-3">
-        {t('You have')} <span className="text-[#1f1f1f]">{myPoints}</span> {mode === 'wool' ? t('wool') : t('Tree').toLowerCase()} {t('points')}
-      </p>
-
-      <div className="bg-[#1f1f1f] rounded-2xl mt-3 overflow-hidden">
-        <div className="grid grid-cols-3 text-white font-serif font-bold text-center py-3 border-b border-white/20 text-[11px] sm:text-xs uppercase tracking-wide px-2 gap-1">
-          <span>{t('POSITION')}</span>
-          <span>{t('USER')}</span>
-          <span className="whitespace-nowrap">{heading}</span>
-        </div>
-        {board.map((r, i) => (
-          <div
-            key={`${mode}-${i}`}
-            className="grid grid-cols-3 text-white font-serif font-bold text-center py-3 text-lg border-b border-white/10 last:border-0"
-          >
-            <span>#{i + 1}</span>
-            <span>{r.name}</span>
-            <span>{r.points}</span>
-          </div>
-        ))}
-      </div>
-
-      {mode === 'tree' && (
-        <>
-          <div className="flex justify-center my-6">
-            <OakTreeIcon className="h-28 w-28" />
-          </div>
-          <div className="bg-[#1f1f1f] rounded-2xl py-4 text-center text-white font-serif font-bold text-2xl mb-4">
-            {t('Trees you have planted')}: {treesPlanted}
-          </div>
-          <button
-            onClick={join}
-            className="w-full bg-[#1f1f1f] rounded-2xl py-5 text-white font-serif font-bold text-2xl active:scale-[0.99] transition"
-          >
-            {t('Join the Tree Queue')}
-            <p className="text-base font-normal mt-1">{t('100 Tree Points Required')}</p>
-          </button>
-        </>
-      )}
-
-      {mode === 'wool' && (
-        <>
-          <div className="flex justify-center items-end gap-6 my-6">
-            <img src={nelsonHead.url} alt="Nelson" className="h-28 w-28 object-contain" />
-            <WoolBallIcon color={woolColor} className="h-24 w-24" />
-          </div>
-          <div className="mt-2 bg-[#1f1f1f] rounded-2xl p-4 text-white font-serif">
-            <p className="font-bold text-lg mb-1">{t('Spend your wool')}</p>
-            <p className="text-sm opacity-80">
-              {t('Use wool points to customise your sheep on the Account tab, or cool the borough by placing solar farms and wind turbines on the Shop Local map.')}
-            </p>
-          </div>
-        </>
-      )}
-
-    </div>
-  );
-};
-
-export default LeaderboardTreesScreen;
