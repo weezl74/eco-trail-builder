@@ -48,6 +48,7 @@ const AccountScreen: React.FC<AccountScreenProps> = ({
 }) => {
   const [editingAvatar, setEditingAvatar] = useState(false);
   const [subPage, setSubPage] = useState<SubPage | null>(null);
+  const [showGroups, setShowGroups] = useState(false);
   const { t } = useTranslations();
 
   const handleLogOut = async () => {
@@ -63,6 +64,10 @@ const AccountScreen: React.FC<AccountScreenProps> = ({
 
   if (editingAvatar) {
     return <SheepAvatarScreen onBack={() => setEditingAvatar(false)} />;
+  }
+
+  if (showGroups) {
+    return <GroupsScreen onBack={() => setShowGroups(false)} />;
   }
 
   if (subPage) {
