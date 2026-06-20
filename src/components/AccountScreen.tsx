@@ -4,6 +4,7 @@ import AccountCard from './AccountCard';
 import WoollyWallet from './WoollyWallet';
 import SheepAvatarScreen from './screens/SheepAvatarScreen';
 import AccountSubScreen, { Page as SubPage } from './screens/AccountSubScreen';
+import GroupsScreen from './screens/GroupsScreen';
 import { supabase } from '@/integrations/supabase/client';
 import { useTranslations } from '@/hooks/useTranslations';
 
@@ -47,6 +48,7 @@ const AccountScreen: React.FC<AccountScreenProps> = ({
 }) => {
   const [editingAvatar, setEditingAvatar] = useState(false);
   const [subPage, setSubPage] = useState<SubPage | null>(null);
+  const [showGroups, setShowGroups] = useState(false);
   const { t } = useTranslations();
 
   const handleLogOut = async () => {
@@ -62,6 +64,10 @@ const AccountScreen: React.FC<AccountScreenProps> = ({
 
   if (editingAvatar) {
     return <SheepAvatarScreen onBack={() => setEditingAvatar(false)} />;
+  }
+
+  if (showGroups) {
+    return <GroupsScreen onBack={() => setShowGroups(false)} />;
   }
 
   if (subPage) {
@@ -88,6 +94,7 @@ const AccountScreen: React.FC<AccountScreenProps> = ({
 
       <Section title={t('Account')}>
         <Row label={t('Edit Carbon Card')} onClick={() => setEditingAvatar(true)} />
+        <Row label={t('Groups')} onClick={() => setShowGroups(true)} />
         <Row label={t('Account Information')} onClick={() => setSubPage('account-info')} />
         <Row label={t('Privacy Settings')} onClick={() => setSubPage('privacy')} />
         <Row label={t('Change Password')} onClick={() => setSubPage('change-password')} />
