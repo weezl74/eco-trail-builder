@@ -4,6 +4,7 @@ import AccountCard from './AccountCard';
 import WoollyWallet from './WoollyWallet';
 import SheepAvatarScreen from './screens/SheepAvatarScreen';
 import AccountSubScreen, { Page as SubPage } from './screens/AccountSubScreen';
+import GroupsScreen from './screens/GroupsScreen';
 import { supabase } from '@/integrations/supabase/client';
 import { useTranslations } from '@/hooks/useTranslations';
 
