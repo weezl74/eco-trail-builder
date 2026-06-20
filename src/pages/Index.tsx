@@ -37,15 +37,6 @@ const Index = () => {
   };
 
   useEffect(() => {
-    if (loading) return;
-    if (!bootChecked) {
-      if (user) routeAuthenticated();
-      setBootChecked(true);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, user, bootChecked]);
-
-  useEffect(() => {
     if (!loading && user) {
       routeAuthenticated();
     }
