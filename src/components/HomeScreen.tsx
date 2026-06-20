@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
-import { Mail, Gift, Calendar, Shirt } from 'lucide-react';
+import { Mail, Gift, Calendar, Shirt, Users } from 'lucide-react';
 import SheepAvatarScreen from './screens/SheepAvatarScreen';
 import EventsCalendarScreen from './screens/EventsCalendarScreen';
 import RewardsScreen from './screens/RewardsScreen';
 import NelsonMessagesScreen from './screens/NelsonMessagesScreen';
+import GroupsScreen from './screens/GroupsScreen';
 import { useSavings } from '@/hooks/useSavings';
 import { useTranslations } from '@/hooks/useTranslations';
 import badHomepageAsset from '@/assets/final-bad-homepage.svg.asset.json';
 import NelsonAvatar from './NelsonAvatar';
 import BinDayBanner from './BinDayBanner';
 
-type Screen = 'home' | 'avatar' | 'calendar' | 'rewards' | 'messages';
+type Screen = 'home' | 'avatar' | 'calendar' | 'rewards' | 'messages' | 'groups';
 
 const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges }) => {
   const [screen, setScreen] = useState<Screen>('home');
@@ -21,6 +22,7 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
   if (screen === 'calendar') return <EventsCalendarScreen onBack={() => setScreen('home')} />;
   if (screen === 'rewards') return <RewardsScreen onBack={() => setScreen('home')} />;
   if (screen === 'messages') return <NelsonMessagesScreen onBack={() => setScreen('home')} />;
+  if (screen === 'groups') return <GroupsScreen onBack={() => setScreen('home')} />;
 
   return (
     <div className="h-[calc(100svh-5rem)] max-h-[calc(100svh-5rem)] bg-black pb-3 flex flex-col overflow-hidden">
