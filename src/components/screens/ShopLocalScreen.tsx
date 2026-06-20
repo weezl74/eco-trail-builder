@@ -442,12 +442,12 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           }
         />
 
-        {/* Warm→cool hue overlay (only in cool mode) */}
-        {mode === 'cool' && (
+        {/* Red-orange "the borough is warming" overlay — fades as cooling rises */}
+        {mode === 'cool' && overlayAlpha > 0.01 && (
           <div
-            className="absolute inset-0 transition-colors duration-700 pointer-events-none"
+            className="absolute inset-0 transition-opacity duration-700 pointer-events-none"
             style={{
-              background: `radial-gradient(circle at 50% 55%, ${overlayColor}, hsla(0, 70%, 50%, 0.25))`,
+              background: overlayColor,
               mixBlendMode: 'multiply',
             }}
           />
