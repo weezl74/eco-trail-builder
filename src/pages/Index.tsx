@@ -33,7 +33,7 @@ const Index = () => {
     );
 
     const data = await res.json();
-
+    setStage("app");
     if (data?.account_type === "business") {
       // If they have no card yet, route them to onboarding
       const { data: card } = await supabase.from("business_cards").select("id").eq("user_id", user.id).maybeSingle();
