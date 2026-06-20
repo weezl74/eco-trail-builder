@@ -50,7 +50,7 @@ const Index = () => {
       routeAuthenticated();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, stage]);
+  }, [user]);
 
   if (loading && !bootChecked) {
     return <div className="min-h-screen bg-[#f5a623]" />;
