@@ -273,9 +273,21 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
 
   // Cooling % from renewables placed
   const cooling = Math.min(95, renewables.length * 6);
-  // Hue from red (0) -> blue (210), saturation eases as cooling rises
-  const hue = (cooling / 100) * 210;
-  const overlayColor = `hsla(${hue}, 75%, 50%, ${0.18 + (cooling / 100) * 0.22})`;
+  // Red-orange overlay that fades as the borough cools.
+  // Starts a strong red/orange wash at 0% cooled and tapers to transparent at 100%.
+  const warmRatio = 1 - cooling / 100; // 1 = fully hot, 0 = fully cooled
+  const overlayAlpha = 0.45 * warmRatio;
+  const overlayColor = `hsla(14, 90%, 50%, ${overlayAlpha})`;
+
+  if (showJourney) {
+    return (
+      <NelsonJourneyScreen
+        totalPoints={woolPoints}
+        onBack={() => setShowJourney(false)}
+      />
+    );
+  }
+
 
 
 
