@@ -47,9 +47,9 @@ const CATEGORY_INFO: Record<
     delta: { money: 18, co2: 14, water: 25 },
   },
   business: {
-    label: 'Local Businesses',
+    label: 'Member Businesses',
     color: '#f4971d',
-    message: 'Tap to add this business loyalty card to your wallet.',
+    message: 'Member business — tap to add their loyalty card to your wallet.',
     delta: { money: 0, co2: 0, water: 0 },
   },
 };
