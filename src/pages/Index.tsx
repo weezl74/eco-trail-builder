@@ -54,6 +54,10 @@ const Index = () => {
     return <BusinessOnboarding editMode={!!user} onComplete={() => setStage("business-app")} />;
   }
 
+  if (!loading && user) {
+    return <SimplifiedApp onBackToLanding={() => setStage("landing")} language={language} />;
+  }
+
   if (stage === "app") {
     return <SimplifiedApp onBackToLanding={() => setStage("landing")} language={language} />;
   }
