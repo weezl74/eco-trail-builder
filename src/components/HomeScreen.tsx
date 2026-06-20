@@ -28,7 +28,7 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
     <div className="h-[calc(100svh-5rem)] max-h-[calc(100svh-5rem)] bg-black pb-3 flex flex-col overflow-hidden">
       {/* Pill of icons */}
       <div className="pt-4 flex justify-center">
-        <div className="bg-[#f5a623] rounded-full px-5 py-2 flex items-center gap-5 shadow-lg">
+        <div className="bg-[#f5a623] rounded-full px-4 py-2 flex items-center gap-4 shadow-lg">
           <button onClick={() => setScreen('messages')} aria-label="Messages from Nelson">
             <Mail className="h-6 w-6 text-white" strokeWidth={2.5} />
           </button>
@@ -40,6 +40,9 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
           </button>
           <button onClick={() => setScreen('avatar')} aria-label="Customise sheep">
             <Shirt className="h-6 w-6 text-white" strokeWidth={2.5} />
+          </button>
+          <button onClick={() => setScreen('groups')} aria-label="Groups">
+            <Users className="h-6 w-6 text-white" strokeWidth={2.5} />
           </button>
         </div>
       </div>
