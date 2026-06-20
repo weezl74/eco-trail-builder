@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
-import { Mail, Gift, Calendar, Shirt } from 'lucide-react';
+import { Mail, Gift, Calendar, Shirt, Users } from 'lucide-react';
 import SheepAvatarScreen from './screens/SheepAvatarScreen';
 import EventsCalendarScreen from './screens/EventsCalendarScreen';
 import RewardsScreen from './screens/RewardsScreen';
 import NelsonMessagesScreen from './screens/NelsonMessagesScreen';
+import GroupsScreen from './screens/GroupsScreen';
 import { useSavings } from '@/hooks/useSavings';
 import { useTranslations } from '@/hooks/useTranslations';
 import badHomepageAsset from '@/assets/final-bad-homepage.svg.asset.json';
 import NelsonAvatar from './NelsonAvatar';
 import BinDayBanner from './BinDayBanner';
 
-type Screen = 'home' | 'avatar' | 'calendar' | 'rewards' | 'messages';
+type Screen = 'home' | 'avatar' | 'calendar' | 'rewards' | 'messages' | 'groups';
 
 const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges }) => {
   const [screen, setScreen] = useState<Screen>('home');
@@ -21,12 +22,13 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
   if (screen === 'calendar') return <EventsCalendarScreen onBack={() => setScreen('home')} />;
   if (screen === 'rewards') return <RewardsScreen onBack={() => setScreen('home')} />;
   if (screen === 'messages') return <NelsonMessagesScreen onBack={() => setScreen('home')} />;
+  if (screen === 'groups') return <GroupsScreen onBack={() => setScreen('home')} />;
 
   return (
     <div className="h-[calc(100svh-5rem)] max-h-[calc(100svh-5rem)] bg-black pb-3 flex flex-col overflow-hidden">
       {/* Pill of icons */}
       <div className="pt-4 flex justify-center">
-        <div className="bg-[#f5a623] rounded-full px-5 py-2 flex items-center gap-5 shadow-lg">
+        <div className="bg-[#f5a623] rounded-full px-4 py-2 flex items-center gap-4 shadow-lg">
           <button onClick={() => setScreen('messages')} aria-label="Messages from Nelson">
             <Mail className="h-6 w-6 text-white" strokeWidth={2.5} />
           </button>
@@ -38,6 +40,9 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
           </button>
           <button onClick={() => setScreen('avatar')} aria-label="Customise sheep">
             <Shirt className="h-6 w-6 text-white" strokeWidth={2.5} />
+          </button>
+          <button onClick={() => setScreen('groups')} aria-label="Groups">
+            <Users className="h-6 w-6 text-white" strokeWidth={2.5} />
           </button>
         </div>
       </div>

@@ -8,6 +8,8 @@ import WalkMyWarmUpJourney from '@/components/WalkMyWarmUpJourney';
 import ShopLocalLeafletMap, { LeafletPoi } from '@/components/ShopLocalLeafletMap';
 import { useWalletBusinesses as useWallet } from '@/hooks/useWallet';
 import { getSector } from '@/lib/sectorIcons';
+import NelsonJourneyScreen from '@/components/screens/NelsonJourneyScreen';
+import actLocal from '@/assets/svg/act-local.svg.asset.json';
 
 type Category = 'libraries' | 'allotments' | 'leisure' | 'ev' | 'eco' | 'business';
 type Saving = { money: number; co2: number; water: number };
@@ -110,6 +112,7 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const { businesses: walletBusinesses, addBusiness } = useWallet();
   const { t } = useTranslations();
   const [walkOpen, setWalkOpen] = useState(false);
+  const [showJourney, setShowJourney] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -270,9 +273,21 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
 
   // Cooling % from renewables placed
   const cooling = Math.min(95, renewables.length * 6);
-  // Hue from red (0) -> blue (210), saturation eases as cooling rises
-  const hue = (cooling / 100) * 210;
-  const overlayColor = `hsla(${hue}, 75%, 50%, ${0.18 + (cooling / 100) * 0.22})`;
+  // Red-orange overlay that fades as the borough cools.
+  // Starts a strong red/orange wash at 0% cooled and tapers to transparent at 100%.
+  const warmRatio = 1 - cooling / 100; // 1 = fully hot, 0 = fully cooled
+  const overlayAlpha = 0.45 * warmRatio;
+  const overlayColor = `hsla(14, 90%, 50%, ${overlayAlpha})`;
+
+  if (showJourney) {
+    return (
+      <NelsonJourneyScreen
+        totalPoints={woolPoints}
+        onBack={() => setShowJourney(false)}
+      />
+    );
+  }
+
 
 
 
@@ -398,6 +413,16 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
               })}
             </div>
           </div>
+
+          {/* Nelson "bring him home" button */}
+          <button
+            onClick={() => setShowJourney(true)}
+            className="fixed bottom-64 right-3 z-[1000] w-16 h-16 rounded-full bg-[#f5a623] shadow-lg border-2 border-white flex items-center justify-center active:scale-95 transition"
+            aria-label="Find Nelson"
+            title={t('Bring Nelson home')}
+          >
+            <img src={actLocal.url} alt="" className="w-11 h-11" />
+          </button>
         </>
       )}
 
@@ -427,12 +452,12 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           }
         />
 
-        {/* Warm→cool hue overlay (only in cool mode) */}
-        {mode === 'cool' && (
+        {/* Red-orange "the borough is warming" overlay — fades as cooling rises */}
+        {mode === 'cool' && overlayAlpha > 0.01 && (
           <div
-            className="absolute inset-0 transition-colors duration-700 pointer-events-none"
+            className="absolute inset-0 transition-opacity duration-700 pointer-events-none"
             style={{
-              background: `radial-gradient(circle at 50% 55%, ${overlayColor}, hsla(0, 70%, 50%, 0.25))`,
+              background: overlayColor,
               mixBlendMode: 'multiply',
             }}
           />
