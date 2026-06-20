@@ -89,6 +89,59 @@ export type Database = {
         }
         Relationships: []
       }
+      group_members: {
+        Row: {
+          group_id: string
+          joined_at: string
+          user_id: string
+        }
+        Insert: {
+          group_id: string
+          joined_at?: string
+          user_id: string
+        }
+        Update: {
+          group_id?: string
+          joined_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      groups: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       map_locations: {
         Row: {
           carbon_action: string | null
@@ -494,6 +547,8 @@ export type Database = {
         Row: {
           id: string
           points_cost: number
+          position_x: number | null
+          position_y: number | null
           purchased_at: string
           technology_type: string
           user_id: string
@@ -501,6 +556,8 @@ export type Database = {
         Insert: {
           id?: string
           points_cost: number
+          position_x?: number | null
+          position_y?: number | null
           purchased_at?: string
           technology_type: string
           user_id: string
@@ -508,6 +565,8 @@ export type Database = {
         Update: {
           id?: string
           points_cost?: number
+          position_x?: number | null
+          position_y?: number | null
           purchased_at?: string
           technology_type?: string
           user_id?: string
@@ -771,6 +830,10 @@ export type Database = {
           user_id: string
           username: string
         }[]
+      }
+      is_group_member: {
+        Args: { _group: string; _user: string }
+        Returns: boolean
       }
     }
     Enums: {
