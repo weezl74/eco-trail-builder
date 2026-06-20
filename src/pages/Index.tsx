@@ -46,6 +46,10 @@ const Index = () => {
     return <div className="min-h-screen bg-[#f5a623]" />;
   }
 
+  if (!loading && user) {
+    return <SimplifiedApp onBackToLanding={() => setStage("landing")} language={language} />;
+  }
+
   if (stage === "business-app") {
     return <BusinessApp onSignOut={() => setStage("landing")} onEditCard={() => setStage("business-onboarding")} />;
   }
