@@ -446,7 +446,7 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
     if (!user) return;
     
     try {
-      // Save to database
+      // Save to database (position left null — user places it next on the map)
       const { data, error } = await supabase
         .from('user_renewables')
         .insert({
@@ -473,6 +473,13 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
         total_points: newTotalPoints
       }));
 
+      // Reveal the map so the user can place it
+      setShowAvatarPanels(true);
+      toast({
+        title: `${tech.name} ready to place`,
+        description: 'Tap anywhere on the Borough map to install it.',
+      });
+
     } catch (error) {
       console.error('Error purchasing renewable:', error);
       toast({
@@ -481,6 +488,22 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
         variant: "destructive"
       });
     }
+  };
+
+  const handlePlaceRenewable = async (renewableId: string, x: number, y: number) => {
+    if (!user) return;
+    const { error } = await (supabase as any)
+      .from('user_renewables')
+      .update({ position_x: x, position_y: y })
+      .eq('id', renewableId)
+      .eq('user_id', user.id);
+    if (error) {
+      toast({ title: 'Could not save placement', description: error.message, variant: 'destructive' });
+      return;
+    }
+    setUserRenewables((prev) =>
+      prev.map((r) => (r.id === renewableId ? { ...r, position_x: x, position_y: y } : r)),
+    );
   };
 
   const addSprint = async (title: string, impact: number, frequency: string, costSaving: number = 0) => {
