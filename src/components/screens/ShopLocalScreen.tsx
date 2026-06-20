@@ -8,6 +8,8 @@ import WalkMyWarmUpJourney from '@/components/WalkMyWarmUpJourney';
 import ShopLocalLeafletMap, { LeafletPoi } from '@/components/ShopLocalLeafletMap';
 import { useWalletBusinesses as useWallet } from '@/hooks/useWallet';
 import { getSector } from '@/lib/sectorIcons';
+import NelsonJourneyScreen from '@/components/screens/NelsonJourneyScreen';
+import actLocal from '@/assets/svg/act-local.svg.asset.json';
 
 type Category = 'libraries' | 'allotments' | 'leisure' | 'ev' | 'eco' | 'business';
 type Saving = { money: number; co2: number; water: number };
