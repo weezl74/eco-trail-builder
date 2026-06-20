@@ -94,6 +94,7 @@ const AccountScreen: React.FC<AccountScreenProps> = ({
 
       <Section title={t('Account')}>
         <Row label={t('Edit Carbon Card')} onClick={() => setEditingAvatar(true)} />
+        <Row label={t('Groups')} onClick={() => setShowGroups(true)} />
         <Row label={t('Account Information')} onClick={() => setSubPage('account-info')} />
         <Row label={t('Privacy Settings')} onClick={() => setSubPage('privacy')} />
         <Row label={t('Change Password')} onClick={() => setSubPage('change-password')} />
