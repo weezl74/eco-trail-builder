@@ -1,55 +1,38 @@
+## Status legend
+- [x] DONE — already shipped
+- [ ] TODO — still required
 
 ## 1. Cool the Borough — tech objects
 
-**Tech types (6 total):** Solar, Wind, Mine water, Heat pumps, Tree planting, Green roofs, CCUS, Hydrogen, SLES (Smart Local Energy System).
+- [x] Expanded tech list to 11 types (Solar, Wind, Mine water, Heat pumps, Tree planting, Green roofs, CCUS, Hydrogen, SLES, etc.)
+- [x] Persistence: `position_x`, `position_y` added to `user_renewables` (RLS already in place). **No further migration needed.**
+- [x] Tap-to-place flow after purchase
+- [x] Coloured/labelled markers, high contrast
+- [x] `TechRewardDialog` with 1–3 stars + warming explainer on placement
+- [ ] **Red-orange "heat" overlay on the borough map at game start, fading as the borough cools** (driven by points / placed tech count). NEW request — not yet built on `CaerphillyMap` (only the Shop Local screen got a wash). No DB work.
 
-**Persistence:** new `user_map_tech` table in Lovable Cloud (per-user, RLS):
-- `id, user_id, tech_type, lat, lng, label, created_at`
-- GRANT to authenticated + service_role; policy `auth.uid() = user_id`.
+## 2. Nelson's journey home
 
-**Map behaviour:**
-- On load, fetch & render the signed-in user's pins as coloured markers (one icon per tech type).
-- Add-flow: pick tech type → tap map → save to DB → marker appears immediately.
-- On add, show a **rewards popup** (same visual language as sheep customisation): 1–3 stars + a short explainer of how this tech tackles global warming. Award small point bonus (e.g. 25 pts).
-- Markers visible across sessions/devices.
-
-## 2. Nelson's journey home (mini-map button)
-
-- Add a circular button in the bottom-right of the Cool the Borough screen, using the `act-local` asset.
-- Button opens a `NelsonJourneyScreen` overlay with a small stylised UK map.
-- Linear progress by `profiles.total_points`:
-  - 0 pts → Nelson icon in N. Scotland
-  - threshold (e.g. 5000 pts) → Nelson, Caerphilly (home)
-- Nelson icon tweens along a polyline (Scotland → Cumbria → Manchester → Birmingham → Cardiff → Nelson).
-- Shows "X points to bring Nelson Y miles closer" and a progress bar.
-- Group boost: if user is in a group, `groupTotalPoints` adds to their personal progress on this screen only (caps at 100%).
+- [x] `NelsonJourneyScreen.tsx` with stylised UK map + polyline (Scotland → Caerphilly)
+- [x] Linear progress from `profiles.total_points` (0 → 5000)
+- [x] `groupBoost` prop wired in component
+- [x] `act-local` circular button on Shop Local screen opens the journey
+- [ ] **Same `act-local` button on the Cool the Borough map screen** (user reports it's missing there). UI only.
+- [ ] Decide whether to auto-apply group pooled points to personal Nelson progress (prop exists, not fed yet). UI/logic only.
 
 ## 3. Groups v1
 
-New tables:
-- `groups`: `id, name, code (unique 6-char), created_by, created_at`
-- `group_members`: `group_id, user_id, joined_at` (PK on pair)
+- [x] Migration: `groups` + `group_members` tables, RLS, `is_group_member()` security-definer helper. **Done — no further migration needed.**
+- [x] `useGroups` hook (create / join / leave / leaderboard, 6-char codes)
+- [x] `GroupsScreen.tsx` (create, join, member list, pooled leaderboard)
+- [x] Entry point from Account tab
+- [x] Entry point added to the orange 4-item menu on Home (now 5 items)
+- [ ] Confirm/clean up any remaining stale "Groups" references elsewhere in the app. UI only.
 
-RLS:
-- `groups`: members can SELECT their group; creator can UPDATE/DELETE; authenticated can INSERT.
-- `group_members`: user can SELECT rows where `user_id = auth.uid()` OR same `group_id` as their own membership (via security-definer helper to avoid recursion); user can INSERT/DELETE their own row.
+## Migration work still required
 
-Helper function `public.is_group_member(_group uuid, _user uuid)` SECURITY DEFINER.
+**None.** All database changes for these three features are already applied:
+- `user_renewables.position_x / position_y` ✓
+- `groups`, `group_members`, `is_group_member()` ✓
 
-**UI — new `GroupsScreen`** (accessible from Account tab where "Groups" is already referenced):
-- Create group (name → returns code to share)
-- Join via code
-- View current group: member list + pooled points leaderboard (sum of `profiles.total_points` across members; per-member rank).
-- Leave group.
-
-Wire the existing broken "Groups" entry points to this screen.
-
-## Technical notes
-
-- New file `src/components/screens/NelsonJourneyScreen.tsx` with inline SVG UK silhouette + polyline.
-- New file `src/components/screens/GroupsScreen.tsx` + `useGroups` hook.
-- New file `src/components/TechRewardDialog.tsx` (reuses sheep reward styling).
-- Update `CaerphillyMap.tsx`: persistence, expanded tech list, reward dialog, Nelson-home button.
-- Update `BottomNavigation` / Account routing to expose Groups.
-- 3 migrations (one combined): `user_map_tech`, `groups`, `group_members` + helper function.
-- No changes to point-award caps in `profiles_guard_protected_cols` (25-pt bonus is well under 200).
+Everything still open is frontend/presentation work (heat overlay on the borough map, Nelson button on the Cool the Borough screen, optional group-boost wiring, stale-link cleanup).
