@@ -112,6 +112,7 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const { businesses: walletBusinesses, addBusiness } = useWallet();
   const { t } = useTranslations();
   const [walkOpen, setWalkOpen] = useState(false);
+  const [showJourney, setShowJourney] = useState(false);
 
   useEffect(() => {
     let mounted = true;
