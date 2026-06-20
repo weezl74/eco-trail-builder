@@ -1,108 +1,233 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Zap, Wind, Sun, Thermometer, Droplet, Factory, Home } from 'lucide-react';
+import { Zap, Wind, Sun, Thermometer, Droplet, Factory, Home, X, MapPin } from 'lucide-react';
+import TechRewardDialog from './TechRewardDialog';
+import NelsonJourneyScreen from './screens/NelsonJourneyScreen';
+import actLocal from '@/assets/svg/act-local.svg.asset.json';
 
-interface CaerphillyMapProps {
-  userRenewables: Array<{
-    id: string;
-    technology_type: string;
-    points_cost: number;
-  }>;
-  totalPoints: number;
-  currentFootprint: number;
-  onPurchaseRenewable?: (tech: any) => void;
+export interface UserRenewable {
+  id: string;
+  technology_type: string;
+  points_cost: number;
+  position_x?: number | null;
+  position_y?: number | null;
 }
 
-const CaerphillyMap: React.FC<CaerphillyMapProps> = ({ 
-  userRenewables, 
-  totalPoints, 
-  currentFootprint 
+interface CaerphillyMapProps {
+  userRenewables: UserRenewable[];
+  totalPoints: number;
+  currentFootprint: number;
+  groupBoost?: number;
+  /** Persist a placement: returns once saved. */
+  onPlaceRenewable?: (renewableId: string, x: number, y: number) => Promise<void> | void;
+}
+
+const TECH_META: Record<
+  string,
+  { name: string; icon: React.ReactNode; explanation: string; stars: number; colour: string }
+> = {
+  solar: {
+    name: 'Solar Panels',
+    icon: <Sun className="w-5 h-5 text-white" strokeWidth={1.5} />,
+    explanation:
+      'Solar panels convert sunlight straight into electricity, displacing fossil-fuel power and cutting carbon at the source.',
+    stars: 2,
+    colour: '#fbbf24',
+  },
+  solar_battery: {
+    name: 'Solar + Battery',
+    icon: <Sun className="w-5 h-5 text-white" strokeWidth={1.5} />,
+    explanation:
+      'Pairing solar with storage means clean power day and night — pushing fossil fuels off the grid even after sunset.',
+    stars: 3,
+    colour: '#f59e0b',
+  },
+  heat_pump: {
+    name: 'Heat Pump',
+    icon: <Thermometer className="w-5 h-5 text-white" strokeWidth={1.5} />,
+    explanation:
+      'Heat pumps move heat with electricity instead of burning gas, slashing home heating emissions by up to 70%.',
+    stars: 2,
+    colour: '#60a5fa',
+  },
+  wind_turbine: {
+    name: 'Small Wind Turbine',
+    icon: <Wind className="w-5 h-5 text-white" strokeWidth={1.5} />,
+    explanation:
+      'A small turbine harvests Caerphilly’s hillside winds, producing zero-carbon electricity for your home.',
+    stars: 2,
+    colour: '#22d3ee',
+  },
+  wind_municipal: {
+    name: 'Community Wind',
+    icon: <Wind className="w-5 h-5 text-white" strokeWidth={1.5} />,
+    explanation:
+      'A shared community turbine powers many homes at once — multiplying climate impact and keeping value local.',
+    stars: 3,
+    colour: '#0ea5e9',
+  },
+  green_hydrogen: {
+    name: 'Green Hydrogen',
+    icon: <Droplet className="w-5 h-5 text-white" strokeWidth={1.5} />,
+    explanation:
+      'Hydrogen made with renewable electricity can decarbonise transport and heavy industry where batteries fall short.',
+    stars: 3,
+    colour: '#34d399',
+  },
+  mine_water: {
+    name: 'Mine Water Heat',
+    icon: <Factory className="w-5 h-5 text-white" strokeWidth={1.5} />,
+    explanation:
+      'Warm water sitting in old coal mines is pumped up to heat homes — turning the borough’s mining heritage into a climate solution.',
+    stars: 3,
+    colour: '#a78bfa',
+  },
+  sles: {
+    name: 'Smart Local Energy',
+    icon: <Home className="w-5 h-5 text-white" strokeWidth={1.5} />,
+    explanation:
+      'A smart local energy system matches generation and demand street-by-street, squeezing more carbon out of every kWh.',
+    stars: 2,
+    colour: '#f472b6',
+  },
+  ccus: {
+    name: 'Carbon Capture',
+    icon: <Factory className="w-5 h-5 text-white" strokeWidth={1.5} />,
+    explanation:
+      'Carbon capture pulls CO₂ from flue gas or even the air and stores or reuses it, undoing emissions we can’t yet avoid.',
+    stars: 3,
+    colour: '#94a3b8',
+  },
+  tree_planting: {
+    name: 'Tree Planting',
+    icon: <Wind className="w-5 h-5 text-white" strokeWidth={1.5} />,
+    explanation:
+      'Trees lock carbon into wood and soil, cool the air, and bring shade to overheated streets.',
+    stars: 2,
+    colour: '#16a34a',
+  },
+  green_roof: {
+    name: 'Green Roof',
+    icon: <Home className="w-5 h-5 text-white" strokeWidth={1.5} />,
+    explanation:
+      'A planted roof insulates buildings, reduces flooding and lowers the urban heat-island effect.',
+    stars: 1,
+    colour: '#65a30d',
+  },
+};
+
+const getMeta = (t: string) =>
+  TECH_META[t] || {
+    name: t,
+    icon: <Zap className="w-5 h-5 text-white" strokeWidth={1.5} />,
+    explanation: 'Renewable technology helps combat climate change by cutting carbon emissions.',
+    stars: 1,
+    colour: '#F4971D',
+  };
+
+const CaerphillyMap: React.FC<CaerphillyMapProps> = ({
+  userRenewables,
+  totalPoints,
+  currentFootprint,
+  groupBoost = 0,
+  onPlaceRenewable,
 }) => {
-  // Calculate warming reduction based on renewables owned
+  const mapRef = useRef<HTMLDivElement>(null);
+  const [showJourney, setShowJourney] = useState(false);
+  const [reward, setReward] = useState<{ name: string; explanation: string; stars: number } | null>(null);
+
+  // First unplaced renewable (no x/y) is awaiting placement
+  const pending = userRenewables.find((r) => r.position_x == null || r.position_y == null);
+  const placed = userRenewables.filter((r) => r.position_x != null && r.position_y != null);
+
   const renewableCount = userRenewables.length;
-  const warmingReduction = Math.min(renewableCount * 10, 80); // Max 80% cooling
-  
-  // Define Caerphilly borough areas
+  const warmingReduction = Math.min(renewableCount * 10, 80);
+
   const boroughAreas = [
-    { name: "Caerphilly Town", x: 45, y: 35, size: "large" },
-    { name: "Blackwood", x: 25, y: 65, size: "medium" },
-    { name: "Risca", x: 15, y: 45, size: "medium" },
-    { name: "Bargoed", x: 60, y: 25, size: "medium" },
-    { name: "Ystrad Mynach", x: 35, y: 50, size: "medium" },
-    { name: "Nelson", x: 50, y: 60, size: "small" },
-    { name: "Llanbradach", x: 40, y: 40, size: "small" },
-    { name: "Bedwas", x: 35, y: 35, size: "small" },
-    { name: "Rhymney", x: 70, y: 15, size: "small" },
-    { name: "New Tredegar", x: 75, y: 35, size: "small" },
-    { name: "Abertridwr", x: 30, y: 30, size: "small" },
-    { name: "Senghenydd", x: 40, y: 25, size: "small" }
+    { name: 'Caerphilly Town', x: 45, y: 35, size: 'large' as const },
+    { name: 'Blackwood', x: 25, y: 65, size: 'medium' as const },
+    { name: 'Risca', x: 15, y: 45, size: 'medium' as const },
+    { name: 'Bargoed', x: 60, y: 25, size: 'medium' as const },
+    { name: 'Ystrad Mynach', x: 35, y: 50, size: 'medium' as const },
+    { name: 'Nelson', x: 50, y: 60, size: 'small' as const },
+    { name: 'Llanbradach', x: 40, y: 40, size: 'small' as const },
+    { name: 'Bedwas', x: 35, y: 35, size: 'small' as const },
+    { name: 'Rhymney', x: 70, y: 15, size: 'small' as const },
+    { name: 'New Tredegar', x: 75, y: 35, size: 'small' as const },
+    { name: 'Abertridwr', x: 30, y: 30, size: 'small' as const },
+    { name: 'Senghenydd', x: 40, y: 25, size: 'small' as const },
   ];
 
-  // Get color based on warming level (red = hot, green = cool)
   const getAreaColor = (baseWarmth: number) => {
-    const cooledWarmth = Math.max(0, baseWarmth - warmingReduction);
-    if (cooledWarmth > 70) return 'bg-red-500';
-    if (cooledWarmth > 50) return 'bg-orange-500';
-    if (cooledWarmth > 30) return 'bg-yellow-500';
-    if (cooledWarmth > 15) return 'bg-green-300';
+    const c = Math.max(0, baseWarmth - warmingReduction);
+    if (c > 70) return 'bg-red-500';
+    if (c > 50) return 'bg-orange-500';
+    if (c > 30) return 'bg-yellow-500';
+    if (c > 15) return 'bg-green-300';
     return 'bg-green-500';
   };
 
-  // Get renewable technology icon
-  const getRenewableIcon = (type: string) => {
-    switch (type) {
-      case 'solar': return <Sun className="w-4 h-4 text-white" strokeWidth={1} />;
-      case 'solar_battery': return <><Sun className="w-3 h-3 text-white" strokeWidth={1} /><Zap className="w-3 h-3 text-white" strokeWidth={1} /></>;
-      case 'heat_pump': return <Thermometer className="w-4 h-4 text-white" strokeWidth={1} />;
-      case 'wind_turbine': return <Wind className="w-4 h-4 text-white" strokeWidth={1} />;
-      case 'wind_municipal': return <Wind className="w-5 h-5 text-white" strokeWidth={1} />;
-      case 'green_hydrogen': return <Droplet className="w-4 h-4 text-white" strokeWidth={1} />;
-      case 'mine_water': return <Factory className="w-4 h-4 text-white" strokeWidth={1} />;
-      case 'sles': return <Home className="w-4 h-4 text-white" strokeWidth={1} />;
-      case 'ccus': return <Factory className="w-4 h-4 text-white" strokeWidth={1} />;
-      default: return <Zap className="w-4 h-4 text-white" strokeWidth={1} />;
-    }
+  const handleMapClick = async (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!pending || !onPlaceRenewable || !mapRef.current) return;
+    const rect = mapRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    await onPlaceRenewable(pending.id, x, y);
+    const meta = getMeta(pending.technology_type);
+    setReward({ name: meta.name, explanation: meta.explanation, stars: meta.stars });
   };
+
+  if (showJourney) {
+    return (
+      <NelsonJourneyScreen
+        totalPoints={totalPoints}
+        groupBoost={groupBoost}
+        onBack={() => setShowJourney(false)}
+      />
+    );
+  }
 
   return (
     <Card className="bg-slate-800/50 backdrop-blur-sm border-slate-700">
       <CardContent className="p-6">
         <div className="mb-4">
-          <h3 className="text-xl font-semibold text-white mb-2">Caerphilly County Borough</h3>
+          <h3 className="text-xl font-semibold text-white mb-2">Cool the Borough</h3>
           <div className="flex flex-wrap items-center gap-3 text-sm text-slate-300">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-red-500 rounded"></div>
-              <span>Hot</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-orange-500 rounded"></div>
-              <span>Warm</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-yellow-500 rounded"></div>
-              <span>Mild</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-green-300 rounded"></div>
-              <span>Cool</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-green-500 rounded"></div>
-              <span>Cold</span>
-            </div>
+            {[
+              ['Hot', 'bg-red-500'],
+              ['Warm', 'bg-orange-500'],
+              ['Mild', 'bg-yellow-500'],
+              ['Cool', 'bg-green-300'],
+              ['Cold', 'bg-green-500'],
+            ].map(([label, cls]) => (
+              <div key={label} className="flex items-center gap-2">
+                <div className={`w-3 h-3 ${cls} rounded`} />
+                <span>{label}</span>
+              </div>
+            ))}
           </div>
         </div>
 
+        {pending && (
+          <div className="mb-3 px-3 py-2 rounded-lg bg-[#F4971D]/15 border border-[#F4971D]/40 text-[#F4971D] text-sm flex items-center gap-2">
+            <MapPin className="w-4 h-4" />
+            Tap the map to place your new <strong className="mx-1">{getMeta(pending.technology_type).name}</strong>
+          </div>
+        )}
+
         {/* Interactive Map */}
-        <div className="relative w-full h-96 bg-slate-900 rounded-lg border border-slate-600 overflow-hidden">
-          {/* Background terrain */}
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 opacity-30"></div>
-          
-          {/* Caerphilly County Borough Outline - Using thin outline based on accurate geographical boundaries */}
-          <svg 
-            className="absolute inset-0 w-full h-full" 
-            viewBox="0 0 100 100" 
+        <div
+          ref={mapRef}
+          onClick={handleMapClick}
+          className={`relative w-full h-96 bg-slate-900 rounded-lg border border-slate-600 overflow-hidden ${
+            pending ? 'cursor-crosshair ring-2 ring-[#F4971D]' : ''
+          }`}
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 opacity-30" />
+
+          <svg
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            viewBox="0 0 100 100"
             preserveAspectRatio="xMidYMid meet"
           >
             <path
@@ -110,90 +235,81 @@ const CaerphillyMap: React.FC<CaerphillyMapProps> = ({
               fill="none"
               stroke="rgb(156 163 175 / 0.5)"
               strokeWidth="0.8"
-              className="opacity-80"
             />
           </svg>
-          
+
           {/* Borough areas */}
-          {boroughAreas.map((area, index) => {
-            const baseWarmth = 80 - (totalPoints / 20); // Areas start hot, cool with user points
-            const areaWarmth = Math.max(10, baseWarmth + (Math.random() * 20 - 10)); // Some variation
-            
+          {boroughAreas.map((area) => {
+            const baseWarmth = 80 - totalPoints / 20;
+            const areaWarmth = Math.max(10, baseWarmth);
             return (
               <div
                 key={area.name}
-                className={`absolute transform -translate-x-1/2 -translate-y-1/2 rounded-full transition-all duration-1000 hover:scale-110 cursor-pointer group ${getAreaColor(areaWarmth)} ${
-                  area.size === 'large' ? 'w-8 h-8' : 
-                  area.size === 'medium' ? 'w-6 h-6' : 'w-4 h-4'
+                className={`absolute pointer-events-none transform -translate-x-1/2 -translate-y-1/2 rounded-full transition-all duration-1000 ${getAreaColor(areaWarmth)} ${
+                  area.size === 'large' ? 'w-8 h-8' : area.size === 'medium' ? 'w-6 h-6' : 'w-4 h-4'
                 }`}
-                style={{ 
-                  left: `${area.x}%`, 
+                style={{
+                  left: `${area.x}%`,
                   top: `${area.y}%`,
-                  boxShadow: `0 0 ${area.size === 'large' ? '12px' : area.size === 'medium' ? '8px' : '4px'} rgba(255,255,255,0.2)`
+                  boxShadow: `0 0 ${area.size === 'large' ? '12px' : area.size === 'medium' ? '8px' : '4px'} rgba(255,255,255,0.2)`,
+                  opacity: 0.55,
                 }}
                 title={area.name}
-              >
-                {/* Area name tooltip */}
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black/80 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                  {area.name}
-                </div>
-              </div>
+              />
             );
           })}
 
-          {/* Renewable technology icons scattered across map */}
-          {userRenewables.map((renewable, index) => {
-            const getTechExplanation = (type: string) => {
-              switch (type) {
-                case 'solar': return 'Solar panels convert sunlight into clean electricity, reducing reliance on fossil fuels';
-                case 'solar_battery': return 'Solar + battery storage provides clean energy day and night, eliminating grid dependence';
-                case 'heat_pump': return 'Heat pumps use efficient electricity instead of gas, reducing greenhouse gas emissions';
-                case 'wind_turbine': return 'Wind turbines harness natural wind power to generate zero-emission electricity';
-                case 'wind_municipal': return 'Community wind farms provide clean energy to multiple homes, multiplying climate impact';
-                case 'green_hydrogen': return 'Green hydrogen stores renewable energy for transport and industry, replacing fossil fuels';
-                case 'mine_water': return 'Mine water heating uses geothermal energy from old mines, turning heritage into climate solution';
-                case 'sles': return 'Smart energy systems optimise renewable generation and consumption, maximising efficiency';
-                case 'ccus': return 'Carbon capture removes CO₂ from the atmosphere and converts it into useful materials';
-                default: return 'Renewable technology helps combat climate change by reducing carbon emissions';
-              }
-            };
-
+          {/* Placed renewables — high-contrast, labelled */}
+          {placed.map((r) => {
+            const meta = getMeta(r.technology_type);
             return (
               <div
-                key={renewable.id}
-                className="absolute transform -translate-x-1/2 -translate-y-1/2 animate-pulse group"
-                style={{
-                  left: `${20 + (index * 15) % 60}%`,
-                  top: `${20 + (index * 12) % 60}%`,
-                  zIndex: 10
-                }}
+                key={r.id}
+                className="absolute pointer-events-none transform -translate-x-1/2 -translate-y-1/2 group z-20"
+                style={{ left: `${r.position_x}%`, top: `${r.position_y}%` }}
               >
-                <div className="bg-white/20 backdrop-blur-sm rounded-full p-2 border border-white/30">
-                  {getRenewableIcon(renewable.technology_type)}
+                <div
+                  className="rounded-full p-2 border-2 border-white shadow-lg"
+                  style={{ backgroundColor: meta.colour }}
+                  title={meta.name}
+                >
+                  {meta.icon}
                 </div>
-                {/* Climate explanation tooltip */}
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black/90 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none w-64 text-center">
-                  {getTechExplanation(renewable.technology_type)}
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-[10px] text-white bg-black/70 px-1.5 py-0.5 rounded whitespace-nowrap">
+                  {meta.name}
                 </div>
               </div>
             );
           })}
 
           {/* Progress overlay */}
-          <div className="absolute bottom-4 left-4 right-4">
+          <div className="absolute bottom-4 left-4 right-20 pointer-events-none">
             <div className="bg-black/60 backdrop-blur-sm rounded-lg p-3">
               <div className="flex justify-between items-center text-sm text-white mb-2">
                 <span>Borough Cooling Progress</span>
                 <span>{warmingReduction}% Cooled</span>
               </div>
               <div className="w-full bg-red-900 rounded-full h-2">
-                <div 
+                <div
                   className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-1000"
                   style={{ width: `${warmingReduction}%` }}
-                ></div>
+                />
               </div>
             </div>
           </div>
+
+          {/* Nelson "bring him home" button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowJourney(true);
+            }}
+            className="absolute bottom-3 right-3 z-30 w-14 h-14 rounded-full bg-[#F4971D] shadow-lg border-2 border-white flex items-center justify-center hover:scale-110 transition-transform"
+            title="Bring Nelson home"
+            aria-label="Bring Nelson home"
+          >
+            <img src={actLocal.url} alt="" className="w-10 h-10" />
+          </button>
         </div>
 
         {/* Statistics */}
@@ -211,6 +327,14 @@ const CaerphillyMap: React.FC<CaerphillyMapProps> = ({
             <div className="text-xs text-slate-400">Cooling Impact</div>
           </div>
         </div>
+
+        <TechRewardDialog
+          open={!!reward}
+          onClose={() => setReward(null)}
+          techName={reward?.name || ''}
+          explanation={reward?.explanation || ''}
+          stars={reward?.stars || 1}
+        />
       </CardContent>
     </Card>
   );
