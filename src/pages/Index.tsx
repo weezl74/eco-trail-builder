@@ -46,11 +46,10 @@ const Index = () => {
   }, [loading, user, bootChecked]);
 
   useEffect(() => {
-    if (user) {
+    if (!loading && user) {
       routeAuthenticated();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [loading, user]);
 
   if (loading && !bootChecked) {
     return <div className="min-h-screen bg-[#f5a623]" />;
