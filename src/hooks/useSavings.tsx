@@ -4,7 +4,16 @@ import { useAuth } from '@/hooks/useAuth';
 
 export type Saving = { money: number; co2: number; water: number };
 export type RenewableType = 'solar' | 'wind' | 'mine_water';
-export type Renewable = { id: string; type: RenewableType; x: number; y: number };
+export type Renewable = {
+  id: string;
+  type: RenewableType;
+  /** Legacy screen-% position (still written for older clients). */
+  x: number;
+  y: number;
+  /** Geo-anchored position so pins stay where the user tapped. */
+  lat?: number;
+  lng?: number;
+};
 
 type State = {
   savings: Saving;
