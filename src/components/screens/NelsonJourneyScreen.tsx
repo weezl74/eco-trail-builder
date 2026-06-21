@@ -27,6 +27,30 @@ const NelsonJourneyScreen: React.FC<Props> = ({ totalPoints, groupBoost = 0, onB
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
+  const routeLineRef = useRef<L.Polyline | null>(null);
+  const [route, setRoute] = useState<[number, number][] | null>(null);
+
+  // Fetch a realistic driving route from OSRM. Falls back to a straight line
+  // if the public router is unreachable.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const url = `https://router.project-osrm.org/route/v1/driving/${START[1]},${START[0]};${HOME[1]},${HOME[0]}?overview=full&geometries=geojson`;
+        const res = await fetch(url);
+        const json = await res.json();
+        const coords: [number, number][] = json?.routes?.[0]?.geometry?.coordinates?.map(
+          (c: [number, number]) => [c[1], c[0]],
+        );
+        if (!cancelled && coords?.length) setRoute(coords);
+      } catch {
+        /* fall back to straight line */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -49,14 +73,6 @@ const NelsonJourneyScreen: React.FC<Props> = ({ totalPoints, groupBoost = 0, onB
       attribution: '&copy; OpenStreetMap',
     }).addTo(map);
 
-    // Journey line + home pin
-    L.polyline([START, HOME], {
-      color: '#F4971D',
-      weight: 2,
-      dashArray: '6 6',
-      opacity: 0.7,
-    }).addTo(map);
-
     const homeIcon = L.divIcon({
       className: '',
       html: `<div style="transform:translate(-50%,-100%);">
@@ -74,6 +90,23 @@ const NelsonJourneyScreen: React.FC<Props> = ({ totalPoints, groupBoost = 0, onB
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Draw / update the journey polyline once the route is known.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    if (routeLineRef.current) {
+      routeLineRef.current.remove();
+      routeLineRef.current = null;
+    }
+    const coords: [number, number][] = route ?? [START, HOME];
+    routeLineRef.current = L.polyline(coords, {
+      color: '#F4971D',
+      weight: 3,
+      dashArray: '6 6',
+      opacity: 0.8,
+    }).addTo(map);
+  }, [route]);
 
   // Update / animate Nelson's pin as points change
   useEffect(() => {
