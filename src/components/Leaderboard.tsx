@@ -1,45 +1,55 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Trophy, Medal, Award } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { fetchLeaderboard as apiFetchLeaderboard } from "@/lib/api";
+
+interface ApiUser {
+  user_id: string;
+  display_name?: string | null;
+  username?: string | null;
+  wool_points?: number | null;
+  tree_points?: number | null;
+}
 
 interface LeaderboardEntry {
   user_id: string;
   username: string;
   total_points: number;
-  avatar_level: number;
   rank: number;
 }
 
 export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const { user } = useAuth();
 
   useEffect(() => {
-    loadLeaderboard();
+    fetch("https://caerphilly-api.onrender.com/profile")
+      .then((res) => res.json())
+      .then((data: ApiUser[]) => {
+        const users = Array.isArray(data) ? data : [];
+        const sorted = [...users].sort(
+          (a, b) =>
+            ((b.wool_points || 0) + (b.tree_points || 0)) -
+            ((a.wool_points || 0) + (a.tree_points || 0))
+        );
+        const mapped: LeaderboardEntry[] = sorted.map((u, i) => ({
+          user_id: u.user_id,
+          username: u.display_name || u.username || "",
+          total_points: (u.wool_points || 0) + (u.tree_points || 0),
+          rank: i + 1,
+        }));
+        setLeaderboard(mapped);
+      })
+      .catch((err) => {
+        console.error("Error fetching leaderboard:", err);
+        setError(true);
+        setLeaderboard([]);
+      })
+      .finally(() => setLoading(false));
   }, []);
-
-  const loadLeaderboard = async () => {
-    try {
-      const data = await apiFetchLeaderboard(50);
-      const leaderboardData: LeaderboardEntry[] = (data ?? []).map((entry, index) => ({
-        user_id: entry.user_id,
-        username: entry.display_name ?? entry.username ?? "",
-        total_points: entry.wool_points ?? entry.total_points ?? 0,
-        avatar_level: entry.avatar_level ?? 1,
-        rank: index + 1,
-      }));
-      setLeaderboard(leaderboardData);
-    } catch (error) {
-      console.error('Error fetching leaderboard:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
@@ -115,15 +125,13 @@ export default function Leaderboard() {
                   {getRankIcon(entry.rank)}
                 </div>
                 <div className="flex-shrink-0">
-                  {getUserAvatar(entry.username, entry.avatar_level)}
+                  {getUserAvatar(entry.username, 1)}
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="font-medium truncate text-sm">
-                    {entry.username || `User ${entry.user_id.slice(0, 8)}`}
+                    {(entry.username || `User ${entry.user_id.slice(0, 8)}`)}
+                    {entry.user_id === user?.id ? " (you)" : ""}
                   </p>
-                  <Badge variant="outline" className="text-xs mt-1">
-                    Level {entry.avatar_level}
-                  </Badge>
                 </div>
               </div>
               <div className="text-right flex-shrink-0">
@@ -135,7 +143,7 @@ export default function Leaderboard() {
           {leaderboard.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">
               <Trophy className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No participants yet. Complete actions to join the leaderboard!</p>
+              <p>{error ? "Unable to load leaderboard." : "No participants yet."}</p>
             </div>
           )}
         </div>
