@@ -125,15 +125,13 @@ export default function Leaderboard() {
                   {getRankIcon(entry.rank)}
                 </div>
                 <div className="flex-shrink-0">
-                  {getUserAvatar(entry.username, entry.avatar_level)}
+                  {getUserAvatar(entry.username, 1)}
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="font-medium truncate text-sm">
-                    {entry.username || `User ${entry.user_id.slice(0, 8)}`}
+                    {(entry.username || `User ${entry.user_id.slice(0, 8)}`)}
+                    {entry.user_id === user?.id ? " (you)" : ""}
                   </p>
-                  <Badge variant="outline" className="text-xs mt-1">
-                    Level {entry.avatar_level}
-                  </Badge>
                 </div>
               </div>
               <div className="text-right flex-shrink-0">
