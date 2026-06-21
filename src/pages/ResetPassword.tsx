@@ -19,11 +19,12 @@ const ResetPassword: React.FC = () => {
   const { t } = useTranslations();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') setReady(true);
+    let mounted = true;
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (mounted && session) setReady(true);
     });
-    supabase.auth.getSession().then(({ data }) => { if (data.session) setReady(true); });
-    return () => subscription.unsubscribe();
+    supabase.auth.getSession().then(({ data }) => { if (mounted && data.session) setReady(true); });
+    return () => { mounted = false; subscription.unsubscribe(); };
   }, []);
 
   const submit = async () => {
