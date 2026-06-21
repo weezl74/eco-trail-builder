@@ -5,10 +5,11 @@ import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useTranslations } from '@/hooks/useTranslations';
 import WalkMyWarmUpJourney from '@/components/WalkMyWarmUpJourney';
-import ShopLocalLeafletMap, { LeafletPoi } from '@/components/ShopLocalLeafletMap';
+import ShopLocalLeafletMap, { LeafletPoi, LeafletRenewable } from '@/components/ShopLocalLeafletMap';
 import { useWalletBusinesses as useWallet } from '@/hooks/useWallet';
 import { getSector } from '@/lib/sectorIcons';
 import NelsonJourneyScreen from '@/components/screens/NelsonJourneyScreen';
+import TechRewardDialog from '@/components/TechRewardDialog';
 import actLocal from '@/assets/svg/act-local.svg.asset.json';
 
 type Category = 'libraries' | 'allotments' | 'leisure' | 'ev' | 'eco' | 'business';
