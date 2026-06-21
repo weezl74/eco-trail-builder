@@ -5,13 +5,16 @@ import nelsonHead from "@/assets/sheep/NelsonHead.svg.asset.json";
 import { useToast } from "@/hooks/use-toast";
 import { useSavings } from "@/hooks/useSavings";
 import { useTranslations } from "@/hooks/useTranslations";
+import { useAuth } from "@/hooks/useAuth";
 
 type Mode = "wool" | "tree";
 
 interface Row {
   name: string;
   points: number;
+  isMe?: boolean;
 }
+
 
 // ✅ Oak tree icon
 const OakTreeIcon: React.FC<{ className?: string }> = ({ className }) => (
