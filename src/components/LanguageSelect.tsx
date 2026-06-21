@@ -1,10 +1,18 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+import { CLIMATE_QUOTES } from '@/data/climateQuotes';
+import QuoteCard from '@/components/QuoteCard';
 
 interface LanguageSelectProps {
   onSelect: (lang: 'cy' | 'en') => void;
 }
 
 const LanguageSelect: React.FC<LanguageSelectProps> = ({ onSelect }) => {
+  // Pick one quote per session — stable across rerenders.
+  const quote = useMemo(
+    () => CLIMATE_QUOTES[Math.floor(Math.random() * CLIMATE_QUOTES.length)],
+    [],
+  );
+
   return (
     <div className="min-h-screen w-full bg-black flex flex-col items-center pt-[18%] px-6 gap-6">
       <button
@@ -19,6 +27,8 @@ const LanguageSelect: React.FC<LanguageSelectProps> = ({ onSelect }) => {
       >
         English
       </button>
+
+      <QuoteCard quote={quote} bilingual className="max-w-md mt-4" />
     </div>
   );
 };
