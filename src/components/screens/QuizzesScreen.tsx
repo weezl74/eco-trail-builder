@@ -1,8 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Check, Circle, ArrowLeft, X } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { useTranslations } from '@/hooks/useTranslations';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { usePoints } from '@/hooks/usePoints';
+import quizIcon from '@/assets/svg/quiz-icon.svg.asset.json';
+
+const QUIZ_WOOL_POINTS = 5;
+const storageKey = (uid: string) => `quizzes:${uid}`;
 
 type Question = { q: string; options: string[]; answer: number; explain: string };
 
