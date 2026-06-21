@@ -150,6 +150,28 @@ const ShopLocalLeafletMap: React.FC<Props> = ({ bbox, pois, className, onMapClic
     });
   }, [pois]);
 
+  // Render placed renewables anchored to lat/lng so they sit on top of the map.
+  useEffect(() => {
+    const layer = renewableLayerRef.current;
+    if (!layer) return;
+    layer.clearLayers();
+    renewables.forEach((r) => {
+      const icon = L.divIcon({
+        className: '',
+        html: `
+          <div style="transform:translate(-50%,-50%); display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:9999px; background:${r.color}; border:2px solid white; box-shadow:0 2px 6px rgba(0,0,0,0.35); color:white; font-size:18px; line-height:1;">
+            ${r.glyph}
+          </div>`,
+        iconSize: [34, 34],
+        iconAnchor: [17, 17],
+      });
+      const m = L.marker([r.lat, r.lng], { icon, title: r.label }).addTo(layer);
+      if (r.onClick) m.on('click', () => r.onClick?.());
+    });
+  }, [renewables]);
+
+
+
   return <div ref={containerRef} className={className} />;
 };
 
