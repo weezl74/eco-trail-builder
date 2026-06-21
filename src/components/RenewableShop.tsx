@@ -113,6 +113,24 @@ const RenewableShop: React.FC<RenewableShopProps> = ({
       impact: 'Personal carbon offset',
       icon: <Factory className="w-6 h-6 text-white" strokeWidth={1} />,
       type: 'ccus'
+    },
+    {
+      id: 'tree_planting',
+      name: 'Tree Planting',
+      description: 'Plant native broadleaf trees. Locks in carbon, cools streets and brings nature back to the Borough.',
+      pointsCost: 80,
+      impact: '10-tree micro-woodland',
+      icon: <Wind className="w-6 h-6 text-white" strokeWidth={1} />,
+      type: 'tree_planting'
+    },
+    {
+      id: 'green_roof',
+      name: 'Green Roof',
+      description: 'A planted roof that insulates buildings, manages rainwater and tackles the urban heat-island effect.',
+      pointsCost: 140,
+      impact: 'Sedum / wildflower roof',
+      icon: <Home className="w-6 h-6 text-white" strokeWidth={1} />,
+      type: 'green_roof'
     }
   ];
 
