@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { markPasswordResetDone } from '@/components/ForcePasswordResetGate';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff } from 'lucide-react';
 import { useTranslations } from '@/hooks/useTranslations';
@@ -82,6 +83,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onComplete }) => {
       toast({ title: 'Registration failed', description: error.message, variant: 'destructive' });
       return;
     }
+    // New users do NOT need the forced password reset (migration-only flow).
+    if (data.user) markPasswordResetDone(data.user.id);
     // Set account_type on profile (best-effort; trigger creates the row).
     if (data.user && isBusiness) {
       try {
