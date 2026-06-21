@@ -17,6 +17,8 @@ interface Props {
 
 const API_URL = "https://caerphilly-api.onrender.com/profile";
 
+/* ---------- Shell ---------- */
+
 const Shell: React.FC<{ title: string; onBack: () => void; children: React.ReactNode }> = ({
   title,
   onBack,
@@ -26,16 +28,18 @@ const Shell: React.FC<{ title: string; onBack: () => void; children: React.React
 
   return (
     <div className="min-h-screen bg-[#F4971D] p-4">
-      <button onClick={onBack}>
+      <button onClick={onBack} className="mb-4">
         <ArrowLeft /> {t("Back")}
       </button>
 
-      <h1>{title}</h1>
+      <h1 className="text-xl font-bold mb-4">{title}</h1>
 
-      <div>{children}</div>
+      <div className="bg-white p-4 rounded-xl">{children}</div>
     </div>
   );
 };
+
+/* ---------- Account Info ---------- */
 
 const AccountInfo: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { user } = useAuth();
@@ -50,11 +54,16 @@ const AccountInfo: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     (async () => {
       if (!user) return;
 
-      const res = await fetch(API_URL);
-      const data = await res.json();
+      try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
 
-      const profile = data.find((p: any) => p.user_id === user.id);
-      setDisplayName(profile?.display_name || "");
+        const profile = data.find((p: any) => p.user_id === user.id);
+        setDisplayName(profile?.display_name || "");
+      } catch (err) {
+        console.error(err);
+      }
+
       setLoaded(true);
     })();
   }, [user]);
@@ -90,54 +99,82 @@ const AccountInfo: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       <Label>Display Name</Label>
       <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
 
-      <Button onClick={save}>{saving ? "Saving…" : "Save"}</Button>
+      <Button onClick={save} disabled={!loaded || saving}>
+        {saving ? "Saving…" : "Save"}
+      </Button>
     </Shell>
   );
 };
 
-const Privacy: React.FC<{ onBack: () => void }> = ({ onBack }) => (
-  <Shell title="Privacy" onBack={onBack}>
-    <p>Privacy info</p>
-  </Shell>
-);
+/* ---------- Static Pages ---------- */
 
-const Terms: React.FC<{ onBack: () => void }> = ({ onBack }) => (
-  <Shell title="Terms" onBack={onBack}>
-    https://ccbc-decarb.github.io/privacy-policy/" target="_blank">
-      Open Policy
-    </a>
-  </Shell>
-);
+const Privacy: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+  return (
+    <Shell title="Privacy" onBack={onBack}>
+      <p>Your data is stored securely and not sold.</p>
+    </Shell>
+  );
+};
 
-const Contact: React.FC<{ onBack: () => void }> = ({ onBack }) => (
-  <Shell title="Contact" onBack={onBack}>
-    urture-caerphilly.app">Email</a>
-  </Shell>
-);
+const Terms: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+  return (
+    <Shell title="Terms" onBack={onBack}>
+      <p>Read full terms on our website.</p>
 
-const About: React.FC<{ onBack: () => void }> = ({ onBack }) => (
-  <Shell title="About" onBack={onBack}>
-    <p>About app</p>
-  </Shell>
-);
+      <a
+        href="https://ccbc-decarb.github.io/privacy-policy/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline"
+      >
+        Open Privacy Policy
+      </a>
+    </Shell>
+  );
+};
+
+const Contact: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+  return (
+    <Shell title="Contact" onBack={onBack}>
+      <a href="mailto:hello@nurture-caerphilly.app">Email the team</a>
+    </Shell>
+  );
+};
+
+const About: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+  return (
+    <Shell title="About" onBack={onBack}>
+      <p>Nelson is a sustainability app for Caerphilly.</p>
+    </Shell>
+  );
+};
+
+/* ---------- Change Password ---------- */
 
 const ChangePassword: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [pw, setPw] = useState("");
   const [pw2, setPw2] = useState("");
+  const [busy, setBusy] = useState(false);
 
   const submit = async () => {
     if (pw !== pw2) return;
+
+    setBusy(true);
     await supabase.auth.updateUser({ password: pw });
+    setBusy(false);
   };
 
   return (
-    <Shell title="Password" onBack={onBack}>
-      <Input value={pw} onChange={(e) => setPw(e.target.value)} />
-      <Input value={pw2} onChange={(e) => setPw2(e.target.value)} />
-      <Button onClick={submit}>Update</Button>
+    <Shell title="Change Password" onBack={onBack}>
+      <Input value={pw} onChange={(e) => setPw(e.target.value)} placeholder="New password" />
+      <Input value={pw2} onChange={(e) => setPw2(e.target.value)} placeholder="Confirm password" />
+
+      <Button onClick={submit}>{busy ? "Updating…" : "Update password"}</Button>
     </Shell>
   );
 };
+
+/* ---------- Main Switch ---------- */
 
 const AccountSubScreen: React.FC<Props> = ({ page, onBack }) => {
   switch (page) {
