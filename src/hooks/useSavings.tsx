@@ -166,7 +166,7 @@ export const useSavings = () => {
   );
 
   const buyRenewable = useCallback(
-    (type: RenewableType, x: number, y: number) => {
+    (type: RenewableType, x: number, y: number, lat?: number, lng?: number) => {
       const s = latest.current;
       const cost = RENEWABLE_COSTS[type];
       if (s.woolPoints < cost) return false;
@@ -175,7 +175,14 @@ export const useSavings = () => {
         woolPoints: s.woolPoints - cost,
         renewables: [
           ...s.renewables,
-          { id: `${type}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, type, x, y },
+          {
+            id: `${type}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+            type,
+            x,
+            y,
+            lat,
+            lng,
+          },
         ],
       });
       return true;
