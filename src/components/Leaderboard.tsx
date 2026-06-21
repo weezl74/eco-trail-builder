@@ -3,8 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, Medal, Award } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { fetchLeaderboard as apiFetchLeaderboard } from "@/lib/api";
 
 interface LeaderboardEntry {
   user_id: string;
@@ -20,20 +20,19 @@ export default function Leaderboard() {
   const { user } = useAuth();
 
   useEffect(() => {
-    fetchLeaderboard();
+    loadLeaderboard();
   }, []);
 
-  const fetchLeaderboard = async () => {
+  const loadLeaderboard = async () => {
     try {
-      const { data, error } = await supabase.rpc('get_leaderboard', { _limit: 50 });
-
-      if (error) throw error;
-
-      const leaderboardData = data?.map((entry, index) => ({
-        ...entry,
-        rank: index + 1
-      })) || [];
-
+      const data = await apiFetchLeaderboard(50);
+      const leaderboardData: LeaderboardEntry[] = (data ?? []).map((entry, index) => ({
+        user_id: entry.user_id,
+        username: entry.display_name ?? entry.username ?? "",
+        total_points: entry.wool_points ?? entry.total_points ?? 0,
+        avatar_level: entry.avatar_level ?? 1,
+        rank: index + 1,
+      }));
       setLeaderboard(leaderboardData);
     } catch (error) {
       console.error('Error fetching leaderboard:', error);

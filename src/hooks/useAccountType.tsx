@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { fetchMyProfile } from '@/lib/api';
 
 export type AccountType = 'resident' | 'business';
 
@@ -14,14 +14,16 @@ export const useAccountType = () => {
     if (!user) { setAccountType(null); setLoading(false); return; }
     let active = true;
     (async () => {
-      const { data } = await supabase
-        .from('profiles')
-        .select('account_type')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      if (!active) return;
-      setAccountType(((data?.account_type as AccountType) ?? 'resident'));
-      setLoading(false);
+      try {
+        const profile = await fetchMyProfile(user.id);
+        if (!active) return;
+        setAccountType((profile?.account_type as AccountType) ?? 'resident');
+      } catch {
+        if (!active) return;
+        setAccountType('resident');
+      } finally {
+        if (active) setLoading(false);
+      }
     })();
     return () => { active = false; };
   }, [user, authLoading]);
