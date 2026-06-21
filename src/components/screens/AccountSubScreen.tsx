@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,12 +18,15 @@ interface Props {
 
 const API_URL = "https://caerphilly-api.onrender.com/profile";
 
+/* -------------------------- Shell Wrapper -------------------------- */
+
 const Shell: React.FC<{ title: string; onBack: () => void; children: React.ReactNode }> = ({
   title,
   onBack,
   children,
 }) => {
   const { t } = useTranslations();
+
   return (
     <div className="min-h-screen bg-[#F4971D] pb-24 px-4 pt-10 font-roboto">
       <button
@@ -31,21 +35,28 @@ const Shell: React.FC<{ title: string; onBack: () => void; children: React.React
       >
         <ArrowLeft className="h-5 w-5" /> {t("Back")}
       </button>
+
       <h1 className="text-white text-2xl font-bold mb-4">{title}</h1>
-      <div className="bg-white rounded-2xl p-5 shadow-lg space-y-4 text-[#1f1f1f]">{children}</div>
+
+      <div className="bg-white rounded-2xl p-5 shadow-lg space-y-4 text-[#1f1f1f]">
+        {children}
+      </div>
     </div>
   );
 };
+
+/* -------------------------- Account Info -------------------------- */
 
 const AccountInfo: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const { t } = useTranslations();
+
   const [displayName, setDisplayName] = useState("");
   const [loaded, setLoaded] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // ✅ READ from API instead of Supabase
+  // ✅ Load from Render API instead of Supabase
   React.useEffect(() => {
     (async () => {
       if (!user) return;
@@ -53,7 +64,6 @@ const AccountInfo: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       try {
         const res = await fetch(API_URL);
         const data = await res.json();
-
         const profile = data.find((p: any) => p.user_id === user.id);
 
         setDisplayName(profile?.display_name || "");
@@ -67,6 +77,7 @@ const AccountInfo: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   const save = async () => {
     if (!user) return;
+
     setSaving(true);
 
     await fetch(API_URL, {
@@ -118,121 +129,27 @@ const AccountInfo: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   );
 };
 
+/* -------------------------- Static Pages -------------------------- */
+
 const Privacy: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { t } = useTranslations();
   return (
     <Shell title={t("Privacy Settings")} onBack={onBack}>
-      <p>
-        {t(
-          "Your personal data is stored securely on Lovable Cloud and is only ever used to power your Nelson experience. We never sell your data.",
-        )}
-      </p>
-      <p>
-        {t(
-          "Your name, footprint and points appear on the community leaderboard so other Caerphilly residents can cheer you on. To remove yourself from the leaderboard, contact us via the Contact Us page.",
-        )}
-      </p>
+      <p>{t("Your personal data is stored securely on Lovable Cloud and is only ever used to power your Nelson experience. We never sell your data.")}</p>
+      <p>{t("Your name, footprint and points appear on the community leaderboard so other Caerphilly residents can cheer you on. To remove yourself from the leaderboard, contact us via the Contact Us page.")}</p>
     </Shell>
   );
 };
 
-const ChangePassword: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-  const { toast } = useToast();
+const About: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { t } = useTranslations();
-  const [pw, setPw] = useState("");
-  const [pw2, setPw2] = useState("");
-  const [show, setShow] = useState(false);
-  const [busy, setBusy] = useState(false);
-
-  const submit = async () => {
-    if (pw.length < 8) {
-      toast({ title: t("Too short"), description: t("Use at least 8 characters."), variant: "destructive" });
-      return;
-    }
-    if (pw !== pw2) {
-      toast({ title: t("Mismatch"), description: t("Passwords do not match."), variant: "destructive" });
-      return;
-    }
-    setBusy(true);
-
-    const { error } = await supabase.auth.updateUser({ password: pw });
-
-    setBusy(false);
-
-    if (error) {
-      toast({ title: t("Error"), description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: t("Password updated") });
-      setPw("");
-      setPw2("");
-    }
-  };
-
   return (
-    <Shell title={t("Change Password")} onBack={onBack}>
-      <div className="space-y-2">
-        <Label>{t("New password")}</Label>
-        <div className="relative">
-          <Input
-            type={show ? "text" : "password"}
-            value={pw}
-            onChange={(e) => setPw(e.target.value)}
-            className="rounded-xl pr-10"
-          />
-          <button
-            type="button"
-            onClick={() => setShow((s) => !s)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#1f1f1f]"
-          >
-            {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-          </button>
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label>{t("Confirm new password")}</Label>
-        <Input
-          type={show ? "text" : "password"}
-          value={pw2}
-          onChange={(e) => setPw2(e.target.value)}
-          className="rounded-xl"
-        />
-      </div>
-
-      <Button
-        onClick={submit}
-        disabled={busy}
-        className="w-full rounded-2xl bg-[#1f1f1f] hover:bg-black text-white font-bold"
-      >
-        {busy ? t("Updating…") : t("Update password")}
-      </Button>
+    <Shell title={t("About Nelson")} onBack={onBack}>
+      <p>{t("Nelson is a community sustainability app for residents of Caerphilly.")}</p>
+      <p>{t("Made with ❤️ for the Caerphilly borough.")}</p>
     </Shell>
   );
 };
 
-// ✅ everything else unchanged...
-
-export default AccountSubScreen;
-export type { Page };
-
-const AccountSubScreen: React.FC<Props> = ({ page, onBack }) => {
-  switch (page) {
-    case "account-info":
-      return <AccountInfo onBack={onBack} />;
-    case "privacy":
-      return <Privacy onBack={onBack} />;
-    case "change-password":
-      return <ChangePassword onBack={onBack} />;
-    case "about":
-      return <About onBack={onBack} />;
-    case "terms":
-      return <Terms onBack={onBack} />;
-    case "contact":
-      return <Contact onBack={onBack} />;
-    default:
-      return null;
-  }
-};
-
-export default AccountSubScreen;
-export type { Page };
+const Terms: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+  const { t } = useTranslations();
