@@ -300,7 +300,7 @@ const CaerphillyMap: React.FC<CaerphillyMapProps> = ({
                 <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-[10px] text-white bg-black/70 px-1.5 py-0.5 rounded whitespace-nowrap">
                   {meta.name}
                 </div>
-              </div>
+              </button>
             );
           })}
 
