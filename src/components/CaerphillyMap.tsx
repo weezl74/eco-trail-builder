@@ -167,6 +167,22 @@ const CaerphillyMap: React.FC<CaerphillyMapProps> = ({
     return 'bg-green-500';
   };
 
+  // Local cooling: each placed renewable cools its surroundings (radius in %).
+  const COOL_RADIUS = 22;
+  const COOL_STRENGTH = 28;
+  const localCooling = (ax: number, ay: number) => {
+    let cool = 0;
+    placed.forEach((r) => {
+      const dx = (r.position_x as number) - ax;
+      const dy = (r.position_y as number) - ay;
+      const dist = Math.hypot(dx, dy);
+      if (dist < COOL_RADIUS) {
+        cool += COOL_STRENGTH * (1 - dist / COOL_RADIUS);
+      }
+    });
+    return cool;
+  };
+
   const handleMapClick = async (e: React.MouseEvent<HTMLDivElement>) => {
     if (!pending || !onPlaceRenewable || !mapRef.current) return;
     const rect = mapRef.current.getBoundingClientRect();
@@ -241,7 +257,7 @@ const CaerphillyMap: React.FC<CaerphillyMapProps> = ({
           {/* Borough areas */}
           {boroughAreas.map((area) => {
             const baseWarmth = 80 - totalPoints / 20;
-            const areaWarmth = Math.max(10, baseWarmth);
+            const areaWarmth = Math.max(10, baseWarmth - localCooling(area.x, area.y));
             return (
               <div
                 key={area.name}
@@ -259,14 +275,20 @@ const CaerphillyMap: React.FC<CaerphillyMapProps> = ({
             );
           })}
 
-          {/* Placed renewables — high-contrast, labelled */}
+          {/* Placed renewables — high-contrast, labelled, clickable for info */}
           {placed.map((r) => {
             const meta = getMeta(r.technology_type);
             return (
-              <div
+              <button
                 key={r.id}
-                className="absolute pointer-events-none transform -translate-x-1/2 -translate-y-1/2 group z-20"
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setReward({ name: meta.name, explanation: meta.explanation, stars: meta.stars });
+                }}
+                className="absolute transform -translate-x-1/2 -translate-y-1/2 group z-20 cursor-pointer"
                 style={{ left: `${r.position_x}%`, top: `${r.position_y}%` }}
+                aria-label={`${meta.name} info`}
               >
                 <div
                   className="rounded-full p-2 border-2 border-white shadow-lg"
@@ -278,7 +300,7 @@ const CaerphillyMap: React.FC<CaerphillyMapProps> = ({
                 <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-[10px] text-white bg-black/70 px-1.5 py-0.5 rounded whitespace-nowrap">
                   {meta.name}
                 </div>
-              </div>
+              </button>
             );
           })}
 

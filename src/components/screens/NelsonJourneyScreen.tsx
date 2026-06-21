@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { ArrowLeft } from 'lucide-react';
 import actLocal from '@/assets/svg/act-local.svg.asset.json';
 
@@ -8,17 +10,9 @@ interface Props {
   onBack: () => void;
 }
 
-// Polyline waypoints across a stylised UK silhouette (viewBox 0 0 100 160)
-// North Scotland (top) → Nelson, Caerphilly (south Wales)
-const stops = [
-  { name: 'North Scotland', x: 50, y: 12 },
-  { name: 'Edinburgh', x: 52, y: 32 },
-  { name: 'Lake District', x: 44, y: 52 },
-  { name: 'Manchester', x: 48, y: 72 },
-  { name: 'Birmingham', x: 48, y: 92 },
-  { name: 'Cardiff', x: 36, y: 118 },
-  { name: 'Nelson (home)', x: 36, y: 128 },
-];
+// Climate refuge → home. Nelson village, Caerphilly.
+const START: [number, number] = [58.0, -4.5];   // Far north of Scotland
+const HOME: [number, number] = [51.6906, -3.2663]; // Nelson, Caerphilly
 
 const MAX_POINTS = 5000;
 
@@ -26,27 +20,82 @@ const NelsonJourneyScreen: React.FC<Props> = ({ totalPoints, groupBoost = 0, onB
   const effective = Math.min(MAX_POINTS, totalPoints + groupBoost);
   const t = effective / MAX_POINTS; // 0..1
 
-  // Interpolate along polyline by cumulative arc length
-  const segs = stops.slice(1).map((s, i) => {
-    const a = stops[i];
-    const d = Math.hypot(s.x - a.x, s.y - a.y);
-    return { a, b: s, d };
-  });
-  const total = segs.reduce((s, x) => s + x.d, 0);
-  let target = t * total;
-  let nx = stops[0].x;
-  let ny = stops[0].y;
-  for (const seg of segs) {
-    if (target <= seg.d) {
-      const u = seg.d === 0 ? 0 : target / seg.d;
-      nx = seg.a.x + (seg.b.x - seg.a.x) * u;
-      ny = seg.a.y + (seg.b.y - seg.a.y) * u;
-      break;
+  // Gradually shift Nelson's pin from START → HOME
+  const nelsonLat = START[0] + (HOME[0] - START[0]) * t;
+  const nelsonLng = START[1] + (HOME[1] - START[1]) * t;
+
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const markerRef = useRef<L.Marker | null>(null);
+
+  useEffect(() => {
+    if (!containerRef.current || mapRef.current) return;
+    const map = L.map(containerRef.current, {
+      zoomControl: false,
+      attributionControl: true,
+      dragging: true,
+      scrollWheelZoom: false,
+    });
+    // Fit the whole journey so user sees how far Nelson has travelled
+    map.fitBounds(
+      [
+        [Math.min(START[0], HOME[0]) - 0.5, Math.min(START[1], HOME[1]) - 0.5],
+        [Math.max(START[0], HOME[0]) + 0.5, Math.max(START[1], HOME[1]) + 0.5],
+      ],
+      { padding: [20, 20] },
+    );
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap',
+    }).addTo(map);
+
+    // Journey line + home pin
+    L.polyline([START, HOME], {
+      color: '#F4971D',
+      weight: 2,
+      dashArray: '6 6',
+      opacity: 0.7,
+    }).addTo(map);
+
+    const homeIcon = L.divIcon({
+      className: '',
+      html: `<div style="transform:translate(-50%,-100%);">
+        <svg width="22" height="30" viewBox="0 0 22 30"><path d="M11 0C5 0 0 5 0 11c0 8 11 19 11 19s11-11 11-19C22 5 17 0 11 0z" fill="#22c55e" stroke="white" stroke-width="1.5"/><circle cx="11" cy="11" r="4" fill="white"/></svg>
+      </div>`,
+      iconSize: [22, 30],
+      iconAnchor: [11, 30],
+    });
+    L.marker(HOME, { icon: homeIcon }).addTo(map).bindPopup('Nelson, Caerphilly — home');
+
+    mapRef.current = map;
+    return () => {
+      map.remove();
+      mapRef.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Update / animate Nelson's pin as points change
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const nelsonIcon = L.divIcon({
+      className: '',
+      html: `<div style="transform:translate(-50%,-100%);">
+        <svg width="28" height="36" viewBox="0 0 22 30"><path d="M11 0C5 0 0 5 0 11c0 8 11 19 11 19s11-11 11-19C22 5 17 0 11 0z" fill="#F4971D" stroke="white" stroke-width="1.6"/><text x="11" y="14" text-anchor="middle" font-size="9" font-weight="700" fill="#1f1f1f" font-family="Georgia, serif">N</text></svg>
+      </div>`,
+      iconSize: [28, 36],
+      iconAnchor: [14, 36],
+    });
+    if (!markerRef.current) {
+      markerRef.current = L.marker([nelsonLat, nelsonLng], { icon: nelsonIcon })
+        .addTo(map)
+        .bindPopup('Nelson the sheep');
+    } else {
+      markerRef.current.setLatLng([nelsonLat, nelsonLng]);
+      markerRef.current.setIcon(nelsonIcon);
     }
-    target -= seg.d;
-    nx = seg.b.x;
-    ny = seg.b.y;
-  }
+  }, [nelsonLat, nelsonLng]);
 
   const milesRemaining = Math.round((1 - t) * 600);
   const pointsToHome = Math.max(0, MAX_POINTS - totalPoints - groupBoost);
@@ -66,41 +115,8 @@ const NelsonJourneyScreen: React.FC<Props> = ({ totalPoints, groupBoost = 0, onB
           Climate change drove Nelson north. Earn points to bring him back to the Borough.
         </p>
 
-        <div className="relative bg-[#2a2a2a] rounded-2xl mt-4 p-3 flex justify-center">
-          <svg viewBox="0 0 100 160" className="w-full max-w-[280px] h-auto">
-            {/* Stylised UK silhouette */}
-            <path
-              d="M50 5 C 60 8, 68 18, 64 30 C 70 35, 72 45, 66 55 C 72 65, 60 75, 58 85 C 64 95, 52 105, 50 115 C 55 125, 40 135, 36 138 C 30 138, 28 132, 32 125 C 28 118, 26 108, 34 100 C 28 92, 30 80, 38 72 C 32 62, 34 50, 42 42 C 36 32, 40 18, 50 5 Z"
-              fill="#3a3a3a"
-              stroke="#555"
-              strokeWidth="0.6"
-            />
-            {/* Route */}
-            <polyline
-              points={stops.map((s) => `${s.x},${s.y}`).join(' ')}
-              fill="none"
-              stroke="#F4971D"
-              strokeWidth="1.2"
-              strokeDasharray="2 1.5"
-              opacity="0.7"
-            />
-            {/* Stops */}
-            {stops.map((s, i) => (
-              <g key={s.name}>
-                <circle cx={s.x} cy={s.y} r="1.6" fill={i === stops.length - 1 ? '#22c55e' : '#fff'} />
-                <text x={s.x + 3} y={s.y + 1.2} fontSize="3" fill="#fff" opacity="0.7">
-                  {s.name}
-                </text>
-              </g>
-            ))}
-            {/* Nelson marker */}
-            <g transform={`translate(${nx}, ${ny})`}>
-              <circle r="3.2" fill="#F4971D" stroke="#fff" strokeWidth="0.6" />
-              <text x="0" y="1.1" textAnchor="middle" fontSize="3.2" fontWeight="bold" fill="#1f1f1f">
-                N
-              </text>
-            </g>
-          </svg>
+        <div className="mt-4 rounded-2xl overflow-hidden border-2 border-[#F4971D]/40">
+          <div ref={containerRef} className="w-full h-[360px] bg-[#2a2a2a]" />
         </div>
 
         <div className="mt-4 space-y-2">
