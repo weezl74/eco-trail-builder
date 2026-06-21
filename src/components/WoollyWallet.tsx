@@ -174,6 +174,103 @@ const WoollyWallet: React.FC<Props> = ({ children }) => {
       },
     );
 
+    // ---- Favourite Quotes card ----
+    const lib = CLIMATE_QUOTES;
+    const favList = lib.filter((q) => favourites.includes(q.id));
+    const activeList = quoteMode === 'favourites' && favList.length > 0 ? favList : lib;
+    const safeIdx = activeList.length ? quoteIdx % activeList.length : 0;
+    const current = activeList[safeIdx];
+    const fav = current ? isFavourite(current.id) : false;
+
+    const stop = (e: React.MouseEvent) => e.stopPropagation();
+    const step = (dir: 1 | -1) => (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setQuoteIdx((i) => {
+        const len = activeList.length || 1;
+        return (i + dir + len) % len;
+      });
+    };
+    const handleToggleFav = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (!current) return;
+      const r = toggleFavourite(current.id);
+      if (!r.ok && r.reason === 'full') {
+        toast({
+          title: t('Favourites full'),
+          description: t('Remove one to save another (max 5).'),
+          variant: 'destructive',
+        });
+      }
+    };
+    const switchMode = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setQuoteMode((m) => (m === 'library' ? 'favourites' : 'library'));
+      setQuoteIdx(0);
+    };
+
+    base.push({
+      id: 'fav-quotes',
+      title: t('My Favourite Quotes'),
+      subtitle: `${t('Climate library')} · ${favourites.length}/${maxFavourites} ★`,
+      gradient: 'from-[#1f1f1f] to-[#000000]',
+      icon: <Quote className="h-5 w-5" />,
+      bgImage: fav && current?.image ? current.image : undefined,
+      body: current ? (
+        <div className="mt-2 bg-black/40 rounded-xl p-3 backdrop-blur space-y-2">
+          <p
+            className="font-roboto italic text-sm leading-snug text-center text-white"
+            style={{ fontFamily: 'Roboto Slab, serif' }}
+          >
+            <span className="text-[#f5a623] text-xl leading-none align-top">“</span>
+            {current.en}
+            <span className="text-[#f5a623] text-xl leading-none">”</span>
+          </p>
+          {current.attribution && (
+            <p className="text-[10px] opacity-80 text-center">
+              — {current.attribution}
+              {current.place ? `, ${current.place}` : ''}
+            </p>
+          )}
+          <div className="flex items-center justify-between pt-1" onClick={stop}>
+            <button
+              onClick={step(-1)}
+              aria-label={t('Previous quote')}
+              className="bg-white/15 hover:bg-white/25 rounded-full p-1.5"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button
+              onClick={handleToggleFav}
+              aria-label={fav ? t('Remove favourite') : t('Save favourite')}
+              className={`rounded-full px-3 py-1 inline-flex items-center gap-1 text-[11px] font-bold ${
+                fav ? 'bg-[#f5a623] text-black' : 'bg-white/15 text-white'
+              }`}
+            >
+              <Star className={`h-3.5 w-3.5 ${fav ? 'fill-current' : ''}`} />
+              {fav ? t('Saved') : t('Save')}
+            </button>
+            <button
+              onClick={step(1)}
+              aria-label={t('Next quote')}
+              className="bg-white/15 hover:bg-white/25 rounded-full p-1.5"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+          {favourites.length > 0 && (
+            <button
+              onClick={switchMode}
+              className="block mx-auto text-[10px] underline opacity-90"
+            >
+              {quoteMode === 'favourites'
+                ? t('Browse full library')
+                : t('Show my favourites')}
+            </button>
+          )}
+        </div>
+      ) : null,
+    });
+
     const extras: DealtCard[] = items.map((it: WalletItem) => {
       if (it.kind === 'business') {
         const isLoyalty = !!it.businessCardId && !!it.stampsRequired;
