@@ -28,9 +28,7 @@ const Index = () => {
   const routeAuthenticated = async () => {
     if (!user) return;
 
-    const res = await fetch(
-      `https://caerphilly-api-dev01.azurewebsites.net/api/getProfile/me/profile?user_id=${user.id}`,
-    );
+    const res = await fetch(`https://caerphilly-api.onrender.com/profile?user_id=${user.id}`);
 
     const data = await res.json();
     setStage("app");
