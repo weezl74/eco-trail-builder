@@ -519,6 +519,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_points_ledger: {
+        Row: {
+          created_at: string
+          id: string
+          points: number
+          points_type: string
+          reference_id: string | null
+          source: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          points: number
+          points_type: string
+          reference_id?: string | null
+          source: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          points?: number
+          points_type?: string
+          reference_id?: string | null
+          source?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_preferences: {
         Row: {
           created_at: string
