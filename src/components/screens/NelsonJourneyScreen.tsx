@@ -105,7 +105,29 @@ const NelsonJourneyScreen: React.FC<Props> = ({ totalPoints, groupBoost = 0, onB
     }).addTo(map);
   }, [route]);
 
-  // Update / animate Nelson's pin as points change
+  // Position Nelson along the real route (or straight-line fallback) by progress t.
+  const path: [number, number][] = route ?? [START, HOME];
+  const segLengths = path.slice(1).map((p, i) => {
+    const a = path[i];
+    return Math.hypot(p[0] - a[0], p[1] - a[1]);
+  });
+  const totalLen = segLengths.reduce((s, n) => s + n, 0) || 1;
+  let target = totalLen * t;
+  let nelsonLat = path[0][0];
+  let nelsonLng = path[0][1];
+  for (let i = 0; i < segLengths.length; i++) {
+    if (target <= segLengths[i]) {
+      const f = segLengths[i] === 0 ? 0 : target / segLengths[i];
+      nelsonLat = path[i][0] + (path[i + 1][0] - path[i][0]) * f;
+      nelsonLng = path[i][1] + (path[i + 1][1] - path[i][1]) * f;
+      break;
+    }
+    target -= segLengths[i];
+    nelsonLat = path[i + 1][0];
+    nelsonLng = path[i + 1][1];
+  }
+
+  // Update / animate Nelson's pin as points / route change
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
