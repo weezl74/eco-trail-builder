@@ -167,6 +167,22 @@ const CaerphillyMap: React.FC<CaerphillyMapProps> = ({
     return 'bg-green-500';
   };
 
+  // Local cooling: each placed renewable cools its surroundings (radius in %).
+  const COOL_RADIUS = 22;
+  const COOL_STRENGTH = 28;
+  const localCooling = (ax: number, ay: number) => {
+    let cool = 0;
+    placed.forEach((r) => {
+      const dx = (r.position_x as number) - ax;
+      const dy = (r.position_y as number) - ay;
+      const dist = Math.hypot(dx, dy);
+      if (dist < COOL_RADIUS) {
+        cool += COOL_STRENGTH * (1 - dist / COOL_RADIUS);
+      }
+    });
+    return cool;
+  };
+
   const handleMapClick = async (e: React.MouseEvent<HTMLDivElement>) => {
     if (!pending || !onPlaceRenewable || !mapRef.current) return;
     const rect = mapRef.current.getBoundingClientRect();
