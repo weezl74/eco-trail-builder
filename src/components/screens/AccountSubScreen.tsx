@@ -214,3 +214,25 @@ const ChangePassword: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
 export default AccountSubScreen;
 export type { Page };
+
+const AccountSubScreen: React.FC<Props> = ({ page, onBack }) => {
+  switch (page) {
+    case "account-info":
+      return <AccountInfo onBack={onBack} />;
+    case "privacy":
+      return <Privacy onBack={onBack} />;
+    case "change-password":
+      return <ChangePassword onBack={onBack} />;
+    case "about":
+      return <About onBack={onBack} />;
+    case "terms":
+      return <Terms onBack={onBack} />;
+    case "contact":
+      return <Contact onBack={onBack} />;
+    default:
+      return null;
+  }
+};
+
+export default AccountSubScreen;
+export type { Page };
