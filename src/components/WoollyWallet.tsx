@@ -68,9 +68,12 @@ const WoollyWallet: React.FC<Props> = ({ children }) => {
   const { toast } = useToast();
   const { config: binCfg, dismissed: binDismissed, save: saveBin, dismiss: dismissBin } = useBinDay();
   const { cards: spotlightCards } = useBusinessSpotlight();
+  const { favourites, isFavourite, toggle: toggleFavourite, max: maxFavourites } = useFavouriteQuotes();
   const [open, setOpen] = useState(false);
   const [index, setIndex] = useState(0);
   const [showBinSetup, setShowBinSetup] = useState(false);
+  const [quoteMode, setQuoteMode] = useState<'library' | 'favourites'>('library');
+  const [quoteIdx, setQuoteIdx] = useState(0);
   const fileRef = useRef<HTMLInputElement>(null);
   const [pendingPhoto, setPendingPhoto] = useState<string | null>(null);
   const [caption, setCaption] = useState('');
