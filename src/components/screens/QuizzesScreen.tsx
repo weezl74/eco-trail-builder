@@ -230,8 +230,9 @@ const QuizzesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
         alt=""
         aria-hidden
         draggable={false}
-        className="fixed left-2 bottom-20 h-16 w-16 object-contain pointer-events-none z-40 drop-shadow-lg"
+        className="fixed left-2 bottom-16 h-32 w-32 object-contain pointer-events-none z-40 drop-shadow-lg"
       />
+
 
 
       <Dialog open={!!topic} onOpenChange={(v) => { if (!v) closeTopic(); }}>
