@@ -143,7 +143,7 @@ export default function Leaderboard() {
           {leaderboard.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">
               <Trophy className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No participants yet. Complete actions to join the leaderboard!</p>
+              <p>{error ? "Unable to load leaderboard." : "No participants yet."}</p>
             </div>
           )}
         </div>
