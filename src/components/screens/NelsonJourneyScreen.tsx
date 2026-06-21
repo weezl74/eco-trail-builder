@@ -20,9 +20,6 @@ const NelsonJourneyScreen: React.FC<Props> = ({ totalPoints, groupBoost = 0, onB
   const effective = Math.min(MAX_POINTS, totalPoints + groupBoost);
   const t = effective / MAX_POINTS; // 0..1
 
-  // Gradually shift Nelson's pin from START → HOME
-  const nelsonLat = START[0] + (HOME[0] - START[0]) * t;
-  const nelsonLng = START[1] + (HOME[1] - START[1]) * t;
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
