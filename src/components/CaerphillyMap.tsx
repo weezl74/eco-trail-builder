@@ -257,7 +257,7 @@ const CaerphillyMap: React.FC<CaerphillyMapProps> = ({
           {/* Borough areas */}
           {boroughAreas.map((area) => {
             const baseWarmth = 80 - totalPoints / 20;
-            const areaWarmth = Math.max(10, baseWarmth);
+            const areaWarmth = Math.max(10, baseWarmth - localCooling(area.x, area.y));
             return (
               <div
                 key={area.name}
@@ -275,14 +275,20 @@ const CaerphillyMap: React.FC<CaerphillyMapProps> = ({
             );
           })}
 
-          {/* Placed renewables — high-contrast, labelled */}
+          {/* Placed renewables — high-contrast, labelled, clickable for info */}
           {placed.map((r) => {
             const meta = getMeta(r.technology_type);
             return (
-              <div
+              <button
                 key={r.id}
-                className="absolute pointer-events-none transform -translate-x-1/2 -translate-y-1/2 group z-20"
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setReward({ name: meta.name, explanation: meta.explanation, stars: meta.stars });
+                }}
+                className="absolute transform -translate-x-1/2 -translate-y-1/2 group z-20 cursor-pointer"
                 style={{ left: `${r.position_x}%`, top: `${r.position_y}%` }}
+                aria-label={`${meta.name} info`}
               >
                 <div
                   className="rounded-full p-2 border-2 border-white shadow-lg"
