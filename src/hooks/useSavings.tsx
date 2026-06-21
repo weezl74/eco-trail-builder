@@ -148,7 +148,7 @@ export const useSavings = () => {
           water: s.savings.water + delta.water,
         },
         woolPoints: s.woolPoints + 25,
-        treePoints: s.treePoints + 10,
+        treePoints: s.treePoints + 2,
       };
       void persist(next);
       return true;
