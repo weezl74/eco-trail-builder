@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,8 +17,6 @@ interface Props {
 
 const API_URL = "https://caerphilly-api.onrender.com/profile";
 
-/* ---------------- Shell ---------------- */
-
 const Shell: React.FC<{ title: string; onBack: () => void; children: React.ReactNode }> = ({
   title,
   onBack,
@@ -28,24 +25,17 @@ const Shell: React.FC<{ title: string; onBack: () => void; children: React.React
   const { t } = useTranslations();
 
   return (
-    <div className="min-h-screen bg-[#F4971D] pb-24 px-4 pt-10 font-roboto">
-      <button
-        onClick={onBack}
-        className="flex items-center gap-2 bg-[#1f1f1f] text-white font-bold mb-4 px-4 py-2 rounded-full shadow-lg"
-      >
-        <ArrowLeft className="h-5 w-5" /> {t("Back")}
+    <div className="min-h-screen bg-[#F4971D] p-4">
+      <button onClick={onBack}>
+        <ArrowLeft /> {t("Back")}
       </button>
 
-      <h1 className="text-white text-2xl font-bold mb-4">{title}</h1>
+      <h1>{title}</h1>
 
-      <div className="bg-white rounded-2xl p-5 shadow-lg space-y-4 text-[#1f1f1f]">
-        {children}
-      </div>
+      <div>{children}</div>
     </div>
   );
 };
-
-/* ---------------- Account Info ---------------- */
 
 const AccountInfo: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { user } = useAuth();
@@ -56,21 +46,15 @@ const AccountInfo: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [loaded, setLoaded] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     (async () => {
       if (!user) return;
 
-      try {
-        const res = await fetch(API_URL);
-        const data = await res.json();
+      const res = await fetch(API_URL);
+      const data = await res.json();
 
-        const profile = data.find((p: any) => p.user_id === user.id);
-
-        setDisplayName(profile?.display_name || "");
-      } catch (err) {
-        console.error(err);
-      }
-
+      const profile = data.find((p: any) => p.user_id === user.id);
+      setDisplayName(profile?.display_name || "");
       setLoaded(true);
     })();
   }, [user]);
@@ -95,94 +79,65 @@ const AccountInfo: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
     setSaving(false);
 
-    toast({
-      title: t("Saved"),
-      description: t("Your account information has been updated."),
-    });
+    toast({ title: t("Saved") });
   };
 
   return (
-    <Shell title={t("Account Information")} onBack={onBack}>
+    <Shell title={t("Account")} onBack={onBack}>
       <Label>Email</Label>
       <Input value={user?.email || ""} disabled />
 
-      <Label>Display name</Label>
-      <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} disabled={!loaded} />
+      <Label>Display Name</Label>
+      <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
 
-      <Button onClick={save} disabled={saving || !loaded}>
-        {saving ? "Saving…" : "Save changes"}
-      </Button>
+      <Button onClick={save}>{saving ? "Saving…" : "Save"}</Button>
     </Shell>
   );
 };
 
-/* ---------------- Static Pages ---------------- */
+const Privacy: React.FC<{ onBack: () => void }> = ({ onBack }) => (
+  <Shell title="Privacy" onBack={onBack}>
+    <p>Privacy info</p>
+  </Shell>
+);
 
-const Privacy: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-  return (
-    <Shell title="Privacy Settings" onBack={onBack}>
-      <p>Your data is stored securely and not sold.</p>
-    </Shell>
-  );
-};
+const Terms: React.FC<{ onBack: () => void }> = ({ onBack }) => (
+  <Shell title="Terms" onBack={onBack}>
+    https://ccbc-decarb.github.io/privacy-policy/" target="_blank">
+      Open Policy
+    </a>
+  </Shell>
+);
 
-const Terms: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-  return (
-    <Shell title="Terms and Conditions" onBack={onBack}>
-      <p>Read full terms on our website.</p>
+const Contact: React.FC<{ onBack: () => void }> = ({ onBack }) => (
+  <Shell title="Contact" onBack={onBack}>
+    urture-caerphilly.app">Email</a>
+  </Shell>
+);
 
-      <a
-        href="https://ccbc-decarb.github.io/privacy-policy/"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Open Privacy Policy
-      </a>
-    </Shell>
-  );
-};
-
-const Contact: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-  return (
-    <Shell title="Contact" onBack={onBack}>
-      <a href="mailto:hello@nurture-caerphilly.app">Email the team</a>
-    </Shell>
-  );
-};
-
-const About: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-  return (
-    <Shell title="About" onBack={onBack}>
-      <p>Nelson is a sustainability app for Caerphilly.</p>
-    </Shell>
-  );
-};
-
-/* ---------------- Password ---------------- */
+const About: React.FC<{ onBack: () => void }> = ({ onBack }) => (
+  <Shell title="About" onBack={onBack}>
+    <p>About app</p>
+  </Shell>
+);
 
 const ChangePassword: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [pw, setPw] = useState("");
   const [pw2, setPw2] = useState("");
-  const [busy, setBusy] = useState(false);
 
   const submit = async () => {
     if (pw !== pw2) return;
-
-    setBusy(true);
     await supabase.auth.updateUser({ password: pw });
-    setBusy(false);
   };
 
   return (
-    <Shell title="Change Password" onBack={onBack}>
-      <Input value={pw} onChange={(e) => setPw(e.target.value)} placeholder="New password" />
-      <Input value={pw2} onChange={(e) => setPw2(e.target.value)} placeholder="Confirm password" />
-      <Button onClick={submit}>{busy ? "Updating…" : "Update password"}</Button>
+    <Shell title="Password" onBack={onBack}>
+      <Input value={pw} onChange={(e) => setPw(e.target.value)} />
+      <Input value={pw2} onChange={(e) => setPw2(e.target.value)} />
+      <Button onClick={submit}>Update</Button>
     </Shell>
   );
 };
-
-/* ---------------- Main Switch ---------------- */
 
 const AccountSubScreen: React.FC<Props> = ({ page, onBack }) => {
   switch (page) {
@@ -190,3 +145,18 @@ const AccountSubScreen: React.FC<Props> = ({ page, onBack }) => {
       return <AccountInfo onBack={onBack} />;
     case "privacy":
       return <Privacy onBack={onBack} />;
+    case "change-password":
+      return <ChangePassword onBack={onBack} />;
+    case "about":
+      return <About onBack={onBack} />;
+    case "terms":
+      return <Terms onBack={onBack} />;
+    case "contact":
+      return <Contact onBack={onBack} />;
+    default:
+      return null;
+  }
+};
+
+export default AccountSubScreen;
+export type { Page };
