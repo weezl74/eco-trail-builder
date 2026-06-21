@@ -141,6 +141,27 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const { t } = useTranslations();
   const [walkOpen, setWalkOpen] = useState(false);
   const [showJourney, setShowJourney] = useState(false);
+  const [reward, setReward] = useState<{ label: string; explanation: string; stars: number } | null>(null);
+
+  const leafletRenewables: LeafletRenewable[] = useMemo(
+    () =>
+      renewables
+        .filter((r) => r.lat != null && r.lng != null)
+        .map((r) => {
+          const meta = RENEWABLE_META[r.type];
+          return {
+            id: r.id,
+            lat: r.lat as number,
+            lng: r.lng as number,
+            color: meta.color,
+            label: meta.label,
+            glyph: meta.glyph,
+            onClick: () =>
+              setReward({ label: meta.label, explanation: meta.explanation, stars: meta.stars }),
+          };
+        }),
+    [renewables],
+  );
 
   useEffect(() => {
     let mounted = true;
