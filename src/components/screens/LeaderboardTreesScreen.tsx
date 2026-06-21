@@ -67,7 +67,35 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
         })
         .then((data: any[]) => {
           if (cancelled) return;
-          const mapped: Row[] = (data || [])
+          const list = Array.isArray(data) ? [...data] : [];
+          // Ensure the current user is always represented on the leaderboard,
+          // even if the API hasn't synced their profile yet.
+          if (user?.id) {
+            const meIdx = list.findIndex((u) => u.user_id === user.id);
+            const meName =
+              (user.user_metadata as any)?.display_name ||
+              (user.user_metadata as any)?.full_name ||
+              user.email?.split("@")[0] ||
+              "You";
+            if (meIdx === -1) {
+              list.push({
+                user_id: user.id,
+                display_name: meName,
+                wool_points: woolPoints,
+                tree_points: treePoints,
+              });
+            } else {
+              // Prefer local points if API still shows 0 / missing
+              const apiWool = Number(list[meIdx].wool_points) || 0;
+              const apiTree = Number(list[meIdx].tree_points) || 0;
+              list[meIdx] = {
+                ...list[meIdx],
+                wool_points: Math.max(apiWool, woolPoints),
+                tree_points: Math.max(apiTree, treePoints),
+              };
+            }
+          }
+          const mapped: Row[] = list
             .map((u) => {
               const isMe = u.user_id === user?.id;
               const wool = Number(u.wool_points) || 0;
@@ -97,7 +125,7 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
       cancelled = true;
       window.removeEventListener("points:updated", onPointsUpdated);
     };
-  }, [mode, user?.id]);
+  }, [mode, user?.id, woolPoints, treePoints]);
 
   const heading = mode === "wool" ? t("WOOL POINTS") : t("TREE POINTS");
   const myPoints = mode === "wool" ? woolPoints : treePoints;
