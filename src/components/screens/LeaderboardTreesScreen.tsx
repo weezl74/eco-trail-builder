@@ -59,37 +59,43 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
   // Fetch leaderboard from API
   useEffect(() => {
     let cancelled = false;
-    fetch("https://caerphilly-api.onrender.com/profile")
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed");
-        return res.json();
-      })
-      .then((data: any[]) => {
-        if (cancelled) return;
-        const mapped: Row[] = (data || [])
-          .map((u) => {
-            const isMe = u.user_id === user?.id;
-            const wool = Number(u.wool_points) || 0;
-            const tree = Number(u.tree_points) || 0;
-            return {
-              name:
-                (u.display_name || u.username || `User ${String(u.user_id).slice(0, 8)}`) +
-                (isMe ? " (you)" : ""),
-              points: mode === "wool" ? wool : tree,
-              isMe,
-            };
-          })
-          .sort((a, b) => b.points - a.points);
-        setRows(mapped);
-        setError(false);
-      })
-      .catch(() => {
-        if (cancelled) return;
-        setRows([]);
-        setError(true);
-      });
+    const load = () => {
+      fetch("https://caerphilly-api.onrender.com/profile")
+        .then((res) => {
+          if (!res.ok) throw new Error("Failed");
+          return res.json();
+        })
+        .then((data: any[]) => {
+          if (cancelled) return;
+          const mapped: Row[] = (data || [])
+            .map((u) => {
+              const isMe = u.user_id === user?.id;
+              const wool = Number(u.wool_points) || 0;
+              const tree = Number(u.tree_points) || 0;
+              return {
+                name:
+                  (u.display_name || u.username || `User ${String(u.user_id).slice(0, 8)}`) +
+                  (isMe ? " (you)" : ""),
+                points: mode === "wool" ? wool : tree,
+                isMe,
+              };
+            })
+            .sort((a, b) => b.points - a.points);
+          setRows(mapped);
+          setError(false);
+        })
+        .catch(() => {
+          if (cancelled) return;
+          setRows([]);
+          setError(true);
+        });
+    };
+    load();
+    const onPointsUpdated = () => load();
+    window.addEventListener("points:updated", onPointsUpdated);
     return () => {
       cancelled = true;
+      window.removeEventListener("points:updated", onPointsUpdated);
     };
   }, [mode, user?.id]);
 
