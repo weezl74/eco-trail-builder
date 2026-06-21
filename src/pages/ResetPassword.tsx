@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff } from 'lucide-react';
 import { useTranslations } from '@/hooks/useTranslations';
+import { markPasswordResetDone } from '@/components/ForcePasswordResetGate';
 
 
 
@@ -35,13 +36,15 @@ const ResetPassword: React.FC = () => {
       return;
     }
     setBusy(true);
+    const { data: userData } = await supabase.auth.getUser();
     const { error } = await supabase.auth.updateUser({ password });
     setBusy(false);
     if (error) {
       toast({ title: t('Error'), description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: t('Password updated'), description: t('You can now sign in with your new password.') });
-      navigate('/');
+      markPasswordResetDone(userData.user?.id);
+      toast({ title: t('Password updated'), description: t('Welcome back!') });
+      navigate('/', { replace: true });
     }
   };
 
