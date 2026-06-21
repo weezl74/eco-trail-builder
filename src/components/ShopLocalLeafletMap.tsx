@@ -58,6 +58,7 @@ const ShopLocalLeafletMap: React.FC<Props> = ({ bbox, pois, className, onMapClic
       attribution: '&copy; OpenStreetMap',
     }).addTo(map);
     layerRef.current = L.layerGroup().addTo(map);
+    renewableLayerRef.current = L.layerGroup().addTo(map);
     mapRef.current = map;
     return () => {
       map.remove();
