@@ -154,16 +154,23 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
           <span className="whitespace-nowrap">{heading}</span>
         </div>
 
-        {rows.map((r, i) => (
-          <div
-            key={`${mode}-${i}`}
-            className="grid grid-cols-3 text-white font-serif font-bold text-center py-3 text-lg border-b border-white/10 last:border-0"
-          >
-            <span>#{i + 1}</span>
-            <span>{r.name}</span>
-            <span>{r.points}</span>
+        {rows.length === 0 ? (
+          <div className="text-white font-serif text-center py-4 text-sm opacity-80">
+            {error ? t("Unable to load leaderboard.") : t("No participants yet.")}
           </div>
-        ))}
+        ) : (
+          rows.map((r, i) => (
+            <div
+              key={`${mode}-${i}`}
+              className="grid grid-cols-3 text-white font-serif font-bold text-center py-3 text-lg border-b border-white/10 last:border-0"
+            >
+              <span>#{i + 1}</span>
+              <span>{r.name}</span>
+              <span>{r.points}</span>
+            </div>
+          ))
+        )}
+
       </div>
 
       {/* TREE MODE */}
