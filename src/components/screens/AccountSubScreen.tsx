@@ -56,11 +56,13 @@ const AccountInfo: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     if (!user) return;
     setSaving(true);
 
-    await fetch("https://caerphilly-api-dev01.azurewebsites.net/api/getProfile/me/profile", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+   
+await fetch("https://caerphilly-api.onrender.com/profile", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+,
       body: JSON.stringify({
         user_id: user.id,
         display_name: displayName,
