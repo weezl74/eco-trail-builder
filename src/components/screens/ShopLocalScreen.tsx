@@ -479,21 +479,25 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
         <ShopLocalLeafletMap
           bbox={BBOX}
           pois={mode === 'local' ? leafletPois : []}
+          renewables={mode === 'cool' ? leafletRenewables : []}
           className="absolute inset-0 w-full h-full"
           onMapClick={
             mode === 'cool' && placing
               ? (lat, lng, x, y) => {
-                  const ok = buyRenewable(placing, x, y);
+                  const tech = placing;
+                  const ok = buyRenewable(tech, x, y, lat, lng);
                   if (ok) {
+                    const meta = RENEWABLE_META[tech];
                     toast({
-                      title: `${t(RENEWABLE_META[placing].label)} ${t('placed')}`,
-                      description: `-${RENEWABLE_COSTS[placing]} ${t('wool')}`,
+                      title: `${t(meta.label)} ${t('placed')}`,
+                      description: `-${RENEWABLE_COSTS[tech]} ${t('wool')}`,
                     });
                     setPlacing(null);
+                    setReward({ label: meta.label, explanation: meta.explanation, stars: meta.stars });
                   } else {
                     toast({
                       title: t('Not enough wool'),
-                      description: `${t(RENEWABLE_META[placing].label)} ${RENEWABLE_COSTS[placing]} ${t('wool')}`,
+                      description: `${t(RENEWABLE_META[tech].label)} ${RENEWABLE_COSTS[tech]} ${t('wool')}`,
                     });
                   }
                 }
@@ -511,33 +515,15 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
             }}
           />
         )}
-
-        {/* Placed renewables (cool mode) — still tracked by % so they
-            scale with the screen overlay rather than the map tiles. */}
-        {mode === 'cool' && (
-          <div className="absolute inset-0 pointer-events-none">
-            {renewables.map((r) => {
-              const meta = RENEWABLE_META[r.type];
-              const Icon = meta.icon;
-              return (
-                <div
-                  key={r.id}
-                  className="absolute -translate-x-1/2 -translate-y-1/2"
-                  style={{ left: `${r.x}%`, top: `${r.y}%` }}
-                  title={meta.label}
-                >
-                  <div
-                    className="rounded-full p-1.5 shadow-lg border-2 border-white"
-                    style={{ background: meta.color }}
-                  >
-                    <Icon className="h-4 w-4 text-white" />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
       </div>
+
+      <TechRewardDialog
+        open={!!reward}
+        onClose={() => setReward(null)}
+        techName={reward?.label ? t(reward.label) : ''}
+        explanation={reward?.explanation ? t(reward.explanation) : ''}
+        stars={reward?.stars || 1}
+      />
 
       <WalkMyWarmUpJourney
         open={walkOpen}
