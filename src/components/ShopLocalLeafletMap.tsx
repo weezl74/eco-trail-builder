@@ -16,18 +16,31 @@ export type LeafletPoi = {
   onAddToWallet?: () => void;
 };
 
+export type LeafletRenewable = {
+  id: string;
+  lat: number;
+  lng: number;
+  color: string;
+  label: string;
+  /** Inline SVG path or emoji used as the marker glyph. */
+  glyph: string;
+  onClick?: () => void;
+};
+
 interface Props {
   bbox: { minLng: number; minLat: number; maxLng: number; maxLat: number };
   pois: LeafletPoi[];
   className?: string;
   onMapClick?: (lat: number, lng: number, x: number, y: number) => void;
   interactive?: boolean;
+  renewables?: LeafletRenewable[];
 }
 
-const ShopLocalLeafletMap: React.FC<Props> = ({ bbox, pois, className, onMapClick, interactive = true }) => {
+const ShopLocalLeafletMap: React.FC<Props> = ({ bbox, pois, className, onMapClick, interactive = true, renewables = [] }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const layerRef = useRef<L.LayerGroup | null>(null);
+  const renewableLayerRef = useRef<L.LayerGroup | null>(null);
 
   // Init map once
   useEffect(() => {
