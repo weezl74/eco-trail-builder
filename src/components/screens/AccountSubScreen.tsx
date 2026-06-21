@@ -18,7 +18,7 @@ interface Props {
 
 const API_URL = "https://caerphilly-api.onrender.com/profile";
 
-/* -------------------------- Shell Wrapper -------------------------- */
+/* ---------------- Shell ---------------- */
 
 const Shell: React.FC<{ title: string; onBack: () => void; children: React.ReactNode }> = ({
   title,
@@ -45,7 +45,7 @@ const Shell: React.FC<{ title: string; onBack: () => void; children: React.React
   );
 };
 
-/* -------------------------- Account Info -------------------------- */
+/* ---------------- Account Info ---------------- */
 
 const AccountInfo: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { user } = useAuth();
@@ -56,7 +56,6 @@ const AccountInfo: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [loaded, setLoaded] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // ✅ Load from Render API instead of Supabase
   React.useEffect(() => {
     (async () => {
       if (!user) return;
@@ -64,11 +63,12 @@ const AccountInfo: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       try {
         const res = await fetch(API_URL);
         const data = await res.json();
+
         const profile = data.find((p: any) => p.user_id === user.id);
 
         setDisplayName(profile?.display_name || "");
       } catch (err) {
-        console.error("Failed to load profile:", err);
+        console.error(err);
       }
 
       setLoaded(true);
@@ -103,53 +103,90 @@ const AccountInfo: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   return (
     <Shell title={t("Account Information")} onBack={onBack}>
-      <div className="space-y-2">
-        <Label>{t("Email")}</Label>
-        <Input value={user?.email || ""} disabled className="rounded-xl" />
-      </div>
+      <Label>Email</Label>
+      <Input value={user?.email || ""} disabled />
 
-      <div className="space-y-2">
-        <Label>{t("Display name")}</Label>
-        <Input
-          value={displayName}
-          onChange={(e) => setDisplayName(e.target.value)}
-          disabled={!loaded}
-          className="rounded-xl"
-        />
-      </div>
+      <Label>Display name</Label>
+      <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} disabled={!loaded} />
 
-      <Button
-        onClick={save}
-        disabled={saving || !loaded}
-        className="w-full rounded-2xl bg-[#1f1f1f] hover:bg-black text-white font-bold"
-      >
-        {saving ? t("Saving…") : t("Save changes")}
+      <Button onClick={save} disabled={saving || !loaded}>
+        {saving ? "Saving…" : "Save changes"}
       </Button>
     </Shell>
   );
 };
 
-/* -------------------------- Static Pages -------------------------- */
+/* ---------------- Static Pages ---------------- */
 
 const Privacy: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-  const { t } = useTranslations();
   return (
-    <Shell title={t("Privacy Settings")} onBack={onBack}>
-      <p>{t("Your personal data is stored securely on Lovable Cloud and is only ever used to power your Nelson experience. We never sell your data.")}</p>
-      <p>{t("Your name, footprint and points appear on the community leaderboard so other Caerphilly residents can cheer you on. To remove yourself from the leaderboard, contact us via the Contact Us page.")}</p>
-    </Shell>
-  );
-};
-
-const About: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-  const { t } = useTranslations();
-  return (
-    <Shell title={t("About Nelson")} onBack={onBack}>
-      <p>{t("Nelson is a community sustainability app for residents of Caerphilly.")}</p>
-      <p>{t("Made with ❤️ for the Caerphilly borough.")}</p>
+    <Shell title="Privacy Settings" onBack={onBack}>
+      <p>Your data is stored securely and not sold.</p>
     </Shell>
   );
 };
 
 const Terms: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-  const { t } = useTranslations();
+  return (
+    <Shell title="Terms and Conditions" onBack={onBack}>
+      <p>Read full terms on our website.</p>
+
+      <a
+        href="https://ccbc-decarb.github.io/privacy-policy/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Open Privacy Policy
+      </a>
+    </Shell>
+  );
+};
+
+const Contact: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+  return (
+    <Shell title="Contact" onBack={onBack}>
+      <a href="mailto:hello@nurture-caerphilly.app">Email the team</a>
+    </Shell>
+  );
+};
+
+const About: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+  return (
+    <Shell title="About" onBack={onBack}>
+      <p>Nelson is a sustainability app for Caerphilly.</p>
+    </Shell>
+  );
+};
+
+/* ---------------- Password ---------------- */
+
+const ChangePassword: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+  const [pw, setPw] = useState("");
+  const [pw2, setPw2] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const submit = async () => {
+    if (pw !== pw2) return;
+
+    setBusy(true);
+    await supabase.auth.updateUser({ password: pw });
+    setBusy(false);
+  };
+
+  return (
+    <Shell title="Change Password" onBack={onBack}>
+      <Input value={pw} onChange={(e) => setPw(e.target.value)} placeholder="New password" />
+      <Input value={pw2} onChange={(e) => setPw2(e.target.value)} placeholder="Confirm password" />
+      <Button onClick={submit}>{busy ? "Updating…" : "Update password"}</Button>
+    </Shell>
+  );
+};
+
+/* ---------------- Main Switch ---------------- */
+
+const AccountSubScreen: React.FC<Props> = ({ page, onBack }) => {
+  switch (page) {
+    case "account-info":
+      return <AccountInfo onBack={onBack} />;
+    case "privacy":
+      return <Privacy onBack={onBack} />;
