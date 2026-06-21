@@ -24,15 +24,6 @@ const QuoteCard: React.FC<Props> = ({
     <figure
       className={`relative font-roboto text-white/95 px-6 py-3 ${className}`}
     >
-      <span
-        aria-hidden
-        className={`absolute left-1 top-0 leading-none text-[#f5a623] select-none ${
-          big ? 'text-6xl' : 'text-4xl'
-        }`}
-        style={{ fontFamily: 'Roboto Slab, serif' }}
-      >
-        “
-      </span>
       <blockquote
         className={`text-center italic ${big ? 'text-base' : 'text-xs'} leading-snug`}
       >
@@ -45,15 +36,6 @@ const QuoteCard: React.FC<Props> = ({
           <p>{lang === 'cy' ? quote.cy : quote.en}</p>
         )}
       </blockquote>
-      <span
-        aria-hidden
-        className={`absolute right-1 bottom-0 leading-none text-[#f5a623] select-none ${
-          big ? 'text-6xl' : 'text-4xl'
-        }`}
-        style={{ fontFamily: 'Roboto Slab, serif' }}
-      >
-        ”
-      </span>
       {quote.attribution && (
         <figcaption
           className={`mt-2 text-center opacity-80 ${
