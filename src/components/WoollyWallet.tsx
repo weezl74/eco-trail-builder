@@ -353,7 +353,7 @@ const WoollyWallet: React.FC<Props> = ({ children }) => {
       ),
     }));
     return [...base, ...extras, ...spotlights];
-  }, [items, treesPlanted, t, removeItem, binCfg, binDismissed, dismissBin, spotlightCards]);
+  }, [items, treesPlanted, t, removeItem, binCfg, binDismissed, dismissBin, spotlightCards, favourites, quoteMode, quoteIdx, isFavourite, toggleFavourite, maxFavourites, toast]);
 
   const handleToggle = () => {
     if (open) { setOpen(false); return; }
