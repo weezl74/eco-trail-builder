@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { ArrowLeft } from 'lucide-react';
@@ -20,13 +20,34 @@ const NelsonJourneyScreen: React.FC<Props> = ({ totalPoints, groupBoost = 0, onB
   const effective = Math.min(MAX_POINTS, totalPoints + groupBoost);
   const t = effective / MAX_POINTS; // 0..1
 
-  // Gradually shift Nelson's pin from START → HOME
-  const nelsonLat = START[0] + (HOME[0] - START[0]) * t;
-  const nelsonLng = START[1] + (HOME[1] - START[1]) * t;
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
+  const routeLineRef = useRef<L.Polyline | null>(null);
+  const [route, setRoute] = useState<[number, number][] | null>(null);
+
+  // Fetch a realistic driving route from OSRM. Falls back to a straight line
+  // if the public router is unreachable.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const url = `https://router.project-osrm.org/route/v1/driving/${START[1]},${START[0]};${HOME[1]},${HOME[0]}?overview=full&geometries=geojson`;
+        const res = await fetch(url);
+        const json = await res.json();
+        const coords: [number, number][] = json?.routes?.[0]?.geometry?.coordinates?.map(
+          (c: [number, number]) => [c[1], c[0]],
+        );
+        if (!cancelled && coords?.length) setRoute(coords);
+      } catch {
+        /* fall back to straight line */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -49,14 +70,6 @@ const NelsonJourneyScreen: React.FC<Props> = ({ totalPoints, groupBoost = 0, onB
       attribution: '&copy; OpenStreetMap',
     }).addTo(map);
 
-    // Journey line + home pin
-    L.polyline([START, HOME], {
-      color: '#F4971D',
-      weight: 2,
-      dashArray: '6 6',
-      opacity: 0.7,
-    }).addTo(map);
-
     const homeIcon = L.divIcon({
       className: '',
       html: `<div style="transform:translate(-50%,-100%);">
@@ -75,7 +88,46 @@ const NelsonJourneyScreen: React.FC<Props> = ({ totalPoints, groupBoost = 0, onB
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Update / animate Nelson's pin as points change
+  // Draw / update the journey polyline once the route is known.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    if (routeLineRef.current) {
+      routeLineRef.current.remove();
+      routeLineRef.current = null;
+    }
+    const coords: [number, number][] = route ?? [START, HOME];
+    routeLineRef.current = L.polyline(coords, {
+      color: '#F4971D',
+      weight: 3,
+      dashArray: '6 6',
+      opacity: 0.8,
+    }).addTo(map);
+  }, [route]);
+
+  // Position Nelson along the real route (or straight-line fallback) by progress t.
+  const path: [number, number][] = route ?? [START, HOME];
+  const segLengths = path.slice(1).map((p, i) => {
+    const a = path[i];
+    return Math.hypot(p[0] - a[0], p[1] - a[1]);
+  });
+  const totalLen = segLengths.reduce((s, n) => s + n, 0) || 1;
+  let target = totalLen * t;
+  let nelsonLat = path[0][0];
+  let nelsonLng = path[0][1];
+  for (let i = 0; i < segLengths.length; i++) {
+    if (target <= segLengths[i]) {
+      const f = segLengths[i] === 0 ? 0 : target / segLengths[i];
+      nelsonLat = path[i][0] + (path[i + 1][0] - path[i][0]) * f;
+      nelsonLng = path[i][1] + (path[i + 1][1] - path[i][1]) * f;
+      break;
+    }
+    target -= segLengths[i];
+    nelsonLat = path[i + 1][0];
+    nelsonLng = path[i + 1][1];
+  }
+
+  // Update / animate Nelson's pin as points / route change
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;

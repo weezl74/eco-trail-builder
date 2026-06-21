@@ -5,10 +5,11 @@ import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useTranslations } from '@/hooks/useTranslations';
 import WalkMyWarmUpJourney from '@/components/WalkMyWarmUpJourney';
-import ShopLocalLeafletMap, { LeafletPoi } from '@/components/ShopLocalLeafletMap';
+import ShopLocalLeafletMap, { LeafletPoi, LeafletRenewable } from '@/components/ShopLocalLeafletMap';
 import { useWalletBusinesses as useWallet } from '@/hooks/useWallet';
 import { getSector } from '@/lib/sectorIcons';
 import NelsonJourneyScreen from '@/components/screens/NelsonJourneyScreen';
+import TechRewardDialog from '@/components/TechRewardDialog';
 import actLocal from '@/assets/svg/act-local.svg.asset.json';
 
 type Category = 'libraries' | 'allotments' | 'leisure' | 'ev' | 'eco' | 'business';
@@ -94,10 +95,37 @@ const pinId = (p: { id: number | string; category: Category }) => `${p.category}
 
 type Mode = 'local' | 'cool';
 
-const RENEWABLE_META: Record<RenewableType, { label: string; color: string; icon: typeof Sun }> = {
-  solar: { label: 'Solar Farm', color: '#fbbf24', icon: Sun },
-  wind: { label: 'Wind Turbine', color: '#38bdf8', icon: Wind },
-  mine_water: { label: 'Mine Water', color: '#a78bfa', icon: Droplet },
+const RENEWABLE_META: Record<
+  RenewableType,
+  { label: string; color: string; icon: typeof Sun; glyph: string; explanation: string; stars: number }
+> = {
+  solar: {
+    label: 'Solar Farm',
+    color: '#fbbf24',
+    icon: Sun,
+    glyph: '☀',
+    explanation:
+      'Solar panels turn sunlight straight into clean electricity, pushing fossil-fuel power off the grid.',
+    stars: 2,
+  },
+  wind: {
+    label: 'Wind Turbine',
+    color: '#38bdf8',
+    icon: Wind,
+    glyph: '🌬',
+    explanation:
+      'A turbine harvests Caerphilly’s hillside winds for zero-carbon electricity — no fuel, no flue gas.',
+    stars: 2,
+  },
+  mine_water: {
+    label: 'Mine Water',
+    color: '#a78bfa',
+    icon: Droplet,
+    glyph: '♨',
+    explanation:
+      'Warm water sitting in old coal mines is pumped up to heat homes — turning mining heritage into a climate solution.',
+    stars: 3,
+  },
 };
 
 const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
@@ -113,6 +141,27 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const { t } = useTranslations();
   const [walkOpen, setWalkOpen] = useState(false);
   const [showJourney, setShowJourney] = useState(false);
+  const [reward, setReward] = useState<{ label: string; explanation: string; stars: number } | null>(null);
+
+  const leafletRenewables: LeafletRenewable[] = useMemo(
+    () =>
+      renewables
+        .filter((r) => r.lat != null && r.lng != null)
+        .map((r) => {
+          const meta = RENEWABLE_META[r.type];
+          return {
+            id: r.id,
+            lat: r.lat as number,
+            lng: r.lng as number,
+            color: meta.color,
+            label: meta.label,
+            glyph: meta.glyph,
+            onClick: () =>
+              setReward({ label: meta.label, explanation: meta.explanation, stars: meta.stars }),
+          };
+        }),
+    [renewables],
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -430,21 +479,25 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
         <ShopLocalLeafletMap
           bbox={BBOX}
           pois={mode === 'local' ? leafletPois : []}
+          renewables={mode === 'cool' ? leafletRenewables : []}
           className="absolute inset-0 w-full h-full"
           onMapClick={
             mode === 'cool' && placing
               ? (lat, lng, x, y) => {
-                  const ok = buyRenewable(placing, x, y);
+                  const tech = placing;
+                  const ok = buyRenewable(tech, x, y, lat, lng);
                   if (ok) {
+                    const meta = RENEWABLE_META[tech];
                     toast({
-                      title: `${t(RENEWABLE_META[placing].label)} ${t('placed')}`,
-                      description: `-${RENEWABLE_COSTS[placing]} ${t('wool')}`,
+                      title: `${t(meta.label)} ${t('placed')}`,
+                      description: `-${RENEWABLE_COSTS[tech]} ${t('wool')}`,
                     });
                     setPlacing(null);
+                    setReward({ label: meta.label, explanation: meta.explanation, stars: meta.stars });
                   } else {
                     toast({
                       title: t('Not enough wool'),
-                      description: `${t(RENEWABLE_META[placing].label)} ${RENEWABLE_COSTS[placing]} ${t('wool')}`,
+                      description: `${t(RENEWABLE_META[tech].label)} ${RENEWABLE_COSTS[tech]} ${t('wool')}`,
                     });
                   }
                 }
@@ -462,33 +515,15 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
             }}
           />
         )}
-
-        {/* Placed renewables (cool mode) — still tracked by % so they
-            scale with the screen overlay rather than the map tiles. */}
-        {mode === 'cool' && (
-          <div className="absolute inset-0 pointer-events-none">
-            {renewables.map((r) => {
-              const meta = RENEWABLE_META[r.type];
-              const Icon = meta.icon;
-              return (
-                <div
-                  key={r.id}
-                  className="absolute -translate-x-1/2 -translate-y-1/2"
-                  style={{ left: `${r.x}%`, top: `${r.y}%` }}
-                  title={meta.label}
-                >
-                  <div
-                    className="rounded-full p-1.5 shadow-lg border-2 border-white"
-                    style={{ background: meta.color }}
-                  >
-                    <Icon className="h-4 w-4 text-white" />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
       </div>
+
+      <TechRewardDialog
+        open={!!reward}
+        onClose={() => setReward(null)}
+        techName={reward?.label ? t(reward.label) : ''}
+        explanation={reward?.explanation ? t(reward.explanation) : ''}
+        stars={reward?.stars || 1}
+      />
 
       <WalkMyWarmUpJourney
         open={walkOpen}
