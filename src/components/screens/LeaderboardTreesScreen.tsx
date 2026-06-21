@@ -49,23 +49,53 @@ const WoolBallIcon: React.FC<{ color: string; className?: string }> = ({ color, 
 const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const [mode, setMode] = useState<Mode>("wool");
   const [rows, setRows] = useState<Row[]>([]);
+  const [error, setError] = useState(false);
 
   const { toast } = useToast();
   const { treesPlanted, treePoints, woolPoints, plantTree, woolColor } = useSavings();
   const { t } = useTranslations();
+  const { user } = useAuth();
 
-  // ✅ Clean leaderboard using REAL user data only
+  // Fetch leaderboard from API
   useEffect(() => {
-    const myRow: Row = {
-      name: "You",
-      points: mode === "wool" ? woolPoints : treePoints,
+    let cancelled = false;
+    fetch("https://caerphilly-api.onrender.com/profile")
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed");
+        return res.json();
+      })
+      .then((data: any[]) => {
+        if (cancelled) return;
+        const mapped: Row[] = (data || [])
+          .map((u) => {
+            const isMe = u.user_id === user?.id;
+            const wool = Number(u.wool_points) || 0;
+            const tree = Number(u.tree_points) || 0;
+            return {
+              name:
+                (u.display_name || u.username || `User ${String(u.user_id).slice(0, 8)}`) +
+                (isMe ? " (you)" : ""),
+              points: mode === "wool" ? wool : tree,
+              isMe,
+            };
+          })
+          .sort((a, b) => b.points - a.points);
+        setRows(mapped);
+        setError(false);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setRows([]);
+        setError(true);
+      });
+    return () => {
+      cancelled = true;
     };
-
-    setRows([myRow]);
-  }, [mode, woolPoints, treePoints]);
+  }, [mode, user?.id]);
 
   const heading = mode === "wool" ? t("WOOL POINTS") : t("TREE POINTS");
   const myPoints = mode === "wool" ? woolPoints : treePoints;
+
 
   const join = () => {
     if (plantTree(100)) {
