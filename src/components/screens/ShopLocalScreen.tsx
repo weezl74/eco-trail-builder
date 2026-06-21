@@ -95,10 +95,37 @@ const pinId = (p: { id: number | string; category: Category }) => `${p.category}
 
 type Mode = 'local' | 'cool';
 
-const RENEWABLE_META: Record<RenewableType, { label: string; color: string; icon: typeof Sun }> = {
-  solar: { label: 'Solar Farm', color: '#fbbf24', icon: Sun },
-  wind: { label: 'Wind Turbine', color: '#38bdf8', icon: Wind },
-  mine_water: { label: 'Mine Water', color: '#a78bfa', icon: Droplet },
+const RENEWABLE_META: Record<
+  RenewableType,
+  { label: string; color: string; icon: typeof Sun; glyph: string; explanation: string; stars: number }
+> = {
+  solar: {
+    label: 'Solar Farm',
+    color: '#fbbf24',
+    icon: Sun,
+    glyph: '☀',
+    explanation:
+      'Solar panels turn sunlight straight into clean electricity, pushing fossil-fuel power off the grid.',
+    stars: 2,
+  },
+  wind: {
+    label: 'Wind Turbine',
+    color: '#38bdf8',
+    icon: Wind,
+    glyph: '🌬',
+    explanation:
+      'A turbine harvests Caerphilly’s hillside winds for zero-carbon electricity — no fuel, no flue gas.',
+    stars: 2,
+  },
+  mine_water: {
+    label: 'Mine Water',
+    color: '#a78bfa',
+    icon: Droplet,
+    glyph: '♨',
+    explanation:
+      'Warm water sitting in old coal mines is pumped up to heat homes — turning mining heritage into a climate solution.',
+    stars: 3,
+  },
 };
 
 const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
