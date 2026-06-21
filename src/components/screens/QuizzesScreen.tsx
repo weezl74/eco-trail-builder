@@ -95,6 +95,8 @@ const TOPICS: Topic[] = [
 ];
 
 const QuizzesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
+  const { user } = useAuth();
+  const { award } = usePoints();
   const [progress, setProgress] = useState<Record<string, number>>({});
   const [completed, setCompleted] = useState<Record<string, boolean>>({});
   const [activeTopic, setActiveTopic] = useState<string | null>(null);
@@ -103,6 +105,31 @@ const QuizzesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const [reveal, setReveal] = useState(false);
   const { t } = useTranslations();
   const { toast } = useToast();
+
+  // Load persisted state for this user
+  useEffect(() => {
+    if (!user) return;
+    try {
+      const raw = localStorage.getItem(storageKey(user.id));
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        setProgress(parsed.progress || {});
+        setCompleted(parsed.completed || {});
+      }
+    } catch (e) {
+      console.error('[QuizzesScreen] load failed', e);
+    }
+  }, [user]);
+
+  // Persist whenever state changes
+  useEffect(() => {
+    if (!user) return;
+    try {
+      localStorage.setItem(storageKey(user.id), JSON.stringify({ progress, completed }));
+    } catch (e) {
+      console.error('[QuizzesScreen] save failed', e);
+    }
+  }, [user, progress, completed]);
 
   const topic = TOPICS.find((tp) => tp.id === activeTopic) || null;
 
@@ -127,12 +154,17 @@ const QuizzesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const nextQuestion = () => {
     if (!topic) return;
     const isLast = qIndex >= topic.questions.length - 1;
-    // Advance topic progress regardless of correctness so the counter mirrors questions seen.
+    const wasCompleted = completed[topic.id];
     setProgress((p) => {
       const next = Math.min(5, qIndex + 1);
-      if (next === 5) {
+      if (next === 5 && !wasCompleted) {
         setCompleted((c) => ({ ...c, [topic.id]: true }));
-        toast({ title: t('Quiz completed!'), description: t(topic.label) });
+        // Award wool points (unverified knowledge action) — only on first completion
+        award(QUIZ_WOOL_POINTS, 'wool', 'quiz', topic.id);
+        toast({
+          title: t('Quiz completed!'),
+          description: `${t(topic.label)} — +${QUIZ_WOOL_POINTS} 🧶`,
+        });
       }
       return { ...p, [topic.id]: next };
     });
@@ -146,7 +178,7 @@ const QuizzesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   };
 
   return (
-    <div className="min-h-screen bg-black pb-24 px-4 pt-4">
+    <div className="min-h-screen bg-black pb-28 px-4 pt-4 relative">
       {onBack && (
         <button onClick={onBack} className="mb-3 text-white flex items-center gap-1 font-serif font-bold">
           <ArrowLeft className="h-5 w-5" /> {t('Back')}
@@ -160,21 +192,30 @@ const QuizzesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
             <button
               key={tp.id}
               onClick={() => openTopic(tp.id)}
-              className="w-full bg-[#f5a623] rounded-2xl p-5 text-left shadow-lg active:scale-[0.99] transition"
+              className="w-full bg-white rounded-2xl p-5 text-left shadow-lg active:scale-[0.99] transition border-2 border-black"
             >
               <div className="flex">
                 <div className="flex-1">
                   <h3 className="font-serif font-bold text-2xl text-black">{t(tp.label)}</h3>
-                  <p className="font-serif font-bold text-black mt-3">
-                    {t('Current Question:')} {current}/5
+                  <p className="font-serif font-bold text-[#f5a623] mt-3">
+                    {t('Current Question:')} <span className="text-black">{current}/5</span>
                   </p>
                 </div>
                 <div className="flex flex-col items-center justify-center gap-3 w-24">
                   <span className="font-serif text-black">{t('Completed?')}</span>
                   {done ? (
-                    <Check className="h-9 w-9 text-black" strokeWidth={3} />
+                    <Check className="h-9 w-9 text-[#f5a623]" strokeWidth={3} />
                   ) : (
-                    <Circle className="h-8 w-8 text-black" strokeWidth={2} />
+                    <span
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-full"
+                      style={{
+                        boxShadow:
+                          '0 0 12px 3px rgba(245,166,35,0.85), 0 0 24px 6px rgba(245,166,35,0.45)',
+                        animation: 'pulse 1.6s ease-in-out infinite',
+                      }}
+                    >
+                      <Circle className="h-8 w-8 text-[#f5a623]" strokeWidth={2.5} />
+                    </span>
                   )}
                 </div>
               </div>
@@ -182,6 +223,16 @@ const QuizzesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           );
         })}
       </div>
+
+      {/* Quiz icon sat on top of bottom nav, far left */}
+      <img
+        src={quizIcon.url}
+        alt=""
+        aria-hidden
+        draggable={false}
+        className="fixed left-2 bottom-20 h-16 w-16 object-contain pointer-events-none z-40 drop-shadow-lg"
+      />
+
 
       <Dialog open={!!topic} onOpenChange={(v) => { if (!v) closeTopic(); }}>
         <DialogContent className="bg-[#1f1f1f] border-0 text-white max-w-md p-5 rounded-3xl">
