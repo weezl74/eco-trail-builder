@@ -161,31 +161,41 @@ const NelsonAvatar: React.FC<Props> = ({
 
         {/* Hats (drawn last so they sit on top) */}
         {has('mohawk')    && <TintedPart url={mohawk.url}    color="#c0392b" />}
-        {has('cap')       && <TintedPart url={cap.url}       color="#F4971D" />}
         {has('pirateHat') && <TintedPart url={pirateHat.url} color="#1a1a1a" />}
 
         {/* Front horns on top */}
         {has('hornsF') && <TintedPart url={hornsF.url} color="#d4b582" />}
       </div>
 
-      {/* Legacy emoji accessories — keep working for existing items */}
-      {has('umbrella') && (
-        <div className="absolute pointer-events-none text-5xl text-center" style={{ left: '50%', top: '-18%', transform: 'translateX(-50%)', zIndex: 4 }}>☂️</div>
-      )}
+      {/* Image accessories — positioned via ACCESSORY_PLACEMENT */}
+      {(['cap', 'sunhat', 'scarf', 'umbrella', 'wellies'] as const).map((id) => {
+        if (!has(id)) return null;
+        if ((id === 'wellies') && headOnly) return null;
+        const p = ACCESSORY_PLACEMENT[id];
+        return (
+          <img
+            key={id}
+            src={ACCESSORY_IMG_URLS[id]}
+            alt=""
+            className="absolute pointer-events-none select-none"
+            style={{
+              left: p.left, top: p.top, width: p.width, height: p.height,
+              objectFit: 'contain', zIndex: p.z,
+            }}
+            draggable={false}
+          />
+        );
+      })}
+
+      {/* Remaining legacy accessories */}
       {has('tophat') && (
         <div className="absolute pointer-events-none text-3xl text-center" style={{ left: '50%', top: '-2%', transform: 'translateX(-50%)', zIndex: 4 }}>🎩</div>
-      )}
-      {has('sunhat') && (
-        <div className="absolute pointer-events-none text-3xl text-center" style={{ left: '50%', top: '0%', transform: 'translateX(-50%)', zIndex: 4 }}>👒</div>
       )}
       {has('sunglasses') && (
         <div className="absolute pointer-events-none flex items-center gap-[2px]" style={{ left: '50%', top: '11%', width: '22%', transform: 'translateX(-50%)', zIndex: 4 }}>
           <div className="flex-1 aspect-[2/1] rounded-sm bg-black" />
           <div className="flex-1 aspect-[2/1] rounded-sm bg-black" />
         </div>
-      )}
-      {has('scarf') && (
-        <div className="absolute pointer-events-none text-2xl text-center" style={{ left: '50%', top: '24%', transform: 'translateX(-50%)', zIndex: 4 }}>🧣</div>
       )}
       {has('bowtie') && (
         <div className="absolute pointer-events-none" style={{ left: '50%', top: '22%', width: '12%', transform: 'translateX(-50%)', zIndex: 4 }}>
@@ -198,9 +208,6 @@ const NelsonAvatar: React.FC<Props> = ({
       )}
       {has('raincoat') && !headOnly && (
         <div className="absolute pointer-events-none text-4xl text-center" style={{ left: '50%', top: '38%', transform: 'translateX(-50%)', zIndex: 4 }}>🧥</div>
-      )}
-      {has('wellies') && !headOnly && (
-        <div className="absolute pointer-events-none text-2xl text-center" style={{ left: '50%', top: '78%', transform: 'translateX(-50%)', zIndex: 4 }}>🥾</div>
       )}
     </div>
   );
