@@ -3,7 +3,6 @@ import TintedSheepBody from './TintedSheepBody';
 import nelsonHead from '@/assets/sheep/NelsonHead.svg.asset.json';
 import barbHead from '@/assets/sheep/BarbHead.svg.asset.json';
 
-import cap from '@/assets/sheep/parts/Cap.svg.asset.json';
 import pirateHat from '@/assets/sheep/parts/PirateHat.svg.asset.json';
 import mohawk from '@/assets/sheep/parts/Mohawk.svg.asset.json';
 import glasses from '@/assets/sheep/parts/Glasses.svg.asset.json';
@@ -16,6 +15,13 @@ import fluffy from '@/assets/sheep/parts/Fluffy.svg.asset.json';
 import hornsF from '@/assets/sheep/parts/HornsF.svg.asset.json';
 import hornsB from '@/assets/sheep/parts/HornsB.svg.asset.json';
 
+// Real accessory artwork (shop catalogue images) – overlaid as <img>
+import capImg from '@/assets/accessories/cap.svg.asset.json';
+import sunhatImg from '@/assets/accessories/sunhat.svg.asset.json';
+import scarfImg from '@/assets/accessories/scarf.svg.asset.json';
+import umbrellaImg from '@/assets/accessories/umbrella.svg.asset.json';
+import welliesImg from '@/assets/accessories/wellies.svg.asset.json';
+
 export type PartId =
   // hats
   | 'cap' | 'pirateHat' | 'mohawk'
@@ -25,8 +31,36 @@ export type PartId =
   | 'stubble' | 'sideburns' | 'mustache' | 'longBeard' | 'fluffy'
   // horns
   | 'hornsF' | 'hornsB'
-  // legacy emoji accessories (still supported)
+  // image accessories
   | 'sunglasses' | 'tophat' | 'bowtie' | 'umbrella' | 'wellies' | 'scarf' | 'sunhat' | 'raincoat';
+
+/**
+ * Alignment framework: per-accessory placement on Nelson's body.
+ * Coordinates are percentages of the avatar container.
+ * Head box (body+head mode) lives at left 15%, top -14%, width 70%, height 70%,
+ * so the face centres around (50%, 21%) and the body fills the bottom half.
+ */
+type Placement = { left: string; top: string; width: string; height: string; z: number };
+const ACCESSORY_PLACEMENT: Record<string, Placement> = {
+  // Cap perches on top of the head, brim forward — narrower than the head
+  cap:      { left: '18%', top: '-24%', width: '64%', height: '42%', z: 5 },
+  // Sun hat brim spreads wider than the head
+  sunhat:   { left: '5%',  top: '-22%', width: '90%', height: '46%', z: 5 },
+  // Scarf wraps the neck just below the chin
+  scarf:    { left: '14%', top: '26%',  width: '72%', height: '26%', z: 4 },
+  // Umbrella floats above the head
+  umbrella: { left: '8%',  top: '-46%', width: '84%', height: '52%', z: 6 },
+  // Wellies sit at the feet
+  wellies:  { left: '22%', top: '74%',  width: '56%', height: '24%', z: 4 },
+};
+
+const ACCESSORY_IMG_URLS: Record<string, string> = {
+  cap:      capImg.url,
+  sunhat:   sunhatImg.url,
+  scarf:    scarfImg.url,
+  umbrella: umbrellaImg.url,
+  wellies:  welliesImg.url,
+};
 
 interface Props {
   woolColor: string;
