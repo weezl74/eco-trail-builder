@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { spendPoints } from '@/lib/api';
 
 export type Saving = { money: number; co2: number; water: number };
 export type RenewableType = 'solar' | 'wind' | 'mine_water';
