@@ -27,10 +27,11 @@ const Index = () => {
   // Decide between resident-app and business-app based on profiles.account_type
   const routeAuthenticated = async () => {
     if (!user) return;
-
-    const res = await fetch(`https://caerphilly-api.onrender.com/profile?user_id=${user.id}`);
-
-    const data = await res.json();
+    try {
+      await fetch(`${API_BASE_URL}/profile?user_id=${user.id}`);
+    } catch (err) {
+      console.error(err);
+    }
     setStage("app");
   };
 

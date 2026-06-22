@@ -4,7 +4,9 @@
 
 import { supabase } from "@/integrations/supabase/client";
 
-export const API_BASE_URL = "https://caerphilly-api.onrender.com";
+export const API_BASE_URL =
+  (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, "") ||
+  "https://caerphilly-api.onrender.com";
 
 async function authHeaders(): Promise<Record<string, string>> {
   try {
