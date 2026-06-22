@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/hooks/useTranslations";
+import { API_BASE_URL } from "@/lib/api";
 
 type Page = "account-info" | "privacy" | "change-password" | "about" | "terms" | "contact";
 
@@ -15,7 +16,7 @@ interface Props {
   onBack: () => void;
 }
 
-const API_URL = "https://caerphilly-api.onrender.com/profile";
+const API_URL = `${API_BASE_URL}/profile`;
 
 /* ---------- Shell ---------- */
 

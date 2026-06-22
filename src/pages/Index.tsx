@@ -8,6 +8,7 @@ import SimplifiedApp from "@/components/SimplifiedApp";
 import BusinessOnboarding from "@/components/business/BusinessOnboarding";
 import BusinessApp from "@/components/business/BusinessApp";
 import { useAuth } from "@/hooks/useAuth";
+import { API_BASE_URL } from "@/lib/api";
 
 
 type Stage = "landing" | "language" | "auth" | "login" | "register" | "app" | "business-onboarding" | "business-app";
@@ -27,10 +28,11 @@ const Index = () => {
   // Decide between resident-app and business-app based on profiles.account_type
   const routeAuthenticated = async () => {
     if (!user) return;
-
-    const res = await fetch(`https://caerphilly-api.onrender.com/profile?user_id=${user.id}`);
-
-    const data = await res.json();
+    try {
+      await fetch(`${API_BASE_URL}/profile?user_id=${user.id}`);
+    } catch (err) {
+      console.error(err);
+    }
     setStage("app");
   };
 
