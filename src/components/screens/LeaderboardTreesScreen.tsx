@@ -59,7 +59,7 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
 
             return {
               user_id: u.user_id,
-              name: (u.display_name || u.username || `User ${String(u.user_id).slice(0, 8)}`) + (isMe ? " (you)" : ""),
+              name: u.display_name || u.username || `User ${String(u.user_id).slice(0, 6)}`,
               points: mode === "wool" ? wool : tree,
               isMe,
             };
@@ -132,12 +132,14 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
 
       {/* ✅ LEADERBOARD */}
       <div className="bg-[#1f1f1f] rounded-2xl mt-3 overflow-hidden">
-        <div className="grid grid-cols-3 text-white font-serif text-center py-2 border-b border-white/20 text-[10px] uppercase tracking-wide opacity-70">
+        {/* Header row */}
+        <div className="grid grid-cols-3 text-white text-center py-2 border-b border-white/20 text-[10px] uppercase tracking-wide opacity-70 font-serif">
           <span>{t("POSITION")}</span>
           <span>{t("USER")}</span>
           <span>{heading}</span>
         </div>
 
+        {/* Rows */}
         {rows.length === 0 ? (
           <div className="text-white text-center py-4 text-sm opacity-80">
             {error ? t("Unable to load leaderboard.") : t("No participants yet.")}
@@ -147,11 +149,16 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
             <div
               key={`${mode}-${i}`}
               className={`grid grid-cols-3 text-center py-3 border-b border-white/10 last:border-0 font-serif ${
-                r.isMe ? "bg-white/10" : ""
+                r.isMe ? "bg-white/15" : ""
               } ${r.points === 0 ? "text-gray-400" : "text-white font-bold"}`}
             >
               <span>#{i + 1}</span>
-              <span>{r.name}</span>
+
+              <span>
+                {r.name}
+                {r.isMe && <span className="ml-1 text-yellow-300">(you)</span>}
+              </span>
+
               <span>{r.points}</span>
             </div>
           ))
@@ -165,13 +172,13 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
             <OakTreeIcon className="h-28 w-28" />
           </div>
 
-          <div className="bg-[#1f1f1f] rounded-2xl py-4 text-center text-white font-serif font-bold text-xl mb-4">
+          <div className="bg-[#1f1f1f] rounded-2xl py-4 text-center text-white font-serif font-bold text-lg mb-4">
             {t("Trees you have planted")}: {treesPlanted}
           </div>
 
           <button
             onClick={join}
-            className="w-full bg-[#1f1f1f] rounded-2xl py-5 text-white font-serif font-bold text-xl"
+            className="w-full bg-[#1f1f1f] rounded-2xl py-5 text-white font-serif font-bold text-lg"
           >
             {t("Join the Tree Queue")}
           </button>
@@ -181,9 +188,7 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
       {/* WOOL MODE */}
       {mode === "wool" && (
         <>
-          <div className="flex justify-center my-4">
-            <img src={nelsonHead.url} alt="Nelson" className="h-28 w-28 object-contain" />
-          </div>
+          <div className="flex justify-center my-4">{nelsonHead.url}</div>
 
           <div className="bg-[#1f1f1f] rounded-2xl p-4 text-white font-serif mt-2">
             <p className="font-bold text-lg mb-1">{t("Spend your wool")}</p>
@@ -200,4 +205,3 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
 };
 
 export default LeaderboardTreesScreen;
-``;
