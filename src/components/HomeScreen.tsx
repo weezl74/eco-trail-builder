@@ -102,7 +102,7 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
         <NelsonAvatar
           woolColor={woolColor}
           accessories={accessories}
-          className="absolute bottom-36 -left-4 w-[70px] h-[70px] pointer-events-none"
+          className="absolute bottom-30 -left-1 w-[70px] h-[70px] pointer-events-none"
         />
       </div>
 
