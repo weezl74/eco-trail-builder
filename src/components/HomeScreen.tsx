@@ -98,10 +98,11 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
         <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
 
         {/* ✅ Nelson - bigger + left-aligned */}
+
         <NelsonAvatar
           woolColor={woolColor}
           accessories={accessories}
-          className="absolute bottom-20 left-6 w-72 h-72 pointer-events-none"
+          className="absolute bottom-28 left-0 w-80 h-80 pointer-events-none"
         />
       </div>
 
