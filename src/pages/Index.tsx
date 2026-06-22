@@ -8,6 +8,7 @@ import SimplifiedApp from "@/components/SimplifiedApp";
 import BusinessOnboarding from "@/components/business/BusinessOnboarding";
 import BusinessApp from "@/components/business/BusinessApp";
 import { useAuth } from "@/hooks/useAuth";
+import { API_BASE_URL } from "@/lib/api";
 
 
 type Stage = "landing" | "language" | "auth" | "login" | "register" | "app" | "business-onboarding" | "business-app";
