@@ -3,7 +3,7 @@ import TintedSheepBody from './TintedSheepBody';
 import nelsonHead from '@/assets/sheep/NelsonHead.svg.asset.json';
 import barbHead from '@/assets/sheep/BarbHead.svg.asset.json';
 
-import pirateHat from '@/assets/sheep/parts/PirateHat.svg.asset.json';
+import pirateHat from '@/assets/accessories/pirateHat.svg.asset.json';
 import mohawk from '@/assets/sheep/parts/Mohawk.svg.asset.json';
 import glasses from '@/assets/sheep/parts/Glasses.svg.asset.json';
 import starGlasses from '@/assets/sheep/parts/StarGlasses.svg.asset.json';
@@ -163,7 +163,7 @@ const NelsonAvatar: React.FC<Props> = ({
 
         {/* Hats (drawn last so they sit on top) */}
         {has('mohawk')    && <TintedPart url={mohawk.url}    color="#c0392b" />}
-        {has('pirateHat') && <TintedPart url={pirateHat.url} color="#1a1a1a" />}
+        {has('pirateHat') && <img src={pirateHat.url} alt="" className="absolute inset-0 w-full h-full pointer-events-none select-none" style={{ objectFit: 'contain' }} draggable={false} />}
 
         {/* Front horns on top */}
         {has('hornsF') && <TintedPart url={hornsF.url} color="#d4b582" />}
