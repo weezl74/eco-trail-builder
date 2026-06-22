@@ -3,7 +3,6 @@ import TintedSheepBody from './TintedSheepBody';
 import nelsonHead from '@/assets/sheep/NelsonHead.svg.asset.json';
 import barbHead from '@/assets/sheep/BarbHead.svg.asset.json';
 
-import cap from '@/assets/sheep/parts/Cap.svg.asset.json';
 import pirateHat from '@/assets/sheep/parts/PirateHat.svg.asset.json';
 import mohawk from '@/assets/sheep/parts/Mohawk.svg.asset.json';
 import glasses from '@/assets/sheep/parts/Glasses.svg.asset.json';
@@ -16,6 +15,13 @@ import fluffy from '@/assets/sheep/parts/Fluffy.svg.asset.json';
 import hornsF from '@/assets/sheep/parts/HornsF.svg.asset.json';
 import hornsB from '@/assets/sheep/parts/HornsB.svg.asset.json';
 
+// Real accessory artwork (shop catalogue images) – overlaid as <img>
+import capImg from '@/assets/accessories/cap.svg.asset.json';
+import sunhatImg from '@/assets/accessories/sunhat.svg.asset.json';
+import scarfImg from '@/assets/accessories/scarf.svg.asset.json';
+import umbrellaImg from '@/assets/accessories/umbrella.svg.asset.json';
+import welliesImg from '@/assets/accessories/wellies.svg.asset.json';
+
 export type PartId =
   // hats
   | 'cap' | 'pirateHat' | 'mohawk'
@@ -25,8 +31,36 @@ export type PartId =
   | 'stubble' | 'sideburns' | 'mustache' | 'longBeard' | 'fluffy'
   // horns
   | 'hornsF' | 'hornsB'
-  // legacy emoji accessories (still supported)
+  // image accessories
   | 'sunglasses' | 'tophat' | 'bowtie' | 'umbrella' | 'wellies' | 'scarf' | 'sunhat' | 'raincoat';
+
+/**
+ * Alignment framework: per-accessory placement on Nelson's body.
+ * Coordinates are percentages of the avatar container.
+ * Head box (body+head mode) lives at left 15%, top -14%, width 70%, height 70%,
+ * so the face centres around (50%, 21%) and the body fills the bottom half.
+ */
+type Placement = { left: string; top: string; width: string; height: string; z: number };
+const ACCESSORY_PLACEMENT: Record<string, Placement> = {
+  // Cap perches on top of the head, brim forward — narrower than the head
+  cap:      { left: '18%', top: '-24%', width: '64%', height: '42%', z: 5 },
+  // Sun hat brim spreads wider than the head
+  sunhat:   { left: '5%',  top: '-22%', width: '90%', height: '46%', z: 5 },
+  // Scarf wraps the neck just below the chin
+  scarf:    { left: '14%', top: '26%',  width: '72%', height: '26%', z: 4 },
+  // Umbrella floats above the head
+  umbrella: { left: '8%',  top: '-46%', width: '84%', height: '52%', z: 6 },
+  // Wellies sit at the feet
+  wellies:  { left: '22%', top: '74%',  width: '56%', height: '24%', z: 4 },
+};
+
+const ACCESSORY_IMG_URLS: Record<string, string> = {
+  cap:      capImg.url,
+  sunhat:   sunhatImg.url,
+  scarf:    scarfImg.url,
+  umbrella: umbrellaImg.url,
+  wellies:  welliesImg.url,
+};
 
 interface Props {
   woolColor: string;
@@ -127,31 +161,41 @@ const NelsonAvatar: React.FC<Props> = ({
 
         {/* Hats (drawn last so they sit on top) */}
         {has('mohawk')    && <TintedPart url={mohawk.url}    color="#c0392b" />}
-        {has('cap')       && <TintedPart url={cap.url}       color="#F4971D" />}
         {has('pirateHat') && <TintedPart url={pirateHat.url} color="#1a1a1a" />}
 
         {/* Front horns on top */}
         {has('hornsF') && <TintedPart url={hornsF.url} color="#d4b582" />}
       </div>
 
-      {/* Legacy emoji accessories — keep working for existing items */}
-      {has('umbrella') && (
-        <div className="absolute pointer-events-none text-5xl text-center" style={{ left: '50%', top: '-18%', transform: 'translateX(-50%)', zIndex: 4 }}>☂️</div>
-      )}
+      {/* Image accessories — positioned via ACCESSORY_PLACEMENT */}
+      {(['cap', 'sunhat', 'scarf', 'umbrella', 'wellies'] as const).map((id) => {
+        if (!has(id)) return null;
+        if ((id === 'wellies') && headOnly) return null;
+        const p = ACCESSORY_PLACEMENT[id];
+        return (
+          <img
+            key={id}
+            src={ACCESSORY_IMG_URLS[id]}
+            alt=""
+            className="absolute pointer-events-none select-none"
+            style={{
+              left: p.left, top: p.top, width: p.width, height: p.height,
+              objectFit: 'contain', zIndex: p.z,
+            }}
+            draggable={false}
+          />
+        );
+      })}
+
+      {/* Remaining legacy accessories */}
       {has('tophat') && (
         <div className="absolute pointer-events-none text-3xl text-center" style={{ left: '50%', top: '-2%', transform: 'translateX(-50%)', zIndex: 4 }}>🎩</div>
-      )}
-      {has('sunhat') && (
-        <div className="absolute pointer-events-none text-3xl text-center" style={{ left: '50%', top: '0%', transform: 'translateX(-50%)', zIndex: 4 }}>👒</div>
       )}
       {has('sunglasses') && (
         <div className="absolute pointer-events-none flex items-center gap-[2px]" style={{ left: '50%', top: '11%', width: '22%', transform: 'translateX(-50%)', zIndex: 4 }}>
           <div className="flex-1 aspect-[2/1] rounded-sm bg-black" />
           <div className="flex-1 aspect-[2/1] rounded-sm bg-black" />
         </div>
-      )}
-      {has('scarf') && (
-        <div className="absolute pointer-events-none text-2xl text-center" style={{ left: '50%', top: '24%', transform: 'translateX(-50%)', zIndex: 4 }}>🧣</div>
       )}
       {has('bowtie') && (
         <div className="absolute pointer-events-none" style={{ left: '50%', top: '22%', width: '12%', transform: 'translateX(-50%)', zIndex: 4 }}>
@@ -164,9 +208,6 @@ const NelsonAvatar: React.FC<Props> = ({
       )}
       {has('raincoat') && !headOnly && (
         <div className="absolute pointer-events-none text-4xl text-center" style={{ left: '50%', top: '38%', transform: 'translateX(-50%)', zIndex: 4 }}>🧥</div>
-      )}
-      {has('wellies') && !headOnly && (
-        <div className="absolute pointer-events-none text-2xl text-center" style={{ left: '50%', top: '78%', transform: 'translateX(-50%)', zIndex: 4 }}>🥾</div>
       )}
     </div>
   );

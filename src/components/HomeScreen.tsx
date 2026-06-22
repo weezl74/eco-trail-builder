@@ -102,8 +102,9 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
         <NelsonAvatar
           woolColor={woolColor}
           accessories={accessories}
-          className="absolute bottom-28 -left-1 w-[90px] h-[90px] pointer-events-none"
+          className="absolute bottom-4 -left-3 w-[170px] h-[170px] pointer-events-none"
         />
+
       </div>
 
       {/* CTA */}
