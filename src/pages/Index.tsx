@@ -1,117 +1,106 @@
-import React, { useState } from "react";
-import { Mail, Gift, Calendar, Shirt, Users } from "lucide-react";
-import SheepAvatarScreen from "./screens/SheepAvatarScreen";
-import EventsCalendarScreen from "./screens/EventsCalendarScreen";
-import RewardsScreen from "./screens/RewardsScreen";
-import NelsonMessagesScreen from "./screens/NelsonMessagesScreen";
-import GroupsScreen from "./screens/GroupsScreen";
-import { useSavings } from "@/hooks/useSavings";
-import { useTranslations } from "@/hooks/useTranslations";
-import badHomepageAsset from "@/assets/final-bad-homepage.svg.asset.json";
-import NelsonAvatar from "./NelsonAvatar";
-import BinDayBanner from "./BinDayBanner";
+import { useState, useEffect } from "react";
+import LandingScreen from "@/components/LandingScreen";
+import LanguageSelect from "@/components/LanguageSelect";
+import AuthChoice from "@/components/AuthChoice";
+import LoginForm from "@/components/LoginForm";
+import RegisterForm, { RegistrationDetails } from "@/components/RegisterForm";
+import SimplifiedApp from "@/components/SimplifiedApp";
+import BusinessOnboarding from "@/components/business/BusinessOnboarding";
+import BusinessApp from "@/components/business/BusinessApp";
+import { useAuth } from "@/hooks/useAuth";
+import { API_BASE_URL } from "@/lib/api";
 
-type Screen = "home" | "avatar" | "calendar" | "rewards" | "messages" | "groups";
 
-const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges }) => {
-  const [screen, setScreen] = useState<Screen>("home");
-  const { savings, pledged, woolPoints, treePoints, woolColor, accessories } = useSavings();
-  const { t } = useTranslations();
+type Stage = "landing" | "language" | "auth" | "login" | "register" | "app" | "business-onboarding" | "business-app";
 
-  if (screen === "avatar") return <SheepAvatarScreen onBack={() => setScreen("home")} />;
-  if (screen === "calendar") return <EventsCalendarScreen onBack={() => setScreen("home")} />;
-  if (screen === "rewards") return <RewardsScreen onBack={() => setScreen("home")} />;
-  if (screen === "messages") return <NelsonMessagesScreen onBack={() => setScreen("home")} />;
-  if (screen === "groups") return <GroupsScreen onBack={() => setScreen("home")} />;
+const Index = () => {
+  const [stage, setStage] = useState<Stage>("landing");
+  const [language, setLanguage] = useState<"en" | "cy">(() => {
+    try {
+      return (localStorage.getItem("app_language") as "en" | "cy") || "en";
+    } catch {
+      return "en";
+    }
+  });
+  const { user, loading } = useAuth();
+  const [bootChecked, setBootChecked] = useState(false);
 
-  return (
-    <div className="h-[calc(100svh-5rem)] max-h-[calc(100svh-5rem)] bg-black pb-3 flex flex-col overflow-hidden">
-      {/* ✅ ICON PILL */}
-      <div className="pt-4 flex justify-center">
-        <div className="bg-[#f5a623] rounded-full px-4 py-2 flex items-center gap-5 shadow-md">
-          <button onClick={() => setScreen("messages")}>
-            <Mail className="h-6 w-6 text-white opacity-90" />
-          </button>
-          <button onClick={() => setScreen("rewards")}>
-            <Gift className="h-6 w-6 text-white opacity-90" />
-          </button>
-          <button onClick={() => setScreen("calendar")}>
-            <Calendar className="h-6 w-6 text-white opacity-90" />
-          </button>
-          <button onClick={() => setScreen("avatar")}>
-            <Shirt className="h-6 w-6 text-white opacity-90" />
-          </button>
-          <button onClick={() => setScreen("groups")}>
-            <Users className="h-6 w-6 text-white opacity-90" />
-          </button>
-        </div>
-      </div>
+  // Decide between resident-app and business-app based on profiles.account_type
+  const routeAuthenticated = async () => {
+    if (!user) return;
+    try {
+      await fetch(`${API_BASE_URL}/profile?user_id=${user.id}`);
+    } catch (err) {
+      console.error(err);
+    }
+    setStage("app");
+  };
 
-      {/* ✅ BIN DAY */}
-      <BinDayBanner />
+  useEffect(() => {
+    if (!loading && user) {
+      routeAuthenticated();
+    }
+  }, [loading, user]);
 
-      {/* ✅ POINTS */}
-      <div className="mx-4 mt-3 grid grid-cols-2 gap-3">
-        <div className="bg-[#1f1f1f] rounded-xl py-3 text-center font-serif">
-          <p className="text-xs text-white opacity-60">{t("Wool Points")}</p>
-          <p className="text-lg text-white font-bold">{woolPoints}</p>
-        </div>
-        <div className="bg-green-700 rounded-xl py-3 text-center font-serif">
-          <p className="text-xs text-white opacity-60">{t("Tree Points")}</p>
-          <p className="text-lg text-white font-bold">{treePoints}</p>
-        </div>
-      </div>
+  if (loading && !bootChecked) {
+    return <div className="min-h-screen bg-[#f5a623]" />;
+  }
 
-      {/* ✅ SAVINGS PANEL */}
-      <div className="mx-4 mt-3 bg-[#1f1f1f] rounded-xl px-4 py-3 text-white font-serif">
-        <p className="text-xs opacity-60 mb-2 text-center">{t("Estimated Savings")}</p>
+  if (!loading && user) {
+    return <SimplifiedApp onBackToLanding={() => setStage("landing")} language={language} />;
+  }
 
-        <div className="space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span>£ {t("Money")}</span>
-            <span className="font-bold">£{savings.money}</span>
-          </div>
+  if (stage === "business-app") {
+    return <BusinessApp onSignOut={() => setStage("landing")} onEditCard={() => setStage("business-onboarding")} />;
+  }
 
-          <div className="flex justify-between">
-            <span>CO₂</span>
-            <span className="font-bold">{savings.co2} kg</span>
-          </div>
+  if (stage === "business-onboarding") {
+    return <BusinessOnboarding editMode={!!user} onComplete={() => setStage("business-app")} />;
+  }
 
-          <div className="flex justify-between">
-            <span>💧 {t("Water")}</span>
-            <span className="font-bold">{savings.water} L</span>
-          </div>
+  if (!loading && user) {
+    return <SimplifiedApp onBackToLanding={() => setStage("landing")} language={language} />;
+  }
 
-          <div className="flex justify-between text-[#f5a623]">
-            <span>✓ {t("Pledges")}</span>
-            <span className="font-bold">{pledged.length}</span>
-          </div>
-        </div>
-      </div>
+  if (stage === "app") {
+    return <SimplifiedApp onBackToLanding={() => setStage("landing")} language={language} />;
+  }
 
-      {/* ✅ SCENE */}
-      <div className="mx-4 mt-3 rounded-2xl overflow-hidden bg-[#1f1f1f] relative flex-1 min-h-0">
-        <img src={badHomepageAsset.url} alt="Environmental impact scene" className="w-full h-full object-cover" />
+  if (stage === "register") {
+    return (
+      <RegisterForm
+        onComplete={(_details: RegistrationDetails, isBusiness: boolean) => {
+          // PII (name, email, postcode, phone, age) is persisted server-side in the
+          // profile via the auth trigger — do not echo it back into browser storage.
+          setStage(isBusiness ? "business-onboarding" : "app");
+        }}
+      />
+    );
+  }
 
-        {/* ✅ SHEEP — SLIGHTLY HIGHER */}
-        <NelsonAvatar
-          woolColor={woolColor}
-          accessories={accessories}
-          className="absolute bottom-[88px] left-2 w-2/5 aspect-square pointer-events-none"
-        />
-      </div>
+  if (stage === "login") {
+    return <LoginForm onSuccess={() => routeAuthenticated()} />;
+  }
 
-      {/* ✅ CTA */}
-      <div className="mx-4 mt-3 flex justify-center">
-        <button
-          onClick={onGoToPledges}
-          className="bg-[#f5a623] hover:bg-[#e69517] active:scale-95 transition text-black font-serif font-bold text-lg rounded-xl px-8 py-3 shadow-lg w-full"
-        >
-          {t("Save Me More")}
-        </button>
-      </div>
-    </div>
-  );
+  if (stage === "auth") {
+    return <AuthChoice onSelect={(choice) => setStage(choice === "register" ? "register" : "login")} />;
+  }
+
+  if (stage === "language") {
+    return (
+      <LanguageSelect
+        onSelect={(lang) => {
+          setLanguage(lang);
+          try {
+            localStorage.setItem("app_language", lang);
+          } catch {}
+          setStage("auth");
+        }}
+      />
+    );
+  }
+
+  return <LandingScreen onBeetleClick={() => setStage("language")} />;
 };
 
-export default HomeScreen;
+export default Index;
