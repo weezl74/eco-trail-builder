@@ -27,7 +27,7 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
   return (
     <div className="h-[calc(100svh-5rem)] bg-black pb-2 flex flex-col overflow-hidden">
       {/* Pill of icons */}
-      <div className="pt-4 flex justify-center">
+      <div className="pt-3 flex justify-center">
         <div className="bg-[#f5a623] rounded-full px-4 py-2 flex items-center gap-4 shadow-lg">
           <button onClick={() => setScreen("messages")} aria-label="Messages from Nelson">
             <Mail className="h-6 w-6 text-white" strokeWidth={2.5} />
