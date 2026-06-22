@@ -149,7 +149,7 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
               key={`${mode}-${i}`}
               className={`grid grid-cols-3 text-center py-3 border-b border-white/10 last:border-0 font-serif ${
                 r.isMe ? "bg-white/10" : ""
-              } ${r.points === 0 ? "opacity-50" : "text-white font-bold"}`}
+             {r.points === 0 ? "opacity-80 text-gray-400" : "text-white font-bold"}
             >
               <span>#{i + 1}</span>
               <span>{r.name}</span>
