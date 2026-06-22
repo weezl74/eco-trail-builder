@@ -51,7 +51,7 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
       <BinDayBanner />
 
       {/* Points balances */}
-      <div className="mx-4 mt-2 grid grid-cols-2 gap-2">
+      <div className="mx-4 mt-1.5 grid grid-cols-2 gap-1.5">
         <div className="bg-[#f5a623] rounded-xl py-1.5 px-2 text-center text-black font-serif font-bold">
           <div className="text-xl leading-tight">{woolPoints}</div>
           <div className="text-[9px] uppercase tracking-wide">{t("Wool Points")}</div>
