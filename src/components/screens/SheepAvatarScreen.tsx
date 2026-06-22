@@ -17,6 +17,11 @@ import stubbleImg from '@/assets/accessories/stubble.svg.asset.json';
 import raincoatImg from '@/assets/accessories/raincoat.svg.asset.json';
 import longBeardImg from '@/assets/accessories/longBeard.svg.asset.json';
 import mohawkImg from '@/assets/accessories/mohawk.png.asset.json';
+import capImg from '@/assets/accessories/cap.svg.asset.json';
+import sunhatImg from '@/assets/accessories/sunhat.svg.asset.json';
+import scarfImg from '@/assets/accessories/scarf.svg.asset.json';
+import umbrellaImg from '@/assets/accessories/umbrella.svg.asset.json';
+import welliesImg from '@/assets/accessories/wellies.svg.asset.json';
 
 const ACCESSORY_IMAGES: Partial<Record<string, string>> = {
   glasses: (glassesImg as { url: string }).url,
@@ -27,7 +32,13 @@ const ACCESSORY_IMAGES: Partial<Record<string, string>> = {
   raincoat: (raincoatImg as { url: string }).url,
   longBeard: (longBeardImg as { url: string }).url,
   mohawk: (mohawkImg as { url: string }).url,
+  cap: (capImg as { url: string }).url,
+  sunhat: (sunhatImg as { url: string }).url,
+  scarf: (scarfImg as { url: string }).url,
+  umbrella: (umbrellaImg as { url: string }).url,
+  wellies: (welliesImg as { url: string }).url,
 };
+
 
 type AccessoryId =
   // SVG parts (new)
