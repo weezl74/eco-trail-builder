@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useSavings } from "@/hooks/useSavings";
 import { useTranslations } from "@/hooks/useTranslations";
 import { useAuth } from "@/hooks/useAuth";
+import { fetchLeaderboard, type ApiLeaderboardEntry } from "@/lib/api";
 
 type Mode = "wool" | "tree";
 
