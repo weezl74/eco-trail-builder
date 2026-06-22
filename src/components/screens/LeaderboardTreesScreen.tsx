@@ -191,7 +191,7 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
             <p className="font-bold text-lg mb-1">{t("Spend your wool")}</p>
             <p className="text-sm opacity-80">
               {t(
-                "Use wool points to customise your sheep on the Account tab, or cool the borough by placing solar farms and wind turbines on the Shop Local map.",
+                "Use wool points to customise your sheep on the Account tab, or cool the borough by placing solar farms and wind turbines on the Act Local map.",
               )}
             </p>
           </div>
