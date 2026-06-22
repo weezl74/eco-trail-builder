@@ -33,20 +33,6 @@ const OakTreeIcon: React.FC<{ className?: string }> = ({ className }) => (
   </svg>
 );
 
-// ✅ Wool ball icon
-const WoolBallIcon: React.FC<{ color: string; className?: string }> = ({ color, className }) => (
-  <svg viewBox="0 0 64 64" className={className} aria-hidden>
-    <circle cx="32" cy="32" r="26" fill={color} stroke="#1f1f1f" strokeWidth="2" />
-    <g fill="none" stroke="#1f1f1f" strokeWidth="1.5" strokeLinecap="round" opacity="0.55">
-      <path d="M10 28 C 22 18, 42 18, 54 28" />
-      <path d="M8 36 C 22 24, 42 24, 56 36" />
-      <path d="M12 44 C 24 36, 40 36, 52 44" />
-      <path d="M18 52 C 26 46, 38 46, 46 52" />
-      <path d="M20 14 C 28 22, 36 22, 44 14" />
-    </g>
-  </svg>
-);
-
 const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const [mode, setMode] = useState<Mode>("wool");
   const [rows, setRows] = useState<Row[]>([]);
