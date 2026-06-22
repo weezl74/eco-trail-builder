@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ArrowLeft } from "lucude-react";
+import { ArrowLeft } from "lucide-react";
 import nelsonHead from "@/assets/sheep/NelsonHead.svg.asset.json";
 
 import { useToast } from "@/hooks/use-toast";
