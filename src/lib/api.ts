@@ -59,17 +59,29 @@ export interface ApiProfile {
   account_type?: "resident" | "business" | null;
 }
 
-/** Current user's profile. Falls back to scanning /profile list if /profile/me 404s. */
+/** Current user's profile — derived from GET /profile (no path params). */
 export async function fetchMyProfile(userId: string): Promise<ApiProfile | null> {
   try {
-    return await api.get<ApiProfile>(`/profile/${userId}`);
+    const all = await api.get<ApiProfile[]>(`/profile`);
+    return all.find((p) => p.user_id === userId) ?? null;
   } catch {
-    try {
-      const all = await api.get<ApiProfile[]>(`/profile`);
-      return all.find((p) => p.user_id === userId) ?? null;
-    } catch {
-      return null;
-    }
+    return null;
+  }
+}
+
+/** Create the user in the backend if they don't already exist. Safe to call on every login. */
+export async function createUser(params: {
+  user_id: string;
+  display_name?: string | null;
+}): Promise<void> {
+  try {
+    await api.post<unknown>(`/create-user`, {
+      user_id: params.user_id,
+      display_name: params.display_name ?? null,
+    });
+  } catch (err) {
+    // If the user already exists the backend may 409 — that's fine.
+    console.warn("[api] createUser:", err);
   }
 }
 

@@ -1,6 +1,7 @@
 import { useState, useEffect, createContext, useContext } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { createUser } from "@/lib/api";
 
 interface AuthContextType {
   user: User | null;
@@ -10,6 +11,18 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const ensuredUsers = new Set<string>();
+function ensureBackendUser(u: User | null) {
+  if (!u || ensuredUsers.has(u.id)) return;
+  ensuredUsers.add(u.id);
+  const displayName =
+    (u.user_metadata?.display_name as string | undefined) ??
+    (u.user_metadata?.full_name as string | undefined) ??
+    u.email ??
+    null;
+  void createUser({ user_id: u.id, display_name: displayName });
+}
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -23,6 +36,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        if (session?.user && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "USER_UPDATED")) {
+          ensureBackendUser(session.user);
+        }
       }
     );
 
@@ -31,6 +47,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      if (session?.user) ensureBackendUser(session.user);
     });
 
     return () => subscription.unsubscribe();
