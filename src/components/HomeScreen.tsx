@@ -84,22 +84,24 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
       {/* Illustration */}
 
       {/* Illustration */}
+
+      {/* Illustration */}
       <div className="mx-4 mt-1.5 rounded-2xl overflow-hidden bg-[#1f1f1f] relative flex-1 min-h-0">
         <img
           src={badHomepageAsset.url}
           alt="A scene showing the impact of pollution and unsustainable choices"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover object-bottom"
           loading="lazy"
         />
 
-        {/* subtle gradient for readability */}
+        {/* subtle gradient */}
         <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
 
-        {/* ✅ Nelson - FIXED positioning (safe values) */}
+        {/* ✅ Nelson - bigger + left-aligned */}
         <NelsonAvatar
           woolColor={woolColor}
           accessories={accessories}
-          className="absolute bottom-14 left-1/2 -translate-x-1/2 w-44 h-44 pointer-events-none"
+          className="absolute bottom-20 left-4 w-52 h-52 pointer-events-none"
         />
       </div>
 
