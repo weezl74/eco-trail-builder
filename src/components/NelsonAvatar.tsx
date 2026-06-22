@@ -163,7 +163,7 @@ const NelsonAvatar: React.FC<Props> = ({
 
         {/* Hats (drawn last so they sit on top) */}
         {has('mohawk')    && <TintedPart url={mohawk.url}    color="#c0392b" />}
-        {has('pirateHat') && <TintedPart url={pirateHat.url} color="#1a1a1a" />}
+        {has('pirateHat') && <img src={pirateHat.url} alt="" className="absolute inset-0 w-full h-full pointer-events-none select-none" style={{ objectFit: 'contain' }} draggable={false} />}
 
         {/* Front horns on top */}
         {has('hornsF') && <TintedPart url={hornsF.url} color="#d4b582" />}
