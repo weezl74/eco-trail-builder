@@ -58,12 +58,9 @@ const ACCESSORIES: Accessory[] = [
   // Facial hair
   { id: 'stubble', label: 'Stubble', emoji: '🧔', cost: 25,
     carbonNote: 'A standard razor lasts ~5 weeks. Switching to a safety razor saves ~30 plastic cartridges a year.' },
-  { id: 'mustache', label: 'Moustache', emoji: '👨', cost: 40,
-    carbonNote: 'Movember-style: small grooming swaps add up. Bar soap beats bottled by ~30g CO₂ per wash.' },
   { id: 'longBeard', label: 'Long Beard', emoji: '🧙', cost: 60,
     carbonNote: 'Beard oil in glass not plastic? You\'ll cut ~12g of single-use plastic per refill.' },
-  { id: 'fluffy', label: 'Fluffy', emoji: '🐑', cost: 45,
-    carbonNote: 'Wool is naturally insulating — UK sheep wool keeps lofts warm and saves ~£200/yr on heating.' },
+
 
   // Glasses
   { id: 'glasses', label: 'Glasses', emoji: '👓', cost: 40,
