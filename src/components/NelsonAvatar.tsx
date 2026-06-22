@@ -154,7 +154,7 @@ const NelsonAvatar: React.FC<Props> = ({
         {has('fluffy')    && <TintedPart url={fluffy.url}    color="#5a3a1f" />}
         {has('longBeard') && <TintedPart url={longBeard.url} color="#5a3a1f" />}
         {has('sideburns') && <TintedPart url={sideburns.url} color="#5a3a1f" />}
-        {has('stubble')   && <TintedPart url={stubble.url}   color="#2b1a0a" style={{ transform: 'translateY(-4%) scale(0.7)', transformOrigin: 'center' }} />}
+        {has('stubble')   && <TintedPart url={stubble.url}   color="#2b1a0a" style={{ transform: 'translateY(-6%) scale(0.65)', transformOrigin: 'center' }} />}
         {has('mustache')  && <TintedPart url={mustache.url}  color="#3a2410" />}
 
         {/* Glasses */}
