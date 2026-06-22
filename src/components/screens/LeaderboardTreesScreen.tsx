@@ -185,7 +185,6 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
           <div className="flex justify-center items-end gap-6 my-6">
             {/* ✅ FIXED LINE BELOW */}
             <img src={nelsonHead.url} alt="Nelson" className="h-28 w-28 object-contain" />
-            <WoolBallIcon color={woolColor} className="h-24 w-24" />
           </div>
 
           <div className="mt-2 bg-[#1f1f1f] rounded-2xl p-4 text-white font-serif">
