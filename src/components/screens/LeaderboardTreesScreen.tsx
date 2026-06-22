@@ -17,7 +17,6 @@ interface Row {
   isMe?: boolean;
 }
 
-
 // ✅ Oak tree icon
 const OakTreeIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="0 0 64 64" className={className} aria-hidden>
@@ -72,9 +71,7 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
             const tree = Number(u.tree_points) || 0;
             return {
               user_id: u.user_id,
-              name:
-                (u.display_name || u.username || `User ${String(u.user_id).slice(0, 8)}`) +
-                (isMe ? " (you)" : ""),
+              name: (u.display_name || u.username || `User ${String(u.user_id).slice(0, 8)}`) + (isMe ? " (you)" : ""),
               points: mode === "wool" ? wool : tree,
               isMe,
             };
@@ -99,7 +96,6 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
 
   const heading = mode === "wool" ? t("WOOL POINTS") : t("TREE POINTS");
   const myPoints = mode === "wool" ? woolPoints : treePoints;
-
 
   const join = () => {
     if (plantTree(100)) {
@@ -126,9 +122,9 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
 
       {/* Heading */}
       <div className="text-center text-black font-serif font-bold">
-        <p className="text-2xl">{t("Estimated Offset")}</p>
+        <p className="text-2xl">{t("Estimated Impact")}</p>
         <p className="text-2xl">25,500 CO₂e</p>
-        <p className="text-2xl">KG</p>
+        <p className="text-2xl">KG reduced</p>
       </div>
 
       {/* Toggle */}
@@ -174,7 +170,6 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
             </div>
           ))
         )}
-
       </div>
 
       {/* TREE MODE */}
