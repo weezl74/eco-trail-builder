@@ -63,7 +63,7 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
       </div>
 
       {/* Estimated savings card */}
-      <div className="mx-4 mt-2 bg-[#1f1f1f] rounded-xl px-3 py-2 text-white">
+      <div className="mx-4 mt-1.5 bg-[#1f1f1f] rounded-xl px-3 py-1.5 text-white">
         <h2 className="font-serif font-bold text-sm text-center mb-1">{t("Estimated Savings")}</h2>
         <div className="space-y-0.5 font-serif font-bold text-xs">
           <p className="flex items-center gap-2">
