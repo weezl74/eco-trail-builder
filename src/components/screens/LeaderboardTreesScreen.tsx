@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucude-react";
 import nelsonHead from "@/assets/sheep/NelsonHead.svg.asset.json";
 
 import { useToast } from "@/hooks/use-toast";
@@ -39,7 +39,7 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
   const [error, setError] = useState(false);
 
   const { toast } = useToast();
-  const { treesPlanted, treePoints, woolPoints, plantTree } = useSavings();
+  const { treesPlanted, plantTree } = useSavings();
   const { t } = useTranslations();
   const { user } = useAuth();
 
@@ -132,14 +132,12 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
 
       {/* ✅ LEADERBOARD */}
       <div className="bg-[#1f1f1f] rounded-2xl mt-3 overflow-hidden">
-        {/* Header row */}
         <div className="grid grid-cols-3 text-white text-center py-2 border-b border-white/20 text-[10px] uppercase tracking-wide opacity-70 font-serif">
           <span>{t("POSITION")}</span>
           <span>{t("USER")}</span>
           <span>{heading}</span>
         </div>
 
-        {/* Rows */}
         {rows.length === 0 ? (
           <div className="text-white text-center py-4 text-sm opacity-80">
             {error ? t("Unable to load leaderboard.") : t("No participants yet.")}
@@ -188,7 +186,10 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
       {/* WOOL MODE */}
       {mode === "wool" && (
         <>
-          <div className="flex justify-center my-4">{nelsonHead.url}</div>
+          <div className="flex justify-center my-4">
+            {/* ✅ FIXED IMAGE */}
+            <img src={nelsonHead.url} alt="Sheep" className="h-20 w-20 object-contain" />
+          </div>
 
           <div className="bg-[#1f1f1f] rounded-2xl p-4 text-white font-serif mt-2">
             <p className="font-bold text-lg mb-1">{t("Spend your wool")}</p>
@@ -205,3 +206,4 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
 };
 
 export default LeaderboardTreesScreen;
+``;
