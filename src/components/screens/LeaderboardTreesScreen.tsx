@@ -206,4 +206,3 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
 };
 
 export default LeaderboardTreesScreen;
-``;
