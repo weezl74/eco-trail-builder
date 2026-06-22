@@ -58,8 +58,6 @@ const ACCESSORIES: Accessory[] = [
   // Facial hair
   { id: 'stubble', label: 'Stubble', emoji: '🧔', cost: 25,
     carbonNote: 'A standard razor lasts ~5 weeks. Switching to a safety razor saves ~30 plastic cartridges a year.' },
-  { id: 'sideburns', label: 'Sideburns', emoji: '🧔‍♂️', cost: 35,
-    carbonNote: 'Skipping a daily shave saves ~8 litres of hot water — about 1.5 kg of CO₂ a year.' },
   { id: 'mustache', label: 'Moustache', emoji: '👨', cost: 40,
     carbonNote: 'Movember-style: small grooming swaps add up. Bar soap beats bottled by ~30g CO₂ per wash.' },
   { id: 'longBeard', label: 'Long Beard', emoji: '🧙', cost: 60,
@@ -72,12 +70,6 @@ const ACCESSORIES: Accessory[] = [
     carbonNote: 'Heatwaves in Wales are now 5× more likely than 50 years ago — protect your eyes from glare.' },
   { id: 'starGlasses', label: 'Star Glasses', emoji: '🤩', cost: 55,
     carbonNote: 'Star-quality climate action: switching to LED bulbs cuts lighting CO₂ by ~80%.' },
-
-  // Horns
-  { id: 'hornsF', label: 'Horns (Front)', emoji: '🐏', cost: 50,
-    carbonNote: 'Welsh mountain sheep have grazed these hills for 4,000 years — keep our uplands wild.' },
-  { id: 'hornsB', label: 'Horns (Back)', emoji: '🐂', cost: 50,
-    carbonNote: 'Rewilded uplands store ~3× more carbon than intensively grazed land.' },
 
   // Legacy emoji accessories — kept for variety
   { id: 'sunhat', label: 'Sun Hat', emoji: '👒', cost: 35,
