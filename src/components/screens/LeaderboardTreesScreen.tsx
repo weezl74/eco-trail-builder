@@ -11,6 +11,7 @@ import { fetchLeaderboard, type ApiLeaderboardEntry } from "@/lib/api";
 type Mode = "wool" | "tree";
 
 interface Row {
+  user_id: string;
   name: string;
   points: number;
   isMe?: boolean;
