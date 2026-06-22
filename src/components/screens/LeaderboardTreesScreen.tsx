@@ -108,11 +108,15 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
 
       {/* Heading */}
       <div className="text-center text-black font-serif font-bold">
-        <p className="text-2xl">{t("Estimated Impact")}</p>
-        <p className="text-2xl">25,500 CO₂e</p>
-        <p className="text-2xl">KG reduced</p>
-      </div>
+        
+<div className="text-center text-black font-serif mb-4">
+  <p className="text-sm opacity-70">Estimated Impact</p>
+  <p className="text-xl font-bold">
+    25,500 kg CO₂e
+  </p>
+</div>
 
+      
       {/* Toggle */}
       <div className="bg-[#1f1f1f] rounded-full mt-4 p-1 grid grid-cols-2 text-center font-serif font-bold">
         {(["wool", "tree"] as Mode[]).map((m) => (
