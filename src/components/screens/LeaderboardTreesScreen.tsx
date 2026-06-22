@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import nelsonHead from "@/assets/sheep/NelsonHead.svg.asset.json";
@@ -39,170 +40,19 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
   const [error, setError] = useState(false);
 
   const { toast } = useToast();
-  const { treesPlanted, treePoints, woolPoints, plantTree, woolColor } = useSavings();
+  const { treesPlanted, treePoints, woolPoints, plantTree } = useSavings();
   const { t } = useTranslations();
   const { user } = useAuth();
 
-  // Fetch leaderboard from API — pure /profile data, no local injection or cached users.
   useEffect(() => {
     let cancelled = false;
+
     const load = async () => {
       try {
         const data: ApiLeaderboardEntry[] = await fetchLeaderboard(100);
         if (cancelled) return;
+
         const mapped: Row[] = data
           .map((u) => {
             const isMe = u.user_id === user?.id;
             const wool = Number(u.wool_points) || 0;
-            const tree = Number(u.tree_points) || 0;
-            return {
-              user_id: u.user_id,
-              name: (u.display_name || u.username || `User ${String(u.user_id).slice(0, 8)}`) + (isMe ? " (you)" : ""),
-              points: mode === "wool" ? wool : tree,
-              isMe,
-            };
-          })
-          .sort((a, b) => b.points - a.points);
-        setRows(mapped);
-        setError(false);
-      } catch {
-        if (cancelled) return;
-        setRows([]);
-        setError(true);
-      }
-    };
-    load();
-    const onPointsUpdated = () => load();
-    window.addEventListener("points:updated", onPointsUpdated);
-    return () => {
-      cancelled = true;
-      window.removeEventListener("points:updated", onPointsUpdated);
-    };
-  }, [mode, user?.id]);
-
-  const heading = mode === "wool" ? t("WOOL POINTS") : t("TREE POINTS");
-  const myPoints = mode === "wool" ? woolPoints : treePoints;
-
-  const join = () => {
-    if (plantTree(100)) {
-      toast({
-        title: t("Joined the Tree Queue!"),
-        description: t("A tree will be planted on your behalf."),
-      });
-    } else {
-      toast({
-        title: t("Not enough Tree Points"),
-        description: t("100 Tree Points required."),
-      });
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-[#f5a623] pb-24 px-4 pt-4">
-      {/* Back */}
-      {onBack && (
-        <button onClick={onBack} className="text-black mb-2 flex items-center gap-1 font-serif font-bold">
-          <ArrowLeft className="h-5 w-5" /> {t("Back")}
-        </button>
-      )}
-
-      {/* Heading */}
-      <div className="text-center text-black font-serif font-bold">
-        
-<div className="text-center text-black font-serif mb-4">
-  <p className="text-sm opacity-70">Estimated Impact</p>
-  <p className="text-xl font-bold">
-    25,500 kg CO₂e
-  </p>
-</div>
-
-      
-      {/* Toggle */}
-      <div className="bg-[#1f1f1f] rounded-full mt-4 p-1 grid grid-cols-2 text-center font-serif font-bold">
-        {(["wool", "tree"] as Mode[]).map((m) => (
-          <button
-            key={m}
-            onClick={() => setMode(m)}
-            className={`rounded-full py-2 transition ${mode === m ? "bg-[#f5a623] text-black" : "text-white"}`}
-          >
-            {m === "wool" ? t("Wool Points") : t("Tree Points")}
-          </button>
-        ))}
-      </div>
-
-      {/* Points summary */}
-      <p className="text-center text-black font-serif font-bold mt-3">
-        {t("You have")} <span className="text-[#1f1f1f]">{myPoints}</span>{" "}
-        {mode === "wool" ? t("wool") : t("Tree").toLowerCase()} {t("points")}
-      </p>
-
-      {/* Leaderboard */}
-      <div className="bg-[#1f1f1f] rounded-2xl mt-3 overflow-hidden">
-        <div className="grid grid-cols-3 text-white font-serif font-bold text-center py-3 border-b border-white/20 text-[11px] sm:text-xs uppercase tracking-wide px-2 gap-1">
-          <span>{t("POSITION")}</span>
-          <span>{t("USER")}</span>
-          <span className="whitespace-nowrap">{heading}</span>
-        </div>
-
-        {rows.length === 0 ? (
-          <div className="text-white font-serif text-center py-4 text-sm opacity-80">
-            {error ? t("Unable to load leaderboard.") : t("No participants yet.")}
-          </div>
-        ) : (
-          rows.map((r, i) => (
-            <div
-              key={`${mode}-${i}`}
-              className="grid grid-cols-3 text-white font-serif font-bold text-center py-3 text-lg border-b border-white/10 last:border-0"
-            >
-              <span>#{i + 1}</span>
-              <span>{r.name}</span>
-              <span>{r.points}</span>
-            </div>
-          ))
-        )}
-      </div>
-
-      {/* TREE MODE */}
-      {mode === "tree" && (
-        <>
-          <div className="flex justify-center my-6">
-            <OakTreeIcon className="h-28 w-28" />
-          </div>
-
-          <div className="bg-[#1f1f1f] rounded-2xl py-4 text-center text-white font-serif font-bold text-2xl mb-4">
-            {t("Trees you have planted")}: {treesPlanted}
-          </div>
-
-          <button
-            onClick={join}
-            className="w-full bg-[#1f1f1f] rounded-2xl py-5 text-white font-serif font-bold text-2xl active:scale-[0.99] transition"
-          >
-            {t("Join the Tree Queue")}
-            <p className="text-base font-normal mt-1">{t("100 Tree Points Required")}</p>
-          </button>
-        </>
-      )}
-
-      {/* WOOL MODE */}
-      {mode === "wool" && (
-        <>
-          <div className="flex justify-center items-end gap-6 my-6">
-            {/* ✅ FIXED LINE BELOW */}
-            <img src={nelsonHead.url} alt="Nelson" className="h-28 w-28 object-contain" />
-          </div>
-
-          <div className="mt-2 bg-[#1f1f1f] rounded-2xl p-4 text-white font-serif">
-            <p className="font-bold text-lg mb-1">{t("Spend your wool")}</p>
-            <p className="text-sm opacity-80">
-              {t(
-                "Use wool points to customise your sheep on the Account tab, or cool the borough by placing solar farms and wind turbines on the Act Local map.",
-              )}
-            </p>
-          </div>
-        </>
-      )}
-    </div>
-  );
-};
-
-export default LeaderboardTreesScreen;
