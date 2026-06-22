@@ -202,7 +202,7 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
             <p className="text-white font-serif font-bold text-sm mb-2">
               {t('Accessories')} <span className="opacity-60 text-xs">{t('(tap to see climate fact)')}</span>
             </p>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 gap-3">
               {ACCESSORIES.map((a) => {
                 const owned = has(a.id);
                 const afford = woolPoints >= a.cost;
@@ -211,7 +211,7 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                     key={a.id}
                     onClick={() => handleBuy(a)}
                     disabled={!owned && !afford}
-                    className={`rounded-xl p-2 text-[11px] font-serif font-bold flex flex-col items-center gap-1 ${
+                    className={`rounded-xl p-3 text-[11px] font-serif font-bold flex flex-col items-center gap-2 ${
                       owned ? 'bg-[#F4971D] text-black' : afford ? 'bg-white text-black' : 'bg-white/30 text-white'
                     }`}
                   >
@@ -219,12 +219,13 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                       <img
                         src={ACCESSORY_IMAGES[a.id]!}
                         alt={a.label}
-                        className="h-20 w-20 object-contain"
+                        className="h-32 w-32 object-contain"
                         draggable={false}
                       />
                     ) : (
-                      <span className="text-4xl leading-none">{a.emoji}</span>
+                      <span className="text-6xl leading-none">{a.emoji}</span>
                     )}
+
                     <span className="flex items-center gap-1 text-[10px]">
                       {!owned && !afford && <Lock className="h-3 w-3" />}
                       {owned ? `✓ ${t('owned')}` : `${a.cost} ${t('wool')}`}
