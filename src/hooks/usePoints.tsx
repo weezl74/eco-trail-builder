@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { api, fetchMyProfile } from '@/lib/api';
+import { api, fetchMyProfile, spendPoints } from '@/lib/api';
 
 export type PointsType = 'wool' | 'tree';
 
