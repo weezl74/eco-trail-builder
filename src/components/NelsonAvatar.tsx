@@ -46,10 +46,12 @@ const ACCESSORY_PLACEMENT: Record<string, Placement> = {
   cap:      { left: '18%', top: '-24%', width: '64%', height: '42%', z: 5 },
   // Sun hat brim spreads wider than the head
   sunhat:   { left: '5%',  top: '-22%', width: '90%', height: '46%', z: 5 },
-  // Scarf wraps the neck just below the chin
-  scarf:    { left: '14%', top: '26%',  width: '72%', height: '26%', z: 4 },
-  // Umbrella floats above the head
-  umbrella: { left: '8%',  top: '-46%', width: '84%', height: '52%', z: 6 },
+  // Scarf: tight wrap sits at the neck just under the chin, tail drapes down
+  // the chest. Asset is ~0.95 ratio with wrap in top 30%, tail in lower 70%.
+  scarf:    { left: '30%', top: '38%',  width: '40%', height: '44%', z: 4 },
+  // Umbrella held up-and-out to the sheep's left, handle reaching down toward
+  // the hand at mid-body — matches the FlyingUmbrellaNelson reference.
+  umbrella: { left: '-22%', top: '-28%', width: '80%', height: '80%', z: 6 },
   // Wellies sit at the feet
   wellies:  { left: '22%', top: '74%',  width: '56%', height: '24%', z: 4 },
 };
