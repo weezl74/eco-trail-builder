@@ -222,13 +222,12 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                       <img
                         src={ACCESSORY_IMAGES[a.id]!}
                         alt={a.label}
-                        className="h-10 w-10 object-contain"
+                        className="h-20 w-20 object-contain"
                         draggable={false}
                       />
                     ) : (
-                      <span className="text-xl leading-none">{a.emoji}</span>
+                      <span className="text-4xl leading-none">{a.emoji}</span>
                     )}
-                    <span className="leading-tight text-center">{t(a.label)}</span>
                     <span className="flex items-center gap-1 text-[10px]">
                       {!owned && !afford && <Lock className="h-3 w-3" />}
                       {owned ? `✓ ${t('owned')}` : `${a.cost} ${t('wool')}`}
