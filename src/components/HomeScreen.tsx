@@ -82,18 +82,15 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
       </div>
 
       {/* Illustration */}
-      <div className="mx-4 mt-2 rounded-2xl overflow-hidden bg-[#1f1f1f] relative flex-1 min-h-0">
-        <img
-          src={badHomepageAsset.url}
-          alt="A scene showing the impact of pollution and unsustainable choices"
-          className="w-full h-full object-cover block"
-          loading="lazy"
-        />
-        {/* Nelson overlay — raised so he remains visible above the CTA */}
+
+      <div className="mx-3 mt-1.5 rounded-2xl overflow-hidden bg-[#1f1f1f] relative flex-1 min-h-0">
+        {badHomepageAsset.url}
+
+        {/* Nelson — bigger and higher */}
         <NelsonAvatar
           woolColor={woolColor}
           accessories={accessories}
-          className="absolute bottom-16 left-2 w-2/5 aspect-square pointer-events-none"
+          className="absolute bottom-20 left-1/2 -translate-x-1/2 w-1/2 max-w-[220px] aspect-square pointer-events-none"
         />
       </div>
 
