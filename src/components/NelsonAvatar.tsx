@@ -3,7 +3,7 @@ import TintedSheepBody from './TintedSheepBody';
 import nelsonHead from '@/assets/sheep/NelsonHead.svg.asset.json';
 import barbHead from '@/assets/sheep/BarbHead.svg.asset.json';
 
-import pirateHat from '@/assets/sheep/parts/PirateHat.svg.asset.json';
+import pirateHat from '@/assets/accessories/pirateHat.svg.asset.json';
 import mohawk from '@/assets/sheep/parts/Mohawk.svg.asset.json';
 import glasses from '@/assets/sheep/parts/Glasses.svg.asset.json';
 import starGlasses from '@/assets/sheep/parts/StarGlasses.svg.asset.json';
