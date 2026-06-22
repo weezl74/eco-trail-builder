@@ -3,14 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Trophy, Medal, Award } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-
-interface ApiUser {
-  user_id: string;
-  display_name?: string | null;
-  username?: string | null;
-  wool_points?: number | null;
-  tree_points?: number | null;
-}
+import { fetchLeaderboard } from "@/lib/api";
 
 interface LeaderboardEntry {
   user_id: string;
@@ -26,29 +19,35 @@ export default function Leaderboard() {
   const { user } = useAuth();
 
   useEffect(() => {
-    fetch("https://caerphilly-api.onrender.com/profile")
-      .then((res) => res.json())
-      .then((data: ApiUser[]) => {
-        const users = Array.isArray(data) ? data : [];
-        const sorted = [...users].sort(
-          (a, b) =>
-            ((b.wool_points || 0) + (b.tree_points || 0)) -
-            ((a.wool_points || 0) + (a.tree_points || 0))
-        );
-        const mapped: LeaderboardEntry[] = sorted.map((u, i) => ({
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const data = await fetchLeaderboard(100);
+        if (cancelled) return;
+        const mapped: LeaderboardEntry[] = data.map((u, i) => ({
           user_id: u.user_id,
           username: u.display_name || u.username || "",
           total_points: (u.wool_points || 0) + (u.tree_points || 0),
           rank: i + 1,
         }));
         setLeaderboard(mapped);
-      })
-      .catch((err) => {
+        setError(false);
+      } catch (err) {
+        if (cancelled) return;
         console.error("Error fetching leaderboard:", err);
         setError(true);
         setLeaderboard([]);
-      })
-      .finally(() => setLoading(false));
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    load();
+    const onUpdated = () => load();
+    window.addEventListener("points:updated", onUpdated);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("points:updated", onUpdated);
+    };
   }, []);
 
   const getRankIcon = (rank: number) => {
