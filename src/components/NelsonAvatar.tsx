@@ -43,9 +43,9 @@ export type PartId =
 type Placement = { left: string; top: string; width: string; height: string; z: number };
 const ACCESSORY_PLACEMENT: Record<string, Placement> = {
   // Cap perches on top of the head, brim forward — narrower than the head
-  cap:      { left: '18%', top: '-24%', width: '64%', height: '42%', z: 5 },
-  // Sun hat brim spreads wider than the head
-  sunhat:   { left: '5%',  top: '-22%', width: '90%', height: '46%', z: 5 },
+  cap:      { left: '18%', top: '-18%', width: '64%', height: '38%', z: 5 },
+  // Sun hat: brim spreads wider than the head, sits on the crown
+  sunhat:   { left: '2%',  top: '-10%', width: '96%', height: '34%', z: 5 },
   // Scarf: tight wrap sits at the neck just under the chin, tail drapes down
   // the chest. Asset is ~0.95 ratio with wrap in top 30%, tail in lower 70%.
   scarf:    { left: '32%', top: '24%',  width: '36%', height: '34%', z: 4 },
