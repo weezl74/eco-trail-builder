@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { spendPoints } from '@/lib/api';
 
 export type Saving = { money: number; co2: number; water: number };
 export type RenewableType = 'solar' | 'wind' | 'mine_water';
@@ -185,9 +186,16 @@ export const useSavings = () => {
           },
         ],
       });
+      if (userId) {
+        void spendPoints({ user_id: userId, woolDelta: cost, reason: `renewable:${type}` })
+          .catch((e) => console.error('[useSavings] spendPoints renewable failed', e))
+          .finally(() =>
+            window.dispatchEvent(new CustomEvent('points:updated', { detail: { userId } })),
+          );
+      }
       return true;
     },
-    [persist],
+    [persist, userId],
   );
 
   const buyAccessory = useCallback(
@@ -196,9 +204,16 @@ export const useSavings = () => {
       if (s.accessories.includes(id)) return true;
       if (s.woolPoints < cost) return false;
       void persist({ ...s, woolPoints: s.woolPoints - cost, accessories: [...s.accessories, id] });
+      if (userId) {
+        void spendPoints({ user_id: userId, woolDelta: cost, reason: `accessory:${id}` })
+          .catch((e) => console.error('[useSavings] spendPoints accessory failed', e))
+          .finally(() =>
+            window.dispatchEvent(new CustomEvent('points:updated', { detail: { userId } })),
+          );
+      }
       return true;
     },
-    [persist],
+    [persist, userId],
   );
 
   const plantTree = useCallback(
@@ -206,9 +221,16 @@ export const useSavings = () => {
       const s = latest.current;
       if (s.treePoints < cost) return false;
       void persist({ ...s, treePoints: s.treePoints - cost, treesPlanted: s.treesPlanted + 1 });
+      if (userId) {
+        void spendPoints({ user_id: userId, treeDelta: cost, reason: 'tree:plant' })
+          .catch((e) => console.error('[useSavings] spendPoints tree failed', e))
+          .finally(() =>
+            window.dispatchEvent(new CustomEvent('points:updated', { detail: { userId } })),
+          );
+      }
       return true;
     },
-    [persist],
+    [persist, userId],
   );
 
   const setCardColor = useCallback(

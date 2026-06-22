@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { api, fetchMyProfile } from '@/lib/api';
+import { api, fetchMyProfile, spendPoints } from '@/lib/api';
 
 export type PointsType = 'wool' | 'tree';
 
@@ -75,5 +75,28 @@ export const usePoints = () => {
     [user, refresh]
   );
 
-  return { ...breakdown, loading, refresh, award };
+  /**
+   * Spend points via POST /spend-points. Backend is the source of truth.
+   */
+  const spend = useCallback(
+    async (points: number, type: PointsType, reason?: string, referenceId?: string) => {
+      if (!user || points <= 0) return;
+      try {
+        await spendPoints({
+          user_id: user.id,
+          woolDelta: type === 'wool' ? points : 0,
+          treeDelta: type === 'tree' ? points : 0,
+          reason,
+          reference_id: referenceId,
+        });
+      } catch (e) {
+        console.error('[usePoints] spend failed', e);
+      }
+      await refresh();
+      window.dispatchEvent(new CustomEvent('points:updated', { detail: { userId: user.id } }));
+    },
+    [user, refresh],
+  );
+
+  return { ...breakdown, loading, refresh, award, spend };
 };

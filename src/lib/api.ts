@@ -81,18 +81,25 @@ export interface ApiLeaderboardEntry {
   total_points?: number | null;
 }
 
+/** Leaderboard is derived directly from GET /profile. No local data, no cached users. */
 export async function fetchLeaderboard(limit = 50): Promise<ApiLeaderboardEntry[]> {
-  try {
-    return await api.get<ApiLeaderboardEntry[]>(`/leaderboard?limit=${limit}`);
-  } catch {
-    // Fallback: derive leaderboard from /profile if no dedicated endpoint exists
-    const all = await api.get<ApiLeaderboardEntry[]>(`/profile`);
-    return [...all]
-      .sort(
-        (a, b) =>
-          (b.wool_points ?? b.total_points ?? 0) -
-          (a.wool_points ?? a.total_points ?? 0),
-      )
-      .slice(0, limit);
-  }
+  const all = await api.get<ApiLeaderboardEntry[]>(`/profile`);
+  return [...all]
+    .sort(
+      (a, b) =>
+        ((b.wool_points ?? 0) + (b.tree_points ?? 0)) -
+        ((a.wool_points ?? 0) + (a.tree_points ?? 0)),
+    )
+    .slice(0, limit);
+}
+
+/** Spend wool/tree points server-side. Returns the updated profile. */
+export async function spendPoints(params: {
+  user_id: string;
+  woolDelta?: number;
+  treeDelta?: number;
+  reason?: string;
+  reference_id?: string;
+}): Promise<ApiProfile | void> {
+  return api.post<ApiProfile>(`/spend-points`, params);
 }

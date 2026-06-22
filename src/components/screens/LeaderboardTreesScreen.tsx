@@ -6,10 +6,12 @@ import { useToast } from "@/hooks/use-toast";
 import { useSavings } from "@/hooks/useSavings";
 import { useTranslations } from "@/hooks/useTranslations";
 import { useAuth } from "@/hooks/useAuth";
+import { fetchLeaderboard, type ApiLeaderboardEntry } from "@/lib/api";
 
 type Mode = "wool" | "tree";
 
 interface Row {
+  user_id: string;
   name: string;
   points: number;
   isMe?: boolean;
@@ -56,67 +58,35 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
   const { t } = useTranslations();
   const { user } = useAuth();
 
-  // Fetch leaderboard from API
+  // Fetch leaderboard from API — pure /profile data, no local injection or cached users.
   useEffect(() => {
     let cancelled = false;
-    const load = () => {
-      fetch("https://caerphilly-api.onrender.com/profile")
-        .then((res) => {
-          if (!res.ok) throw new Error("Failed");
-          return res.json();
-        })
-        .then((data: any[]) => {
-          if (cancelled) return;
-          const list = Array.isArray(data) ? [...data] : [];
-          // Ensure the current user is always represented on the leaderboard,
-          // even if the API hasn't synced their profile yet.
-          if (user?.id) {
-            const meIdx = list.findIndex((u) => u.user_id === user.id);
-            const meName =
-              (user.user_metadata as any)?.display_name ||
-              (user.user_metadata as any)?.full_name ||
-              user.email?.split("@")[0] ||
-              "You";
-            if (meIdx === -1) {
-              list.push({
-                user_id: user.id,
-                display_name: meName,
-                wool_points: woolPoints,
-                tree_points: treePoints,
-              });
-            } else {
-              // Prefer local points if API still shows 0 / missing
-              const apiWool = Number(list[meIdx].wool_points) || 0;
-              const apiTree = Number(list[meIdx].tree_points) || 0;
-              list[meIdx] = {
-                ...list[meIdx],
-                wool_points: Math.max(apiWool, woolPoints),
-                tree_points: Math.max(apiTree, treePoints),
-              };
-            }
-          }
-          const mapped: Row[] = list
-            .map((u) => {
-              const isMe = u.user_id === user?.id;
-              const wool = Number(u.wool_points) || 0;
-              const tree = Number(u.tree_points) || 0;
-              return {
-                name:
-                  (u.display_name || u.username || `User ${String(u.user_id).slice(0, 8)}`) +
-                  (isMe ? " (you)" : ""),
-                points: mode === "wool" ? wool : tree,
-                isMe,
-              };
-            })
-            .sort((a, b) => b.points - a.points);
-          setRows(mapped);
-          setError(false);
-        })
-        .catch(() => {
-          if (cancelled) return;
-          setRows([]);
-          setError(true);
-        });
+    const load = async () => {
+      try {
+        const data: ApiLeaderboardEntry[] = await fetchLeaderboard(100);
+        if (cancelled) return;
+        const mapped: Row[] = data
+          .map((u) => {
+            const isMe = u.user_id === user?.id;
+            const wool = Number(u.wool_points) || 0;
+            const tree = Number(u.tree_points) || 0;
+            return {
+              user_id: u.user_id,
+              name:
+                (u.display_name || u.username || `User ${String(u.user_id).slice(0, 8)}`) +
+                (isMe ? " (you)" : ""),
+              points: mode === "wool" ? wool : tree,
+              isMe,
+            };
+          })
+          .sort((a, b) => b.points - a.points);
+        setRows(mapped);
+        setError(false);
+      } catch {
+        if (cancelled) return;
+        setRows([]);
+        setError(true);
+      }
     };
     load();
     const onPointsUpdated = () => load();
@@ -125,7 +95,7 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
       cancelled = true;
       window.removeEventListener("points:updated", onPointsUpdated);
     };
-  }, [mode, user?.id, woolPoints, treePoints]);
+  }, [mode, user?.id]);
 
   const heading = mode === "wool" ? t("WOOL POINTS") : t("TREE POINTS");
   const myPoints = mode === "wool" ? woolPoints : treePoints;
