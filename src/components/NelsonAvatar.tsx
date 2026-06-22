@@ -48,7 +48,7 @@ const ACCESSORY_PLACEMENT: Record<string, Placement> = {
   sunhat:   { left: '5%',  top: '-22%', width: '90%', height: '46%', z: 5 },
   // Scarf: tight wrap sits at the neck just under the chin, tail drapes down
   // the chest. Asset is ~0.95 ratio with wrap in top 30%, tail in lower 70%.
-  scarf:    { left: '30%', top: '38%',  width: '40%', height: '44%', z: 4 },
+  scarf:    { left: '32%', top: '24%',  width: '36%', height: '34%', z: 4 },
   // Umbrella held up-and-out to the sheep's left, handle reaching down toward
   // the hand at mid-body — matches the FlyingUmbrellaNelson reference.
   umbrella: { left: '-22%', top: '-28%', width: '80%', height: '80%', z: 6 },
@@ -154,7 +154,7 @@ const NelsonAvatar: React.FC<Props> = ({
         {has('fluffy')    && <TintedPart url={fluffy.url}    color="#5a3a1f" />}
         {has('longBeard') && <TintedPart url={longBeard.url} color="#5a3a1f" />}
         {has('sideburns') && <TintedPart url={sideburns.url} color="#5a3a1f" />}
-        {has('stubble')   && <TintedPart url={stubble.url}   color="#2b1a0a" />}
+        {has('stubble')   && <TintedPart url={stubble.url}   color="#2b1a0a" style={{ transform: 'translateY(-8%) scale(0.7)', transformOrigin: 'center' }} />}
         {has('mustache')  && <TintedPart url={mustache.url}  color="#3a2410" />}
 
         {/* Glasses */}
