@@ -7,24 +7,12 @@ interface Props {
   className?: string;
 }
 
-const getHeadFile = (head: string, accessories: string[]) => {
-  const base = "/profile/";
-
-  if (head !== "nelson") return base + "head-nelson-base.svg";
-
-  if (accessories.includes("mohawk")) {
-    return base + "head-nelson-mohawk.svg";
-  }
-
-  if (accessories.includes("bowtie")) {
-    return base + "head-nelson-bowtie.svg";
-  }
-
-  return base + "head-nelson-base.svg";
+const getHeadFile = (head: string) => {
+  return "/profile/head-nelson-base.svg";
 };
 
 const NelsonAvatar: React.FC<Props> = ({
-  woolColor = "#ffffff",
+  woolColor = "#e8d9b8",
   accessories = [],
   head = "nelson",
   className = "",
@@ -34,7 +22,7 @@ const NelsonAvatar: React.FC<Props> = ({
   return (
     <div className={`relative ${className}`}>
       <div className="relative w-full h-full overflow-hidden -translate-x-[6%] -translate-y-[2%]">
-        {/* ✅ WOOL COLOUR */}
+        {/* ✅ 1. WOOL COLOUR BASE (BOTTOM) */}
         <div
           className="absolute inset-0"
           style={{
@@ -45,22 +33,18 @@ const NelsonAvatar: React.FC<Props> = ({
           }}
         />
 
-        {/* ✅ BODY DETAIL (FULL STRENGTH, BUT BLENDED) */}
+        {/* ✅ 2. BODY DETAIL (NOW ABOVE MASK ✅) */}
         <img
           src="/body-base-nohead.svg"
           alt=""
           className="absolute inset-0 w-full h-full pointer-events-none"
-          style={{
-            objectFit: "contain",
-            zIndex: 2,
-            mixBlendMode: "multiply",
-          }}
+          style={{ objectFit: "contain", zIndex: 2 }}
           draggable={false}
         />
 
-        {/* ✅ HEAD */}
+        {/* ✅ 3. HEAD */}
         <img
-          src={getHeadFile(head, accessories)}
+          src={getHeadFile(head)}
           alt=""
           className="absolute inset-0 w-full h-full pointer-events-none"
           style={{ objectFit: "contain", zIndex: 3 }}
