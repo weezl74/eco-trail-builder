@@ -1,12 +1,13 @@
 import React from "react";
 
 interface Props {
-  woolColor: string;
+  woolColor?: string;
   accessories?: string[];
+  head?: string;
   className?: string;
 }
 
-const NelsonAvatar: React.FC<Props> = ({ woolColor = "#e8d9b8", accessories = [], className = "" }) => {
+const NelsonAvatar: React.FC<Props> = ({ woolColor = "#e8d9b8", accessories = [], head, className = "" }) => {
   const has = (id: string) => accessories.includes(id);
 
   return (
