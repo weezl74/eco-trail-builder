@@ -3,26 +3,16 @@ import React from "react";
 interface Props {
   woolColor: string;
   accessories?: string[];
-  head?: "nelson" | "barb";
   className?: string;
 }
 
-const getHeadFile = (head: string) => {
-  return "/profile/head-nelson-base.svg";
-};
-
-const NelsonAvatar: React.FC<Props> = ({
-  woolColor = "#e8d9b8",
-  accessories = [],
-  head = "nelson",
-  className = "",
-}) => {
+const NelsonAvatar: React.FC<Props> = ({ woolColor = "#e8d9b8", accessories = [], className = "" }) => {
   const has = (id: string) => accessories.includes(id);
 
   return (
     <div className={`relative ${className}`}>
       <div className="relative w-full h-full overflow-hidden -translate-x-[6%] -translate-y-[2%]">
-        {/* WOOL COLOUR */}
+        {/* ✅ 1. WOOL COLOUR (UNDER everything) */}
         <div
           className="absolute inset-0"
           style={{
@@ -31,15 +21,11 @@ const NelsonAvatar: React.FC<Props> = ({
             WebkitMaskRepeat: "no-repeat",
             WebkitMaskPosition: "center",
             WebkitMaskSize: "contain",
-            maskImage: "url(/body-mask.svg)",
-            maskRepeat: "no-repeat",
-            maskPosition: "center",
-            maskSize: "contain",
             zIndex: 1,
           }}
         />
 
-        {/* BODY DETAIL */}
+        {/* ✅ 2. BODY DETAIL (ABOVE mask ✅) */}
         <img
           src="/profile/body-base-nohead.svg"
           alt=""
@@ -47,15 +33,15 @@ const NelsonAvatar: React.FC<Props> = ({
           style={{ objectFit: "contain", zIndex: 2 }}
         />
 
-        {/* HEAD */}
+        {/* ✅ 3. HEAD */}
         <img
-          src={getHeadFile(head)}
+          src="/profile/head-nelson-base.svg"
           alt=""
           className="absolute inset-0 w-full h-full pointer-events-none"
           style={{ objectFit: "contain", zIndex: 3 }}
         />
 
-        {/* GLASSES */}
+        {/* ✅ GLASSES */}
         {has("glasses") && (
           <img
             src="/glasses-basic.svg"
@@ -65,37 +51,10 @@ const NelsonAvatar: React.FC<Props> = ({
           />
         )}
 
-        {has("starGlasses") && (
-          <img
-            src="/glasses-star.svg"
-            alt=""
-            className="absolute inset-0 w-full h-full pointer-events-none"
-            style={{ objectFit: "contain", zIndex: 4 }}
-          />
-        )}
-
-        {/* HATS */}
+        {/* ✅ HATS */}
         {has("cap") && (
           <img
             src="/hat-cap.svg"
-            alt=""
-            className="absolute inset-0 w-full h-full pointer-events-none"
-            style={{ objectFit: "contain", zIndex: 5 }}
-          />
-        )}
-
-        {has("pirateHat") && (
-          <img
-            src="/hat-pirate.svg"
-            alt=""
-            className="absolute inset-0 w-full h-full pointer-events-none"
-            style={{ objectFit: "contain", zIndex: 5 }}
-          />
-        )}
-
-        {has("sunhat") && (
-          <img
-            src="/hat-sun.svg"
             alt=""
             className="absolute inset-0 w-full h-full pointer-events-none"
             style={{ objectFit: "contain", zIndex: 5 }}
@@ -107,3 +66,4 @@ const NelsonAvatar: React.FC<Props> = ({
 };
 
 export default NelsonAvatar;
+``;
