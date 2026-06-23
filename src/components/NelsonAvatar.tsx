@@ -7,7 +7,7 @@ interface Props {
   className?: string;
 }
 
-// ✅ HEAD PATH (your files are in /profile/)
+// ✅ HEAD FILE (in /public/profile/)
 const getHeadFile = (head: string, accessories: string[]) => {
   const base = "/profile/";
 
@@ -29,19 +29,27 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [], head = "ne
 
   return (
     <div className={`relative ${className ?? ""}`}>
-      {/* ✅ BODY (tintable using mask) */}
+      {/* ✅ BODY (CSS MASK — FINAL CORRECT VERSION) */}
       <div
-        className="absolute inset-0 w-full h-full pointer-events-none"
+        className="absolute inset-0 pointer-events-none"
         style={{
           backgroundColor: woolColor || "#ffffff",
-          WebkitMaskImage: "url(/body-base-nohead.svg)",
-          maskImage: "url(/body-base-nohead.svg)",
+
+          WebkitMaskImage: "url('/body-base-nohead.svg')",
+          maskImage: "url('/body-base-nohead.svg')",
+
           WebkitMaskRepeat: "no-repeat",
           maskRepeat: "no-repeat",
+
           WebkitMaskPosition: "center",
           maskPosition: "center",
+
           WebkitMaskSize: "contain",
           maskSize: "contain",
+
+          WebkitMaskMode: "alpha",
+          maskMode: "alpha",
+
           zIndex: 1,
         }}
       />
@@ -50,7 +58,7 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [], head = "ne
       <img
         src={getHeadFile(head, accessories)}
         alt="sheep head"
-        className="absolute inset-0 w-full h-full pointer-events-none"
+        className="absolute inset-0 w-full h-full pointer-events-none select-none"
         style={{ objectFit: "contain", zIndex: 2 }}
         draggable={false}
       />
