@@ -23,6 +23,10 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [] }) => {
           WebkitMaskRepeat: "no-repeat",
           WebkitMaskPosition: "center",
           WebkitMaskSize: "contain",
+          maskImage: "url(/body-mask.svg)",
+          maskRepeat: "no-repeat",
+          maskPosition: "center",
+          maskSize: "contain",
         }}
       />
 
@@ -36,7 +40,7 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [] }) => {
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
       />
 
-      {/* Z5 GLASSES */}
+      {/* GLASSES */}
       {has("glasses") && (
         <img
           src="/glasses-basic.svg"
@@ -45,7 +49,7 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [] }) => {
         />
       )}
 
-      {/* Z6 HAT */}
+      {/* HATS */}
       {has("cap") && (
         <img src="/hat-cap.svg" alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
       )}
