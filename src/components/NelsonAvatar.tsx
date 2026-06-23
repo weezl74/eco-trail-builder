@@ -10,8 +10,8 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor = "#e8d9b8", accessories = []
   const has = (id: string) => accessories.includes(id);
 
   return (
-    <div className={`relative ${className}`}>
-      <div className="relative w-full h-full overflow-hidden -translate-x-[6%] -translate-y-[2%]">
+    <div className={"relative " + className}>
+      <div className="relative w-full h-full overflow-hidden">
         {/* BODY BASE */}
         <img
           src="/profile/body-base-nohead.svg"
@@ -21,16 +21,17 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor = "#e8d9b8", accessories = []
           draggable={false}
         />
 
-        {/* WOOL COLOUR (MASKED) */}
+        {/* WOOL COLOUR MASK */}
         <div
-          className="absolute inset-0"
           style={{
+            position: "absolute",
+            inset: 0,
             backgroundColor: woolColor,
-            WebkitMaskImage: "url('/body-mask.svg')",
+            WebkitMaskImage: "url(/body-mask.svg)",
             WebkitMaskRepeat: "no-repeat",
             WebkitMaskPosition: "center",
             WebkitMaskSize: "contain",
-            maskImage: "url('/body-mask.svg')",
+            maskImage: "url(/body-mask.svg)",
             maskRepeat: "no-repeat",
             maskPosition: "center",
             maskSize: "contain",
@@ -44,7 +45,6 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor = "#e8d9b8", accessories = []
           alt=""
           className="absolute inset-0 w-full h-full pointer-events-none"
           style={{ objectFit: "contain", zIndex: 3 }}
-          draggable={false}
         />
 
         {/* GLASSES */}
