@@ -1,4 +1,3 @@
-
 import React from "react";
 
 interface Props {
@@ -8,7 +7,6 @@ interface Props {
   className?: string;
 }
 
-// ✅ HEAD FILE
 const getHeadFile = (head: string, accessories: string[]) => {
   const base = "/profile/";
 
@@ -35,11 +33,9 @@ const NelsonAvatar: React.FC<Props> = ({
 
   return (
     <div className={`relative ${className}`}>
-
-      {/* ✅ FIX WHITE BORDER */}
+      {/* OFFSET WRAPPER */}
       <div className="relative w-full h-full overflow-hidden -translate-x-[6%] -translate-y-[2%]">
-
-        {/* ✅ COLOUR LAYER */}
+        {/* WOOL COLOUR */}
         <div
           className="absolute inset-0"
           style={{
@@ -50,35 +46,69 @@ const NelsonAvatar: React.FC<Props> = ({
           }}
         />
 
-        {/* ✅ BODY DETAIL (NOW PARTIALLY TRANSPARENT) */}
-        /body-base-nohead.svg
-
-        {/* ✅ HEAD (FIXED JSX STRUCTURE) */}
-        {getHeadFile(head, alt=""
+        {/* BODY DETAIL */}
+        <img
+          src="/body-base-nohead.svg"
+          alt=""
           className="absolute inset-0 w-full h-full pointer-events-none"
-          style={{ objectFit: "contain", zIndex: 3 }}
+          style={{ objectFit: "contain", zIndex: 2, opacity: 0.7 }}
+          draggable={false}
         />
 
-        {/* ✅ GLASSES */}
+        {/* HEAD */}
+        <img
+          src={getHeadFile(head, accessories)}
+          alt=""
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          style={{ objectFit: "contain", zIndex: 3 }}
+          draggable={false}
+        />
+
+        {/* GLASSES */}
         {has("glasses") && (
-          /glasses-basic.svg
+          <img
+            src="/glasses-basic.svg"
+            alt=""
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            style={{ objectFit: "contain", zIndex: 4 }}
+          />
         )}
 
         {has("starGlasses") && (
-          /glasses-star.svg
+          <img
+            src="/glasses-star.svg"
+            alt=""
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            style={{ objectFit: "contain", zIndex: 4 }}
+          />
         )}
 
-        {/* ✅ HATS */}
+        {/* HATS */}
         {has("cap") && (
-          /hat-cap.svg
+          <img
+            src="/hat-cap.svg"
+            alt=""
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            style={{ objectFit: "contain", zIndex: 5 }}
+          />
         )}
 
         {has("pirateHat") && (
-          /hat-pirate.svg
+          <img
+            src="/hat-pirate.svg"
+            alt=""
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            style={{ objectFit: "contain", zIndex: 5 }}
+          />
         )}
 
         {has("sunhat") && (
-          /hat-sun.svg
+          <img
+            src="/hat-sun.svg"
+            alt=""
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            style={{ objectFit: "contain", zIndex: 5 }}
+          />
         )}
       </div>
     </div>
