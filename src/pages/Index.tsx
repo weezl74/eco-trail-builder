@@ -1,123 +1,106 @@
-import React from "react";
+import { useState, useEffect } from "react";
+import LandingScreen from "@/components/LandingScreen";
+import LanguageSelect from "@/components/LanguageSelect";
+import AuthChoice from "@/components/AuthChoice";
+import LoginForm from "@/components/LoginForm";
+import RegisterForm, { RegistrationDetails } from "@/components/RegisterForm";
+import SimplifiedApp from "@/components/SimplifiedApp";
+import BusinessOnboarding from "@/components/business/BusinessOnboarding";
+import BusinessApp from "@/components/business/BusinessApp";
+import { useAuth } from "@/hooks/useAuth";
+import { API_BASE_URL } from "@/lib/api";
 
-interface Props {
-  woolColor: string;
-  accessories?: string[];
-  head?: "nelson" | "barb";
-  className?: string;
-}
 
-const getHeadFile = (head: string, accessories: string[]) => {
-  const base = "/profile/";
+type Stage = "landing" | "language" | "auth" | "login" | "register" | "app" | "business-onboarding" | "business-app";
 
-  if (head !== "nelson") return base + "head-nelson-base.svg";
+const Index = () => {
+  const [stage, setStage] = useState<Stage>("landing");
+  const [language, setLanguage] = useState<"en" | "cy">(() => {
+    try {
+      return (localStorage.getItem("app_language") as "en" | "cy") || "en";
+    } catch {
+      return "en";
+    }
+  });
+  const { user, loading } = useAuth();
+  const [bootChecked, setBootChecked] = useState(false);
 
-  if (accessories.includes("mohawk")) {
-    return base + "head-nelson-mohawk.svg";
+  // Decide between resident-app and business-app based on profiles.account_type
+  const routeAuthenticated = async () => {
+    if (!user) return;
+    try {
+      await fetch(`${API_BASE_URL}/profile?user_id=${user.id}`);
+    } catch (err) {
+      console.error(err);
+    }
+    setStage("app");
+  };
+
+  useEffect(() => {
+    if (!loading && user) {
+      routeAuthenticated();
+    }
+  }, [loading, user]);
+
+  if (loading && !bootChecked) {
+    return <div className="min-h-screen bg-[#f5a623]" />;
   }
 
-  if (accessories.includes("bowtie")) {
-    return base + "head-nelson-bowtie.svg";
+  if (!loading && user) {
+    return <SimplifiedApp onBackToLanding={() => setStage("landing")} language={language} />;
   }
 
-  return base + "head-nelson-base.svg";
+  if (stage === "business-app") {
+    return <BusinessApp onSignOut={() => setStage("landing")} onEditCard={() => setStage("business-onboarding")} />;
+  }
+
+  if (stage === "business-onboarding") {
+    return <BusinessOnboarding editMode={!!user} onComplete={() => setStage("business-app")} />;
+  }
+
+  if (!loading && user) {
+    return <SimplifiedApp onBackToLanding={() => setStage("landing")} language={language} />;
+  }
+
+  if (stage === "app") {
+    return <SimplifiedApp onBackToLanding={() => setStage("landing")} language={language} />;
+  }
+
+  if (stage === "register") {
+    return (
+      <RegisterForm
+        onComplete={(_details: RegistrationDetails, isBusiness: boolean) => {
+          // PII (name, email, postcode, phone, age) is persisted server-side in the
+          // profile via the auth trigger — do not echo it back into browser storage.
+          setStage(isBusiness ? "business-onboarding" : "app");
+        }}
+      />
+    );
+  }
+
+  if (stage === "login") {
+    return <LoginForm onSuccess={() => routeAuthenticated()} />;
+  }
+
+  if (stage === "auth") {
+    return <AuthChoice onSelect={(choice) => setStage(choice === "register" ? "register" : "login")} />;
+  }
+
+  if (stage === "language") {
+    return (
+      <LanguageSelect
+        onSelect={(lang) => {
+          setLanguage(lang);
+          try {
+            localStorage.setItem("app_language", lang);
+          } catch {}
+          setStage("auth");
+        }}
+      />
+    );
+  }
+
+  return <LandingScreen onBeetleClick={() => setStage("language")} />;
 };
 
-const NelsonAvatar: React.FC<Props> = ({
-  woolColor = "#ffffff",
-  accessories = [],
-  head = "nelson",
-  className = "",
-}) => {
-  const has = (id: string) => accessories.includes(id);
-
-  return (
-    <div className={`relative ${className}`}>
-      {/* ✅ OFFSET + CLIP EDGE */}
-      <div className="relative w-full h-full overflow-hidden -translate-x-[6%] -translate-y-[2%] scale-[1.02]">
-        {/* ✅ WOOL COLOUR (MASK) */}
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundColor: woolColor,
-            WebkitMask: "url(/body-mask.svg) center / contain no-repeat",
-            mask: "url(/body-mask.svg) center / contain no-repeat",
-            zIndex: 1,
-          }}
-        />
-
-        {/* ✅ BODY DETAIL (BLENDED SHADING ONLY) */}
-        <img
-          src="/body-base-nohead.svg"
-          alt=""
-          className="absolute inset-0 w-full h-full pointer-events-none"
-          style={{
-            objectFit: "contain",
-            zIndex: 2,
-            opacity: 0.35, // 🔥 key change
-            mixBlendMode: "multiply", // 🔥 key change
-          }}
-          draggable={false}
-        />
-
-        {/* ✅ HEAD */}
-        <img
-          src={getHeadFile(head, accessories)}
-          alt=""
-          className="absolute inset-0 w-full h-full pointer-events-none"
-          style={{ objectFit: "contain", zIndex: 3 }}
-          draggable={false}
-        />
-
-        {/* ✅ GLASSES */}
-        {has("glasses") && (
-          <img
-            src="/glasses-basic.svg"
-            alt=""
-            className="absolute inset-0 w-full h-full pointer-events-none"
-            style={{ objectFit: "contain", zIndex: 4 }}
-          />
-        )}
-
-        {has("starGlasses") && (
-          <img
-            src="/glasses-star.svg"
-            alt=""
-            className="absolute inset-0 w-full h-full pointer-events-none"
-            style={{ objectFit: "contain", zIndex: 4 }}
-          />
-        )}
-
-        {/* ✅ HATS */}
-        {has("cap") && (
-          <img
-            src="/hat-cap.svg"
-            alt=""
-            className="absolute inset-0 w-full h-full pointer-events-none"
-            style={{ objectFit: "contain", zIndex: 5 }}
-          />
-        )}
-
-        {has("pirateHat") && (
-          <img
-            src="/hat-pirate.svg"
-            alt=""
-            className="absolute inset-0 w-full h-full pointer-events-none"
-            style={{ objectFit: "contain", zIndex: 5 }}
-          />
-        )}
-
-        {has("sunhat") && (
-          <img
-            src="/hat-sun.svg"
-            alt=""
-            className="absolute inset-0 w-full h-full pointer-events-none"
-            style={{ objectFit: "contain", zIndex: 5 }}
-          />
-        )}
-      </div>
-    </div>
-  );
-};
-
-export default NelsonAvatar;
+export default Index;
