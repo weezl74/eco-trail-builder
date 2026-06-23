@@ -35,7 +35,7 @@ const NelsonAvatar: React.FC<Props> = ({
 
         {/* ✅ 2. BODY DETAIL (NOW ABOVE MASK ✅) */}
         <img
-          src="/body-base-nohead.svg"
+          src="/profile/body-base-nohead.svg"
           alt=""
           className="absolute inset-0 w-full h-full pointer-events-none"
           style={{ objectFit: "contain", zIndex: 2 }}
