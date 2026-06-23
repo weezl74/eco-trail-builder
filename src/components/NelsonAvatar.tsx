@@ -23,14 +23,30 @@ const NelsonAvatar: React.FC<Props> = ({
     <div className={`relative ${className}`}>
       <div className="relative w-full h-full overflow-hidden -translate-x-[6%] -translate-y-[2%]">
         {/* ✅ 1. WOOL COLOUR BASE (BOTTOM) */}
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundColor: woolColor,
-            WebkitMask: "url(/body-mask.svg) center / contain no-repeat",
-            mask: "url(/body-mask.svg) center / contain no-repeat",
-            zIndex: 1,
-          }}
+       
+<div
+  className="absolute inset-0"
+  style={{
+    backgroundColor: woolColor,
+    WebkitMaskImage: "url(/body-mask.svg)",
+    maskImage: "url(/body-mask.svg)",
+
+    WebkitMaskRepeat: "no-repeat",
+    maskRepeat: "no-repeat",
+
+    WebkitMaskPosition: "center",
+    maskPosition: "center",
+
+    WebkitMaskSize: "contain",
+    maskSize: "contain",
+
+    WebkitMaskMode: "alpha",
+    maskMode: "alpha",
+
+    zIndex: 1,
+  }}
+/>
+
         />
 
         {/* ✅ 2. BODY DETAIL (NOW ABOVE MASK ✅) */}
