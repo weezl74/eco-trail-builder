@@ -24,20 +24,23 @@ const getHeadFile = (head: string, accessories: string[]) => {
   return base + "head-nelson-base.svg";
 };
 
-const NelsonAvatar: React.FC<Props> = ({ woolColor = "#ffffff", accessories = [], head = "nelson", className }) => {
+const NelsonAvatar: React.FC<Props> = ({
+  woolColor, // not used in debug version
+  accessories = [],
+  head = "nelson",
+  className,
+}) => {
   const has = (id: string) => accessories.includes(id);
 
   return (
     <div className={`relative ${className ?? ""}`}>
-      {/* ✅ BODY (MASK — CLEAN VERSION) */}
+      {/* ✅ DEBUG MASK TEST (FORCE RED) */}
       <div
         className="absolute inset-0"
         style={{
-          backgroundColor: woolColor,
-
-          WebkitMask: "url(/body-base-nohead.svg) center / contain no-repeat",
-          mask: "url(/body-base-nohead.svg) center / contain no-repeat",
-
+          backgroundColor: "red",
+          WebkitMask: "url(/body-mask.svg) center / contain no-repeat",
+          mask: "url(/body-mask.svg) center / contain no-repeat",
           zIndex: 1,
         }}
       />
