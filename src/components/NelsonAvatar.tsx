@@ -11,8 +11,8 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor = "#e8d9b8", accessories = []
 
   return (
     <div className={`relative ${className}`}>
-      <div className="relative w-full h-full overflow-hidden -translate-x-[6%] -translate-y-[2%]">
-        {/* BODY BASE */}
+      <div className="relative w-full h-full overflow-hidden -translate-x-[6%] -translate-y-[2%']">
+        {/* 1. BODY BASE (legs, arms, outlines) */}
         <img
           src="/profile/body-base-nohead.svg"
           alt=""
@@ -21,16 +21,16 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor = "#e8d9b8", accessories = []
           draggable={false}
         />
 
-        {/* WOOL COLOUR (MASKED) */}
+        {/* 2. WOOL COLOUR (masked) */}
         <div
           className="absolute inset-0"
           style={{
             backgroundColor: woolColor,
-            WebkitMaskImage: "url('/body-mask.svg')",
+            WebkitMaskImage: "url(/body-mask.svg)",
             WebkitMaskRepeat: "no-repeat",
             WebkitMaskPosition: "center",
             WebkitMaskSize: "contain",
-            maskImage: "url('/body-mask.svg')",
+            maskImage: "url(/body-mask.svg)",
             maskRepeat: "no-repeat",
             maskPosition: "center",
             maskSize: "contain",
@@ -38,7 +38,7 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor = "#e8d9b8", accessories = []
           }}
         />
 
-        {/* HEAD */}
+        {/* 3. HEAD */}
         <img
           src="/profile/head-nelson-base.svg"
           alt=""
@@ -51,15 +51,6 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor = "#e8d9b8", accessories = []
         {has("glasses") && (
           <img
             src="/glasses-basic.svg"
-            alt=""
-            className="absolute inset-0 w-full h-full pointer-events-none"
-            style={{ objectFit: "contain", zIndex: 4 }}
-          />
-        )}
-
-        {has("starGlasses") && (
-          <img
-            src="/glasses-star.svg"
             alt=""
             className="absolute inset-0 w-full h-full pointer-events-none"
             style={{ objectFit: "contain", zIndex: 4 }}
