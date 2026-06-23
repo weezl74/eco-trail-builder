@@ -1,3 +1,4 @@
+
 import React from "react";
 
 interface Props {
@@ -21,35 +22,27 @@ const NelsonAvatar: React.FC<Props> = ({
 
   return (
     <div className={`relative ${className}`}>
+
       <div className="relative w-full h-full overflow-hidden -translate-x-[6%] -translate-y-[2%]">
-        {/* ✅ 1. WOOL COLOUR BASE (BOTTOM) */}
-       
-<div
-  className="absolute inset-0"
-  style={{
-    backgroundColor: woolColor,
-    WebkitMaskImage: "url(/body-mask.svg)",
-    maskImage: "url(/body-mask.svg)",
 
-    WebkitMaskRepeat: "no-repeat",
-    maskRepeat: "no-repeat",
-
-    WebkitMaskPosition: "center",
-    maskPosition: "center",
-
-    WebkitMaskSize: "contain",
-    maskSize: "contain",
-
-    WebkitMaskMode: "alpha",
-    maskMode: "alpha",
-
-    zIndex: 1,
-  }}
-/>
-
+        {/* ✅ WOOL COLOUR USING MASK (safe syntax) */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundColor: woolColor,
+            WebkitMaskImage: "url(/body-mask.svg)",
+            WebkitMaskRepeat: "no-repeat",
+            WebkitMaskPosition: "center",
+            WebkitMaskSize: "contain",
+            maskImage: "url(/body-mask.svg)",
+            maskRepeat: "no-repeat",
+            maskPosition: "center",
+            maskSize: "contain",
+            zIndex: 1,
+          }}
         />
 
-        {/* ✅ 2. BODY DETAIL (NOW ABOVE MASK ✅) */}
+        {/* ✅ BODY DETAIL */}
         <img
           src="/profile/body-base-nohead.svg"
           alt=""
@@ -58,7 +51,7 @@ const NelsonAvatar: React.FC<Props> = ({
           draggable={false}
         />
 
-        {/* ✅ 3. HEAD */}
+        {/* ✅ HEAD */}
         <img
           src={getHeadFile(head)}
           alt=""
@@ -110,12 +103,3 @@ const NelsonAvatar: React.FC<Props> = ({
             src="/hat-sun.svg"
             alt=""
             className="absolute inset-0 w-full h-full pointer-events-none"
-            style={{ objectFit: "contain", zIndex: 5 }}
-          />
-        )}
-      </div>
-    </div>
-  );
-};
-
-export default NelsonAvatar;
