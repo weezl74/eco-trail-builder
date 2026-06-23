@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import sheepBody from '@/assets/sheep/SheepBody.svg.asset.json';
+
+const BODY_URL = '/profile/body-base-nohead.svg';
 
 let cached: string | null = null;
 let inflight: Promise<string> | null = null;
@@ -7,7 +8,7 @@ let inflight: Promise<string> | null = null;
 const loadSvg = async (): Promise<string> => {
   if (cached) return cached;
   if (inflight) return inflight;
-  inflight = fetch(sheepBody.url)
+  inflight = fetch(BODY_URL)
     .then((r) => r.text())
     .then((t) => {
       cached = t;
@@ -47,7 +48,7 @@ const TintedSheepBody: React.FC<Props> = ({ color, className, style }) => {
   if (!svg) {
     return (
       <img
-        src={sheepBody.url}
+        src={BODY_URL}
         alt=""
         className={className}
         style={style}
