@@ -26,7 +26,7 @@ const NelsonAvatar: React.FC<Props> = ({ accessories = [], head = "nelson", clas
 
   return (
     <div className={`relative ${className ?? ""} flex items-center justify-center`}>
-      {/* ✅ VISUAL OFFSET */}
+      {/* ✅ VISUAL CENTRE OFFSET */}
       <div className="relative w-full h-full -translate-x-[6%]">
         {/* ✅ BODY */}
         <img
@@ -53,6 +53,7 @@ const NelsonAvatar: React.FC<Props> = ({ accessories = [], head = "nelson", clas
             alt=""
             className="absolute inset-0 w-full h-full pointer-events-none"
             style={{ objectFit: "contain", zIndex: 3 }}
+            draggable={false}
           />
         )}
 
@@ -62,6 +63,7 @@ const NelsonAvatar: React.FC<Props> = ({ accessories = [], head = "nelson", clas
             alt=""
             className="absolute inset-0 w-full h-full pointer-events-none"
             style={{ objectFit: "contain", zIndex: 3 }}
+            draggable={false}
           />
         )}
 
@@ -72,6 +74,7 @@ const NelsonAvatar: React.FC<Props> = ({ accessories = [], head = "nelson", clas
             alt=""
             className="absolute inset-0 w-full h-full pointer-events-none"
             style={{ objectFit: "contain", zIndex: 4 }}
+            draggable={false}
           />
         )}
 
@@ -81,6 +84,7 @@ const NelsonAvatar: React.FC<Props> = ({ accessories = [], head = "nelson", clas
             alt=""
             className="absolute inset-0 w-full h-full pointer-events-none"
             style={{ objectFit: "contain", zIndex: 4 }}
+            draggable={false}
           />
         )}
 
@@ -90,6 +94,7 @@ const NelsonAvatar: React.FC<Props> = ({ accessories = [], head = "nelson", clas
             alt=""
             className="absolute inset-0 w-full h-full pointer-events-none"
             style={{ objectFit: "contain", zIndex: 4 }}
+            draggable={false}
           />
         )}
       </div>
@@ -98,4 +103,3 @@ const NelsonAvatar: React.FC<Props> = ({ accessories = [], head = "nelson", clas
 };
 
 export default NelsonAvatar;
-``;
