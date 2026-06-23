@@ -1,4 +1,3 @@
-
 import React from "react";
 import TintedSheepBody from "./TintedSheepBody";
 
@@ -9,9 +8,9 @@ interface Props {
   className?: string;
 }
 
-// ✅ Map old accessory IDs → new assets
+// ✅ Decide which head to show
 const getHeadFile = (head: string, accessories: string[]) => {
-  if (head !== "nelson") return "/profile/head-nelson-base.svg"; // fallback
+  if (head !== "nelson") return "/profile/head-nelson-base.svg";
 
   if (accessories.includes("mohawk")) {
     return "/profile/head-nelson-mohawk.svg";
@@ -24,25 +23,21 @@ const getHeadFile = (head: string, accessories: string[]) => {
   return "/profile/head-nelson-base.svg";
 };
 
-const NelsonAvatar: React.FC<Props> = ({
-  woolColor,
-  accessories = [],
-  head = "nelson",
-  className,
-}) => {
+const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [], head = "nelson", className }) => {
   const has = (id: string) => accessories.includes(id);
 
   return (
     <div className={`relative ${className ?? ""}`}>
-
       {/* ✅ BODY */}
       <TintedSheepBody
         color={woolColor}
         className="absolute inset-0 w-full h-full [&>svg]:w-full [&>svg]:h-full [&>svg]:object-contain"
       />
 
-      {/* ✅ HEAD (composite system) */}
-      {getHeadFile(head,="sheep head"
+      {/* ✅ HEAD */}
+      <img
+        src={getHeadFile(head, accessories)}
+        alt="sheep head"
         className="absolute inset-0 w-full h-full pointer-events-none select-none"
         style={{ objectFit: "contain", zIndex: 2 }}
         draggable={false}
@@ -50,16 +45,27 @@ const NelsonAvatar: React.FC<Props> = ({
 
       {/* ✅ GLASSES */}
       {has("glasses") && (
-        /profile/glasses-basic.svg
+        <img
+          src="/profile/glasses-basic.svg"
+          alt=""
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          style={{ objectFit: "contain", zIndex: 3 }}
+        />
       )}
 
       {has("starGlasses") && (
-        /profile/glasses-star.svg
+        <img
+          src="/profile/glasses-star.svg"
+          alt=""
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          style={{ objectFit: "contain", zIndex: 3 }}
+        />
       )}
 
       {/* ✅ HATS */}
       {has("cap") && (
-        profile/hat-cap.svg"
+        <img
+          src="/profile/hat-cap.svg"
           alt=""
           className="absolute inset-0 w-full h-full pointer-events-none"
           style={{ objectFit: "contain", zIndex: 4 }}
@@ -67,17 +73,22 @@ const NelsonAvatar: React.FC<Props> = ({
       )}
 
       {has("pirateHat") && (
-        /profile/hat-pirate.svg
-      )}
-
-      {has("sunhat") && (
-        un.svg"
+        <img
+          src="/profile/hat-pirate.svg"
           alt=""
           className="absolute inset-0 w-full h-full pointer-events-none"
           style={{ objectFit: "contain", zIndex: 4 }}
         />
       )}
 
+      {has("sunhat") && (
+        <img
+          src="/profile/hat-sun.svg"
+          alt=""
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          style={{ objectFit: "contain", zIndex: 4 }}
+        />
+      )}
     </div>
   );
 };
