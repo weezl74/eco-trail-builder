@@ -16,12 +16,9 @@ type Screen = "home" | "avatar" | "calendar" | "rewards" | "messages" | "groups"
 const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges }) => {
   const [screen, setScreen] = useState<Screen>("home");
 
-  // ✅ LAYER TOGGLES (not swap anymore)
-  const [showBase, setShowBase] = useState(true);
-  const [showAltFrame, setShowAltFrame] = useState(false);
-  const [showGroup6380, setShowGroup6380] = useState(false);
-  const [showGroupAlt, setShowGroupAlt] = useState(false);
-  const [showGroup6385, setShowGroup6385] = useState(false);
+  // ✅ TEST STATE
+  const [hat, setHat] = useState<string | null>(null);
+  const [glasses, setGlasses] = useState<string | null>(null);
 
   const { savings, pledged, woolPoints, treePoints, woolColor, accessories } = useSavings();
   const { t } = useTranslations();
@@ -57,78 +54,62 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
 
       <BinDayBanner />
 
-      {/* Points */}
-      <div className="mx-4 mt-1.5 grid grid-cols-2 gap-1.5">
-        <div className="bg-[#f5a623] rounded-xl py-1.5 px-2 text-center text-black font-bold">
-          <div>{woolPoints}</div>
-          <div className="text-[9px]">{t("Wool Points")}</div>
-        </div>
-        <div className="bg-green-700 rounded-xl py-1.5 px-2 text-center text-white font-bold">
-          <div>{treePoints}</div>
-          <div className="text-[9px]">{t("Tree Points")}</div>
-        </div>
-      </div>
-
-      {/* Savings */}
-      <div className="mx-4 mt-1.5 bg-[#1f1f1f] rounded-xl px-3 py-1.5 text-white text-xs">
-        <div>
-          {t("Money")}: £{savings.money}
-        </div>
-        <div>CO₂e: {savings.co2}</div>
-        <div>
-          {t("Water")}: {savings.water}
-        </div>
-        <div>
-          {t("Pledges made")}: {pledged.length}
-        </div>
-      </div>
-
       {/* Illustration */}
-      <div className="mx-4 mt-1.5 rounded-2xl overflow-hidden bg-[#1f1f1f] relative flex-1">
-        {badHomepageAsset.url}
+      <div className="mx-4 mt-2 rounded-2xl overflow-hidden bg-[#1f1f1f] relative h-[300px]">
+        {/* ✅ LAYER STACK TEST */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="relative w-[200px] h-[200px]">
+            {/* BODY */}
+            <img src="/body-base.svg" className="absolute inset-0 w-full h-full object-contain" />
 
-        <NelsonAvatar
-          woolColor={woolColor}
-          accessories={accessories}
-          className="absolute bottom-28 -left-2 w-[180px] h-[180px]"
-        />
+            {/* GLASSES */}
+            {glasses && (
+              <img src={`/glasses-${glasses}.svg`} className="absolute inset-0 w-full h-full object-contain" />
+            )}
+
+            {/* HAT */}
+            {hat && <img src={`/hat-${hat}.svg`} className="absolute inset-0 w-full h-full object-contain" />}
+
+            {/* Crosshair */}
+            <div className="absolute left-1/2 top-0 w-[1px] h-full bg-red-400 opacity-30" />
+            <div className="absolute top-1/2 left-0 h-[1px] w-full bg-red-400 opacity-30" />
+          </div>
+        </div>
       </div>
 
-      {/* CTA */}
-      <div className="mx-4 mt-2">
-        <button onClick={onGoToPledges} className="bg-[#f5a623] w-full py-3 rounded-xl">
-          {t("Save Me More")}
-        </button>
-      </div>
-
-      {/* ✅ ✅ SVG LAYER TESTER */}
-      <div className="mx-4 mt-6 mb-6 bg-white p-4 rounded-xl">
-        <div className="text-center font-bold mb-2">SVG Layer Tester</div>
-
-        {/* ✅ PREVIEW (ALL LAYERS STACKED) */}
-        <div className="w-[200px] h-[200px] border mx-auto mb-4 relative bg-white">
-          {showBase && <img src="/Frame_83.svg" className="absolute top-0 left-0 w-full h-full opacity-80" />}
-
-          {showAltFrame && <img src="/Frame_83_1.svg" className="absolute top-0 left-0 w-full h-full opacity-80" />}
-
-          {showGroup6380 && <img src="/Group_6380.svg" className="absolute top-0 left-0 w-full h-full opacity-80" />}
-
-          {showGroupAlt && <img src="/Group_6380-2.svg" className="absolute top-0 left-0 w-full h-full opacity-80" />}
-
-          {showGroup6385 && <img src="/Group_6385.svg" className="absolute top-0 left-0 w-full h-full opacity-80" />}
-
-          {/* crosshair */}
-          <div className="absolute left-1/2 top-0 w-[1px] h-full bg-red-400 opacity-30" />
-          <div className="absolute top-1/2 left-0 h-[1px] w-full bg-red-400 opacity-30" />
+      {/* ✅ CONTROLS */}
+      <div className="mx-4 mt-4 text-white space-y-3">
+        <div>
+          <div className="mb-1">Hats</div>
+          <div className="flex gap-2 flex-wrap">
+            <button onClick={() => setHat(null)} className="px-2 py-1 bg-gray-700 rounded">
+              None
+            </button>
+            <button onClick={() => setHat("cap")} className="px-2 py-1 bg-gray-700 rounded">
+              Cap
+            </button>
+            <button onClick={() => setHat("pirate")} className="px-2 py-1 bg-gray-700 rounded">
+              Pirate
+            </button>
+            <button onClick={() => setHat("sun")} className="px-2 py-1 bg-gray-700 rounded">
+              Sun
+            </button>
+          </div>
         </div>
 
-        {/* ✅ CONTROLS */}
-        <div className="flex flex-wrap gap-2 justify-center text-sm">
-          <button onClick={() => setShowBase((prev) => !prev)}>Base</button>
-          <button onClick={() => setShowAltFrame((prev) => !prev)}>Frame Alt</button>
-          <button onClick={() => setShowGroup6380((prev) => !prev)}>6380</button>
-          <button onClick={() => setShowGroupAlt((prev) => !prev)}>6380 Alt</button>
-          <button onClick={() => setShowGroup6385((prev) => !prev)}>6385</button>
+        <div>
+          <div className="mb-1">Glasses</div>
+          <div className="flex gap-2 flex-wrap">
+            <button onClick={() => setGlasses(null)} className="px-2 py-1 bg-gray-700 rounded">
+              None
+            </button>
+            <button onClick={() => setGlasses("basic")} className="px-2 py-1 bg-gray-700 rounded">
+              Basic
+            </button>
+            <button onClick={() => setGlasses("star")} className="px-2 py-1 bg-gray-700 rounded">
+              Star
+            </button>
+          </div>
         </div>
       </div>
     </div>
