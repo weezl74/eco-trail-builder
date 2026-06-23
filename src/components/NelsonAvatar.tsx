@@ -29,7 +29,7 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor = "#ffffff", accessories = []
 
   return (
     <div className={`relative ${className ?? ""}`}>
-      {/* ✅ OFFSET WRAPPER (fixes alignment WITHOUT re-exporting SVGs) */}
+      {/* ✅ POSITION OFFSET */}
       <div className="relative w-full h-full -translate-x-[6%] -translate-y-[2%]">
         {/* ✅ 1. WOOL COLOUR */}
         <div
@@ -42,12 +42,16 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor = "#ffffff", accessories = []
           }}
         />
 
-        {/* ✅ 2. BODY DETAIL (existing SVG, no changes) */}
+        {/* ✅ 2. BODY DETAIL (MAKE TRANSPARENT) */}
         <img
           src="/body-base-nohead.svg"
           alt=""
           className="absolute inset-0 w-full h-full pointer-events-none"
-          style={{ objectFit: "contain", zIndex: 2 }}
+          style={{
+            objectFit: "contain",
+            zIndex: 2,
+            opacity: 0.75, // 👈 THIS FIXES GREY ISSUE
+          }}
           draggable={false}
         />
 
