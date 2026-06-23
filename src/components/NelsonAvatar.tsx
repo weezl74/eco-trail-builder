@@ -1,5 +1,4 @@
 import React from "react";
-import TintedSheepBody from "./TintedSheepBody";
 
 interface Props {
   woolColor: string;
@@ -8,7 +7,7 @@ interface Props {
   className?: string;
 }
 
-// ✅ Decide which head to show (FIXED PATH)
+// ✅ HEAD PATH (your files are in /profile/)
 const getHeadFile = (head: string, accessories: string[]) => {
   const base = "/profile/";
 
@@ -30,13 +29,24 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [], head = "ne
 
   return (
     <div className={`relative ${className ?? ""}`}>
-      {/* ✅ TINTED BODY (works again) */}
-      <TintedSheepBody
-        color={woolColor}
-        className="absolute inset-0 w-full h-full [&>svg]:w-full [&>svg]:h-full [&>svg]:object-contain"
+      {/* ✅ BODY (tintable using mask) */}
+      <div
+        className="absolute inset-0 w-full h-full pointer-events-none"
+        style={{
+          backgroundColor: woolColor || "#ffffff",
+          WebkitMaskImage: "url(/body-base-nohead.svg)",
+          maskImage: "url(/body-base-nohead.svg)",
+          WebkitMaskRepeat: "no-repeat",
+          maskRepeat: "no-repeat",
+          WebkitMaskPosition: "center",
+          maskPosition: "center",
+          WebkitMaskSize: "contain",
+          maskSize: "contain",
+          zIndex: 1,
+        }}
       />
 
-      {/* ✅ HEAD (FIXED PATH) */}
+      {/* ✅ HEAD */}
       <img
         src={getHeadFile(head, accessories)}
         alt="sheep head"
@@ -45,7 +55,7 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [], head = "ne
         draggable={false}
       />
 
-      {/* ✅ GLASSES (root /public) */}
+      {/* ✅ GLASSES */}
       {has("glasses") && (
         <img
           src="/glasses-basic.svg"
@@ -64,7 +74,7 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [], head = "ne
         />
       )}
 
-      {/* ✅ HATS (root /public) */}
+      {/* ✅ HATS */}
       {has("cap") && (
         <img
           src="/hat-cap.svg"
