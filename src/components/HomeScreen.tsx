@@ -16,8 +16,8 @@ type Screen = "home" | "avatar" | "calendar" | "rewards" | "messages" | "groups"
 const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges }) => {
   const [screen, setScreen] = useState<Screen>("home");
 
-  // ✅ SVG TEST STATE
-  const [testSvg, setTestSvg] = useState("/Frame 83.svg");
+  // ✅ SVG TEST STATE (UPDATED FILES)
+  const [testSvg, setTestSvg] = useState("/Frame_83.svg");
 
   const { savings, pledged, woolPoints, treePoints, woolColor, accessories } = useSavings();
   const { t } = useTranslations();
@@ -33,20 +33,20 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
       {/* Icon pill */}
       <div className="pt-3 flex justify-center">
         <div className="bg-[#f5a623] rounded-full px-4 py-2 flex items-center gap-4 shadow-lg">
-          <button onClick={() => setScreen("messages")} aria-label="Messages from Nelson">
-            <Mail className="h-6 w-6 text-white" strokeWidth={2.5} />
+          <button onClick={() => setScreen("messages")}>
+            <Mail className="h-6 w-6 text-white" />
           </button>
-          <button onClick={() => setScreen("rewards")} aria-label="Your rewards">
-            <Gift className="h-6 w-6 text-white" strokeWidth={2.5} />
+          <button onClick={() => setScreen("rewards")}>
+            <Gift className="h-6 w-6 text-white" />
           </button>
-          <button onClick={() => setScreen("calendar")} aria-label="Events and achievements">
-            <Calendar className="h-6 w-6 text-white" strokeWidth={2.5} />
+          <button onClick={() => setScreen("calendar")}>
+            <Calendar className="h-6 w-6 text-white" />
           </button>
-          <button onClick={() => setScreen("avatar")} aria-label="Customise sheep">
-            <Shirt className="h-6 w-6 text-white" strokeWidth={2.5} />
+          <button onClick={() => setScreen("avatar")}>
+            <Shirt className="h-6 w-6 text-white" />
           </button>
-          <button onClick={() => setScreen("groups")} aria-label="Groups">
-            <Users className="h-6 w-6 text-white" strokeWidth={2.5} />
+          <button onClick={() => setScreen("groups")}>
+            <Users className="h-6 w-6 text-white" />
           </button>
         </div>
       </div>
@@ -55,65 +55,54 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
 
       {/* Points */}
       <div className="mx-4 mt-1.5 grid grid-cols-2 gap-1.5">
-        <div className="bg-[#f5a623] rounded-xl py-1.5 px-2 text-center text-black font-serif font-bold">
-          <div className="text-xl leading-tight">{woolPoints}</div>
-          <div className="text-[9px] uppercase tracking-wide">{t("Wool Points")}</div>
+        <div className="bg-[#f5a623] rounded-xl py-1.5 px-2 text-center text-black font-bold">
+          <div>{woolPoints}</div>
+          <div className="text-[9px]">{t("Wool Points")}</div>
         </div>
-        <div className="bg-green-700 rounded-xl py-1.5 px-2 text-center text-white font-serif font-bold">
-          <div className="text-xl leading-tight">{treePoints}</div>
-          <div className="text-[9px] uppercase tracking-wide">{t("Tree Points")}</div>
+        <div className="bg-green-700 rounded-xl py-1.5 px-2 text-center text-white font-bold">
+          <div>{treePoints}</div>
+          <div className="text-[9px]">{t("Tree Points")}</div>
         </div>
       </div>
 
       {/* Savings */}
-      <div className="mx-4 mt-1.5 bg-[#1f1f1f] rounded-xl px-3 py-1.5 text-white">
-        <h2 className="font-serif font-bold text-sm text-center mb-1">{t("Estimated Savings")}</h2>
-        <div className="space-y-0.5 font-serif font-bold text-xs">
-          <p className="flex items-center gap-2">
-            <span className="text-yellow-400 text-base">£</span> {t("Money")}: £{savings.money}
-          </p>
-          <p className="flex items-center gap-2">
-            <span className="text-red-400 text-[10px] font-mono">CO₂e</span> CO₂e: {savings.co2} kg
-          </p>
-          <p className="flex items-center gap-2">
-            <span className="text-blue-400 text-base">💧</span> {t("Water")}: {savings.water}L
-          </p>
-          <p className="flex items-center gap-2 text-[#f5a623]">
-            <span className="text-base">✓</span> {t("Pledges made")}: {pledged.length}
-          </p>
+      <div className="mx-4 mt-1.5 bg-[#1f1f1f] rounded-xl px-3 py-1.5 text-white text-xs">
+        <div>
+          {t("Money")}: £{savings.money}
+        </div>
+        <div>CO₂e: {savings.co2}</div>
+        <div>
+          {t("Water")}: {savings.water}
+        </div>
+        <div>
+          {t("Pledges made")}: {pledged.length}
         </div>
       </div>
 
       {/* Illustration */}
-      <div className="mx-4 mt-1.5 rounded-2xl overflow-hidden bg-[#1f1f1f] relative flex-1 min-h-0">
-        <img src={badHomepageAsset.url} alt="Scene" className="w-full h-full object-cover object-bottom" />
+      <div className="mx-4 mt-1.5 rounded-2xl overflow-hidden bg-[#1f1f1f] relative flex-1">
+        {badHomepageAsset.url}
 
-        <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-black/40 to-transparent" />
-
-        {/* ✅ Stable Nelson */}
+        {/* Nelson stable */}
         <NelsonAvatar
           woolColor={woolColor}
           accessories={accessories}
-          className="absolute bottom-28 -left-2 w-[180px] h-[180px] pointer-events-none"
+          className="absolute bottom-28 -left-2 w-[180px] h-[180px]"
         />
       </div>
 
       {/* CTA */}
-      <div className="mx-4 mt-2 flex justify-center">
-        <button
-          onClick={onGoToPledges}
-          className="bg-[#f5a623] hover:bg-[#e69517] active:scale-95 transition text-black font-serif font-bold text-base rounded-xl px-8 py-2.5 shadow-lg w-full max-w-sm"
-        >
+      <div className="mx-4 mt-2">
+        <button onClick={onGoToPledges} className="bg-[#f5a623] w-full py-3 rounded-xl">
           {t("Save Me More")}
         </button>
       </div>
 
-      {/* ✅ ✅ SVG TESTER (SAFE SECTION) */}
+      {/* ✅ SVG TESTER */}
       <div className="mx-4 mt-6 mb-6 bg-white p-4 rounded-xl">
         <div className="text-center font-bold mb-2">SVG Alignment Tester</div>
 
-        {/* Preview */}
-        <div className="w-[200px] h-[200px] border border-gray-300 relative mx-auto mb-3">
+        <div className="w-[200px] h-[200px] border mx-auto mb-3 relative">
           <img src={testSvg} className="w-full h-full object-contain" />
 
           {/* crosshair */}
@@ -121,23 +110,12 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
           <div className="absolute top-1/2 left-0 h-[1px] w-full bg-red-400 opacity-30" />
         </div>
 
-        {/* Controls */}
         <div className="flex flex-wrap gap-2 justify-center">
-          <button onClick={() => setTestSvg("/Frame 83.svg")} className="px-2 py-1 bg-gray-200 rounded">
-            Frame 83
-          </button>
-          <button onClick={() => setTestSvg("/Frame 83 (1).svg")} className="px-2 py-1 bg-gray-200 rounded">
-            Frame 83 (1)
-          </button>
-          <button onClick={() => setTestSvg("/Group 6385.svg")} className="px-2 py-1 bg-gray-200 rounded">
-            Group 6385
-          </button>
-          <button onClick={() => setTestSvg("/Group 6380.svg")} className="px-2 py-1 bg-gray-200 rounded">
-            Group 6380
-          </button>
-          <button onClick={() => setTestSvg("/Group 6380 (1).svg")} className="px-2 py-1 bg-gray-200 rounded">
-            Group 6380 (1)
-          </button>
+          <button onClick={() => setTestSvg("/Frame_83.svg")}>Frame 83</button>
+          <button onClick={() => setTestSvg("/Frame_83_1.svg")}>Frame 83 (1)</button>
+          <button onClick={() => setTestSvg("/Group_6380.svg")}>Group 6380</button>
+          <button onClick={() => setTestSvg("/Group_6380-2.svg")}>Group 6380 (alt)</button>
+          <button onClick={() => setTestSvg("/Group_6385.svg")}>Group 6385</button>
         </div>
       </div>
     </div>
