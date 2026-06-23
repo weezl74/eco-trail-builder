@@ -3,8 +3,13 @@ import React from "react";
 interface Props {
   woolColor: string;
   accessories?: string[];
+  head?: "nelson" | "barb";
   className?: string;
 }
+
+const getHeadFile = () => {
+  return "/profile/head-nelson-base.svg";
+};
 
 const NelsonAvatar: React.FC<Props> = ({ woolColor = "#e8d9b8", accessories = [], className = "" }) => {
   const has = (id: string) => accessories.includes(id);
@@ -12,7 +17,7 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor = "#e8d9b8", accessories = []
   return (
     <div className={`relative ${className}`}>
       <div className="relative w-full h-full overflow-hidden -translate-x-[6%] -translate-y-[2%]">
-        {/* ✅ 1. WOOL COLOUR (UNDER everything) */}
+        {/* WOOL COLOUR */}
         <div
           className="absolute inset-0"
           style={{
@@ -21,27 +26,33 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor = "#e8d9b8", accessories = []
             WebkitMaskRepeat: "no-repeat",
             WebkitMaskPosition: "center",
             WebkitMaskSize: "contain",
+            maskImage: "url(/body-mask.svg)",
+            maskRepeat: "no-repeat",
+            maskPosition: "center",
+            maskSize: "contain",
             zIndex: 1,
           }}
         />
 
-        {/* ✅ 2. BODY DETAIL (ABOVE mask ✅) */}
+        {/* BODY DETAIL */}
         <img
           src="/profile/body-base-nohead.svg"
           alt=""
           className="absolute inset-0 w-full h-full pointer-events-none"
           style={{ objectFit: "contain", zIndex: 2 }}
+          draggable={false}
         />
 
-        {/* ✅ 3. HEAD */}
+        {/* HEAD */}
         <img
-          src="/profile/head-nelson-base.svg"
+          src={getHeadFile()}
           alt=""
           className="absolute inset-0 w-full h-full pointer-events-none"
           style={{ objectFit: "contain", zIndex: 3 }}
+          draggable={false}
         />
 
-        {/* ✅ GLASSES */}
+        {/* GLASSES */}
         {has("glasses") && (
           <img
             src="/glasses-basic.svg"
@@ -51,10 +62,37 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor = "#e8d9b8", accessories = []
           />
         )}
 
-        {/* ✅ HATS */}
+        {has("starGlasses") && (
+          <img
+            src="/glasses-star.svg"
+            alt=""
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            style={{ objectFit: "contain", zIndex: 4 }}
+          />
+        )}
+
+        {/* HATS */}
         {has("cap") && (
           <img
             src="/hat-cap.svg"
+            alt=""
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            style={{ objectFit: "contain", zIndex: 5 }}
+          />
+        )}
+
+        {has("pirateHat") && (
+          <img
+            src="/hat-pirate.svg"
+            alt=""
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            style={{ objectFit: "contain", zIndex: 5 }}
+          />
+        )}
+
+        {has("sunhat") && (
+          <img
+            src="/hat-sun.svg"
             alt=""
             className="absolute inset-0 w-full h-full pointer-events-none"
             style={{ objectFit: "contain", zIndex: 5 }}
@@ -66,4 +104,3 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor = "#e8d9b8", accessories = []
 };
 
 export default NelsonAvatar;
-``;
