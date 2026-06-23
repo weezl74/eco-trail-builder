@@ -3,21 +3,25 @@ import React from "react";
 interface Props {
   woolColor: string;
   accessories?: string[];
-  head?: "nelson" | "barb";
   className?: string;
 }
-
-const getHeadFile = () => {
-  return "/profile/head-nelson-base.svg";
-};
 
 const NelsonAvatar: React.FC<Props> = ({ woolColor = "#e8d9b8", accessories = [], className = "" }) => {
   const has = (id: string) => accessories.includes(id);
 
   return (
     <div className={`relative ${className}`}>
-      <div className="relative w-full h-full overflow-hidden -translate-x-[6%] -translate-y-[2%]">
-        {/* WOOL COLOUR */}
+      <div className="relative w-full h-full overflow-hidden -translate-x-[6%] -translate-y-[2%']">
+        {/* 1. BODY BASE (legs, arms, outlines) */}
+        <img
+          src="/profile/body-base-nohead.svg"
+          alt=""
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          style={{ objectFit: "contain", zIndex: 1 }}
+          draggable={false}
+        />
+
+        {/* 2. WOOL COLOUR (masked) */}
         <div
           className="absolute inset-0"
           style={{
@@ -30,22 +34,13 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor = "#e8d9b8", accessories = []
             maskRepeat: "no-repeat",
             maskPosition: "center",
             maskSize: "contain",
-            zIndex: 1,
+            zIndex: 2,
           }}
         />
 
-        {/* BODY DETAIL */}
+        {/* 3. HEAD */}
         <img
-          src="/profile/body-base-nohead.svg"
-          alt=""
-          className="absolute inset-0 w-full h-full pointer-events-none"
-          style={{ objectFit: "contain", zIndex: 2 }}
-          draggable={false}
-        />
-
-        {/* HEAD */}
-        <img
-          src={getHeadFile()}
+          src="/profile/head-nelson-base.svg"
           alt=""
           className="absolute inset-0 w-full h-full pointer-events-none"
           style={{ objectFit: "contain", zIndex: 3 }}
@@ -56,15 +51,6 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor = "#e8d9b8", accessories = []
         {has("glasses") && (
           <img
             src="/glasses-basic.svg"
-            alt=""
-            className="absolute inset-0 w-full h-full pointer-events-none"
-            style={{ objectFit: "contain", zIndex: 4 }}
-          />
-        )}
-
-        {has("starGlasses") && (
-          <img
-            src="/glasses-star.svg"
             alt=""
             className="absolute inset-0 w-full h-full pointer-events-none"
             style={{ objectFit: "contain", zIndex: 4 }}
