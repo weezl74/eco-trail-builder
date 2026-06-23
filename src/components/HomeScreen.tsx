@@ -16,8 +16,12 @@ type Screen = "home" | "avatar" | "calendar" | "rewards" | "messages" | "groups"
 const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges }) => {
   const [screen, setScreen] = useState<Screen>("home");
 
-  // ✅ SVG TEST STATE (UPDATED FILES)
-  const [testSvg, setTestSvg] = useState("/Frame_83.svg");
+  // ✅ LAYER TOGGLES (not swap anymore)
+  const [showBase, setShowBase] = useState(true);
+  const [showAltFrame, setShowAltFrame] = useState(false);
+  const [showGroup6380, setShowGroup6380] = useState(false);
+  const [showGroupAlt, setShowGroupAlt] = useState(false);
+  const [showGroup6385, setShowGroup6385] = useState(false);
 
   const { savings, pledged, woolPoints, treePoints, woolColor, accessories } = useSavings();
   const { t } = useTranslations();
@@ -83,7 +87,6 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
       <div className="mx-4 mt-1.5 rounded-2xl overflow-hidden bg-[#1f1f1f] relative flex-1">
         {badHomepageAsset.url}
 
-        {/* Nelson stable */}
         <NelsonAvatar
           woolColor={woolColor}
           accessories={accessories}
@@ -98,24 +101,34 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
         </button>
       </div>
 
-      {/* ✅ SVG TESTER */}
+      {/* ✅ ✅ SVG LAYER TESTER */}
       <div className="mx-4 mt-6 mb-6 bg-white p-4 rounded-xl">
-        <div className="text-center font-bold mb-2">SVG Alignment Tester</div>
+        <div className="text-center font-bold mb-2">SVG Layer Tester</div>
 
-        <div className="w-[200px] h-[200px] border mx-auto mb-3 relative">
-          <img src={testSvg} className="w-full h-full object-contain" />
+        {/* ✅ PREVIEW (ALL LAYERS STACKED) */}
+        <div className="w-[200px] h-[200px] border mx-auto mb-4 relative bg-white">
+          {showBase && <img src="/Frame_83.svg" className="absolute top-0 left-0 w-full h-full opacity-80" />}
+
+          {showAltFrame && <img src="/Frame_83_1.svg" className="absolute top-0 left-0 w-full h-full opacity-80" />}
+
+          {showGroup6380 && <img src="/Group_6380.svg" className="absolute top-0 left-0 w-full h-full opacity-80" />}
+
+          {showGroupAlt && <img src="/Group_6380-2.svg" className="absolute top-0 left-0 w-full h-full opacity-80" />}
+
+          {showGroup6385 && <img src="/Group_6385.svg" className="absolute top-0 left-0 w-full h-full opacity-80" />}
 
           {/* crosshair */}
           <div className="absolute left-1/2 top-0 w-[1px] h-full bg-red-400 opacity-30" />
           <div className="absolute top-1/2 left-0 h-[1px] w-full bg-red-400 opacity-30" />
         </div>
 
-        <div className="flex flex-wrap gap-2 justify-center">
-          <button onClick={() => setTestSvg("/Frame_83.svg")}>Frame 83</button>
-          <button onClick={() => setTestSvg("/Frame_83_1.svg")}>Frame 83 (1)</button>
-          <button onClick={() => setTestSvg("/Group_6380.svg")}>Group 6380</button>
-          <button onClick={() => setTestSvg("/Group_6380-2.svg")}>Group 6380 (alt)</button>
-          <button onClick={() => setTestSvg("/Group_6385.svg")}>Group 6385</button>
+        {/* ✅ CONTROLS */}
+        <div className="flex flex-wrap gap-2 justify-center text-sm">
+          <button onClick={() => setShowBase((prev) => !prev)}>Base</button>
+          <button onClick={() => setShowAltFrame((prev) => !prev)}>Frame Alt</button>
+          <button onClick={() => setShowGroup6380((prev) => !prev)}>6380</button>
+          <button onClick={() => setShowGroupAlt((prev) => !prev)}>6380 Alt</button>
+          <button onClick={() => setShowGroup6385((prev) => !prev)}>6385</button>
         </div>
       </div>
     </div>
@@ -123,3 +136,4 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
 };
 
 export default HomeScreen;
+``;
