@@ -33,9 +33,8 @@ const NelsonAvatar: React.FC<Props> = ({
 
   return (
     <div className={`relative ${className}`}>
-      {/* OFFSET WRAPPER */}
       <div className="relative w-full h-full overflow-hidden -translate-x-[6%] -translate-y-[2%]">
-        {/* WOOL COLOUR */}
+        {/* ✅ WOOL COLOUR */}
         <div
           className="absolute inset-0"
           style={{
@@ -46,16 +45,20 @@ const NelsonAvatar: React.FC<Props> = ({
           }}
         />
 
-        {/* BODY DETAIL */}
+        {/* ✅ BODY DETAIL (FULL STRENGTH, BUT BLENDED) */}
         <img
           src="/body-base-nohead.svg"
           alt=""
           className="absolute inset-0 w-full h-full pointer-events-none"
-          style={{ objectFit: "contain", zIndex: 2, opacity: 0.7 }}
+          style={{
+            objectFit: "contain",
+            zIndex: 2,
+            mixBlendMode: "multiply",
+          }}
           draggable={false}
         />
 
-        {/* HEAD */}
+        {/* ✅ HEAD */}
         <img
           src={getHeadFile(head, accessories)}
           alt=""
@@ -64,7 +67,7 @@ const NelsonAvatar: React.FC<Props> = ({
           draggable={false}
         />
 
-        {/* GLASSES */}
+        {/* ✅ GLASSES */}
         {has("glasses") && (
           <img
             src="/glasses-basic.svg"
@@ -83,7 +86,7 @@ const NelsonAvatar: React.FC<Props> = ({
           />
         )}
 
-        {/* HATS */}
+        {/* ✅ HATS */}
         {has("cap") && (
           <img
             src="/hat-cap.svg"
