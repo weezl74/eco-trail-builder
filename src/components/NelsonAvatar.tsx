@@ -7,7 +7,7 @@ interface Props {
   className?: string;
 }
 
-// ✅ HEAD PATH (correct)
+// ✅ HEAD FILE
 const getHeadFile = (head: string, accessories: string[]) => {
   const base = "/profile/";
 
@@ -24,18 +24,22 @@ const getHeadFile = (head: string, accessories: string[]) => {
   return base + "head-nelson-base.svg";
 };
 
-const NelsonAvatar: React.FC<Props> = ({ accessories = [], head = "nelson", className }) => {
+const NelsonAvatar: React.FC<Props> = ({ woolColor = "#ffffff", accessories = [], head = "nelson", className }) => {
   const has = (id: string) => accessories.includes(id);
 
   return (
     <div className={`relative ${className ?? ""}`}>
-      {/* ✅ BODY (simple render first — no mask yet) */}
-      <img
-        src="/body-base-nohead.svg"
-        alt=""
-        className="absolute inset-0 w-full h-full pointer-events-none"
-        style={{ objectFit: "contain", zIndex: 1 }}
-        draggable={false}
+      {/* ✅ BODY (MASK — CLEAN VERSION) */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundColor: woolColor,
+
+          WebkitMask: "url(/body-base-nohead.svg) center / contain no-repeat",
+          mask: "url(/body-base-nohead.svg) center / contain no-repeat",
+
+          zIndex: 1,
+        }}
       />
 
       {/* ✅ HEAD */}
@@ -54,7 +58,6 @@ const NelsonAvatar: React.FC<Props> = ({ accessories = [], head = "nelson", clas
           alt=""
           className="absolute inset-0 w-full h-full pointer-events-none"
           style={{ objectFit: "contain", zIndex: 3 }}
-          draggable={false}
         />
       )}
 
@@ -64,7 +67,6 @@ const NelsonAvatar: React.FC<Props> = ({ accessories = [], head = "nelson", clas
           alt=""
           className="absolute inset-0 w-full h-full pointer-events-none"
           style={{ objectFit: "contain", zIndex: 3 }}
-          draggable={false}
         />
       )}
 
@@ -75,7 +77,6 @@ const NelsonAvatar: React.FC<Props> = ({ accessories = [], head = "nelson", clas
           alt=""
           className="absolute inset-0 w-full h-full pointer-events-none"
           style={{ objectFit: "contain", zIndex: 4 }}
-          draggable={false}
         />
       )}
 
@@ -85,7 +86,6 @@ const NelsonAvatar: React.FC<Props> = ({ accessories = [], head = "nelson", clas
           alt=""
           className="absolute inset-0 w-full h-full pointer-events-none"
           style={{ objectFit: "contain", zIndex: 4 }}
-          draggable={false}
         />
       )}
 
@@ -95,7 +95,6 @@ const NelsonAvatar: React.FC<Props> = ({ accessories = [], head = "nelson", clas
           alt=""
           className="absolute inset-0 w-full h-full pointer-events-none"
           style={{ objectFit: "contain", zIndex: 4 }}
-          draggable={false}
         />
       )}
     </div>
