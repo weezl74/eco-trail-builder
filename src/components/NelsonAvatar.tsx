@@ -8,19 +8,21 @@ interface Props {
   className?: string;
 }
 
-// ✅ Decide which head to show
+// ✅ Decide which head to show (FIXED PATH)
 const getHeadFile = (head: string, accessories: string[]) => {
-  if (head !== "nelson") return "/head-nelson-base.svg";
+  const base = "/profile/";
+
+  if (head !== "nelson") return base + "head-nelson-base.svg";
 
   if (accessories.includes("mohawk")) {
-    return "/head-nelson-mohawk.svg";
+    return base + "head-nelson-mohawk.svg";
   }
 
   if (accessories.includes("bowtie")) {
-    return "/head-nelson-bowtie.svg";
+    return base + "head-nelson-bowtie.svg";
   }
 
-  return "/head-nelson-base.svg";
+  return base + "head-nelson-base.svg";
 };
 
 const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [], head = "nelson", className }) => {
@@ -28,21 +30,22 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [], head = "ne
 
   return (
     <div className={`relative ${className ?? ""}`}>
-      {/* ✅ BODY (tinted) */}
+      {/* ✅ TINTED BODY (works again) */}
       <TintedSheepBody
         color={woolColor}
         className="absolute inset-0 w-full h-full [&>svg]:w-full [&>svg]:h-full [&>svg]:object-contain"
       />
 
-      {/* ✅ HEAD */}
+      {/* ✅ HEAD (FIXED PATH) */}
       <img
         src={getHeadFile(head, accessories)}
         alt="sheep head"
         className="absolute inset-0 w-full h-full pointer-events-none"
         style={{ objectFit: "contain", zIndex: 2 }}
+        draggable={false}
       />
 
-      {/* ✅ GLASSES */}
+      {/* ✅ GLASSES (root /public) */}
       {has("glasses") && (
         <img
           src="/glasses-basic.svg"
@@ -61,7 +64,7 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [], head = "ne
         />
       )}
 
-      {/* ✅ HATS */}
+      {/* ✅ HATS (root /public) */}
       {has("cap") && (
         <img
           src="/hat-cap.svg"
