@@ -7,7 +7,6 @@ interface Props {
   className?: string;
 }
 
-// ✅ HEAD FILE
 const getHeadFile = (head: string, accessories: string[]) => {
   const base = "/profile/";
 
@@ -24,14 +23,19 @@ const getHeadFile = (head: string, accessories: string[]) => {
   return base + "head-nelson-base.svg";
 };
 
-const NelsonAvatar: React.FC<Props> = ({ woolColor = "#ffffff", accessories = [], head = "nelson", className }) => {
+const NelsonAvatar: React.FC<Props> = ({
+  woolColor = "#ffffff",
+  accessories = [],
+  head = "nelson",
+  className = "",
+}) => {
   const has = (id: string) => accessories.includes(id);
 
   return (
-    <div className={`relative ${className ?? ""}`}>
-      {/* ✅ POSITION OFFSET */}
+    <div className={`relative ${className}`}>
+      {/* ✅ OFFSET WRAPPER */}
       <div className="relative w-full h-full -translate-x-[6%] -translate-y-[2%]">
-        {/* ✅ 1. WOOL COLOUR */}
+        {/* ✅ MASKED WOOL COLOUR */}
         <div
           className="absolute inset-0"
           style={{
@@ -42,26 +46,20 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor = "#ffffff", accessories = []
           }}
         />
 
-        {/* ✅ 2. BODY DETAIL (MAKE TRANSPARENT) */}
+        {/* ✅ BODY DETAIL SVG */}
         <img
           src="/body-base-nohead.svg"
           alt=""
           className="absolute inset-0 w-full h-full pointer-events-none"
-          style={{
-            objectFit: "contain",
-            zIndex: 2,
-            opacity: 0.75, // 👈 THIS FIXES GREY ISSUE
-          }}
-          draggable={false}
+          style={{ objectFit: "contain", zIndex: 2 }}
         />
 
-        {/* ✅ 3. HEAD */}
+        {/* ✅ HEAD */}
         <img
           src={getHeadFile(head, accessories)}
           alt=""
           className="absolute inset-0 w-full h-full pointer-events-none"
           style={{ objectFit: "contain", zIndex: 3 }}
-          draggable={false}
         />
 
         {/* ✅ GLASSES */}
