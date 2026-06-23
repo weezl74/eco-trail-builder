@@ -6,6 +6,7 @@ interface Props {
   className?: string;
 }
 
+// ✅ Decide which head to show
 const getHeadFile = (head: string, accessories: string[]) => {
   if (head !== "nelson") return "/head-nelson-base.svg";
 
@@ -33,14 +34,16 @@ const NelsonAvatar: React.FC<Props> = ({ accessories = [], head = "nelson", clas
           alt=""
           className="absolute inset-0 w-full h-full pointer-events-none"
           style={{ objectFit: "contain", zIndex: 1 }}
+          draggable={false}
         />
 
         {/* ✅ HEAD */}
         <img
           src={getHeadFile(head, accessories)}
-          alt=""
+          alt="sheep head"
           className="absolute inset-0 w-full h-full pointer-events-none"
           style={{ objectFit: "contain", zIndex: 2 }}
+          draggable={false}
         />
 
         {/* ✅ GLASSES */}
@@ -95,3 +98,4 @@ const NelsonAvatar: React.FC<Props> = ({ accessories = [], head = "nelson", clas
 };
 
 export default NelsonAvatar;
+``;
