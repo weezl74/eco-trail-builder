@@ -5,53 +5,99 @@ interface Props {
   accessories?: string[];
 }
 
-const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [] }) => {
+const NelsonAvatar: React.FC<Props> = ({ woolColor = "#e8d9b8", accessories = [] }) => {
   const has = (id: string) => accessories.includes(id);
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
-      {/* Z1 BODY BASE */}
-      <img src="/body-base.svg" alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
+      {/* ✅ Z1 BODY BASE (no wool, no limbs) */}
+      <img
+        src="/body-base.svg"
+        alt=""
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          zIndex: 1,
+        }}
+      />
 
-      {/* Z2 WOOL COLOUR (MASK) */}
+      {/* ✅ Z2 WOOL COLOUR (MASK ✅) */}
       <div
         style={{
           position: "absolute",
           inset: 0,
           backgroundColor: woolColor,
+
           WebkitMaskImage: "url(/body-mask.svg)",
           WebkitMaskRepeat: "no-repeat",
           WebkitMaskPosition: "center",
           WebkitMaskSize: "contain",
+
           maskImage: "url(/body-mask.svg)",
           maskRepeat: "no-repeat",
           maskPosition: "center",
           maskSize: "contain",
+
+          zIndex: 2,
         }}
       />
 
-      {/* Z3 LIMBS */}
-      <img src="/body-limbs.svg" alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
+      {/* ✅ Z3 LIMBS (THIS WAS MISSING VISUALLY) */}
+      <img
+        src="/body-limbs.svg"
+        alt=""
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          zIndex: 3,
+        }}
+      />
 
-      {/* Z4 HEAD */}
+      {/* ✅ Z4 HEAD */}
       <img
         src="/profile/head-nelson-base.svg"
         alt=""
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          zIndex: 4,
+        }}
       />
 
-      {/* GLASSES */}
+      {/* ✅ Z5 GLASSES */}
       {has("glasses") && (
         <img
           src="/glasses-basic.svg"
           alt=""
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            zIndex: 5,
+          }}
         />
       )}
 
-      {/* HATS */}
+      {/* ✅ Z6 HATS */}
       {has("cap") && (
-        <img src="/hat-cap.svg" alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
+        <img
+          src="/hat-cap.svg"
+          alt=""
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            zIndex: 6,
+          }}
+        />
       )}
     </div>
   );
