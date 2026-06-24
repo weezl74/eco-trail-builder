@@ -273,6 +273,7 @@ export const useSavings = () => {
     addPledge,
     buyRenewable,
     buyAccessory,
+    refundAccessory,
     plantTree,
     setCardColor,
     setWoolColor,
