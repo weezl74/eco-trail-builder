@@ -3,12 +3,28 @@ import React from "react";
 interface Props {
   woolColor: string;
   accessories?: string[];
-  head?: string;
   className?: string;
 }
 
-const NelsonAvatar: React.FC<Props> = ({ woolColor = "#e8d9b8", accessories = [], head, className = "" }) => {
-  void head;
+const getHeadFile = (accessories: string[]) => {
+  const base = "/profile/";
+
+  if (accessories.includes("mohawk")) {
+    return base + "head-nelson-mohawk.svg";
+  }
+
+  if (accessories.includes("longbeard")) {
+    return base + "head-nelson-longbeard.svg";
+  }
+
+  if (accessories.includes("stubble")) {
+    return base + "head-nelson-stubble.svg";
+  }
+
+  return base + "head-nelson-base.svg";
+};
+
+const NelsonAvatar: React.FC<Props> = ({ woolColor = "#e8d9b8", accessories = [], className = "" }) => {
   const has = (id: string) => accessories.includes(id);
 
   return (
@@ -49,6 +65,14 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor = "#e8d9b8", accessories = []
         />
 
         {/* HEAD */}
+
+        {/* HEAD (dynamic) */}
+        <img
+          src={getHeadFile(accessories)}
+          alt=""
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          style={{ objectFit: "contain", zIndex: 4 }}
+        />
         <img
           src="/profile/head-nelson-base.svg"
           alt=""
