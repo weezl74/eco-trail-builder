@@ -38,12 +38,7 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [] }) => {
       <img
         src="/body-base.svg"
         alt=""
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-        }}
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
       />
 
       {/* Z2 WOOL COLOUR (MASK) */}
@@ -63,28 +58,18 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [] }) => {
         }}
       />
 
-      {/* Z3 LIMBS ✅ */}
+      {/* Z3 LIMBS */}
       <img
         src="/body-limbs.svg"
         alt=""
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-        }}
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
       />
 
-      {/* Z4 HEAD ✅ dynamic */}
+      {/* ✅ Z4 HEAD (FIXED ✅) */}
       <img
         src={getHeadFile(accessories)}
         alt=""
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-        }}
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
       />
 
       {/* GLASSES */}
@@ -92,12 +77,7 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [] }) => {
         <img
           src="/glasses-basic.svg"
           alt=""
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-          }}
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
         />
       )}
 
@@ -105,12 +85,7 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [] }) => {
         <img
           src="/glasses-star.svg"
           alt=""
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-          }}
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
         />
       )}
 
@@ -119,12 +94,7 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [] }) => {
         <img
           src="/hat-cap.svg"
           alt=""
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-          }}
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
         />
       )}
 
@@ -132,12 +102,7 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [] }) => {
         <img
           src="/hat-pirate.svg"
           alt=""
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-          }}
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
         />
       )}
 
@@ -145,12 +110,7 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [] }) => {
         <img
           src="/hat-sun.svg"
           alt=""
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-          }}
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
         />
       )}
 
