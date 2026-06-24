@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { spendPoints } from '@/lib/api';
+import { api, fetchMyProfile, spendPoints } from '@/lib/api';
 
 export type Saving = { money: number; co2: number; water: number };
 export type RenewableType = 'solar' | 'wind' | 'mine_water';
@@ -78,8 +78,31 @@ export const useSavings = () => {
   const { user } = useAuth();
   const userId = user?.id ?? null;
   const [state, setState] = useState<State>(() => readCache(userId));
+  const [apiPoints, setApiPoints] = useState<{ wool: number; tree: number } | null>(null);
   const latest = useRef(state);
   latest.current = state;
+
+  // Pull points from the API (single source of truth) and broadcast.
+  const refreshPoints = useCallback(async () => {
+    if (!userId) {
+      setApiPoints(null);
+      return;
+    }
+    try {
+      const p = await fetchMyProfile(userId);
+      if (p) setApiPoints({ wool: p.wool_points ?? 0, tree: p.tree_points ?? 0 });
+    } catch (e) {
+      console.error('[useSavings] refreshPoints failed', e);
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    void refreshPoints();
+    const onUpd = () => void refreshPoints();
+    window.addEventListener('points:updated', onUpd);
+    return () => window.removeEventListener('points:updated', onUpd);
+  }, [refreshPoints]);
+
 
   // Load from cloud on user change.
   useEffect(() => {
@@ -161,10 +184,25 @@ export const useSavings = () => {
         treePoints: s.treePoints + 2,
       };
       void persist(next);
+      if (userId) {
+        void api
+          .post('/update-points', {
+            user_id: userId,
+            woolDelta: 25,
+            treeDelta: 2,
+            source: 'pledge.created',
+            reference_id: id,
+          })
+          .catch((e) => console.error('[useSavings] addPledge update-points failed', e))
+          .finally(() =>
+            window.dispatchEvent(new CustomEvent('points:updated', { detail: { userId } })),
+          );
+      }
       return true;
     },
-    [persist],
+    [persist, userId],
   );
+
 
   const buyRenewable = useCallback(
     (type: RenewableType, x: number, y: number, lat?: number, lng?: number) => {
@@ -270,6 +308,10 @@ export const useSavings = () => {
 
   return {
     ...state,
+    // API is the source of truth for points; fall back to cached local state
+    // until the first /profile response arrives.
+    woolPoints: apiPoints ? apiPoints.wool : state.woolPoints,
+    treePoints: apiPoints ? apiPoints.tree : state.treePoints,
     addPledge,
     buyRenewable,
     buyAccessory,
@@ -277,5 +319,7 @@ export const useSavings = () => {
     plantTree,
     setCardColor,
     setWoolColor,
+    refreshPoints,
   };
 };
+
