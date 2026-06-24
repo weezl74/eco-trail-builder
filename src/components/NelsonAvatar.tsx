@@ -14,13 +14,13 @@ const HORIZONTAL_SHIFT_PERCENT = -6;
 const getHeadFile = (accessories: string[], head?: string) => {
   const base = "/profile/";
 
-  if (head === "barb") return base + "head-barb-base.svg";
-
+  // Head-altering accessories always take priority — they ARE the head variant.
   if (accessories.includes("mohawk")) return base + "head-nelson-mohawk.svg";
   if (accessories.includes("longBeard")) return base + "head-nelson-longbeard.svg";
   if (accessories.includes("stubble")) return base + "head-nelson-stubble.svg";
   if (accessories.includes("bowtie")) return base + "head-nelson-bowtie.svg";
 
+  if (head === "barb") return base + "head-barb-base.svg";
   return base + "head-nelson-base.svg";
 };
 
