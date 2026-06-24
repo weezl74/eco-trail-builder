@@ -308,6 +308,10 @@ export const useSavings = () => {
 
   return {
     ...state,
+    // API is the source of truth for points; fall back to cached local state
+    // until the first /profile response arrives.
+    woolPoints: apiPoints ? apiPoints.wool : state.woolPoints,
+    treePoints: apiPoints ? apiPoints.tree : state.treePoints,
     addPledge,
     buyRenewable,
     buyAccessory,
@@ -315,5 +319,7 @@ export const useSavings = () => {
     plantTree,
     setCardColor,
     setWoolColor,
+    refreshPoints,
   };
 };
+
