@@ -3,102 +3,96 @@ import React from "react";
 interface Props {
   woolColor: string;
   accessories?: string[];
+  className?: string;
 }
 
-const NelsonAvatar: React.FC<Props> = ({ woolColor = "#e8d9b8", accessories = [] }) => {
+const NelsonAvatar: React.FC<Props> = ({ woolColor = "#e8d9b8", accessories = [], className = "" }) => {
   const has = (id: string) => accessories.includes(id);
 
   return (
-    <div style={{ position: "relative", width: "100%", height: "100%" }}>
-      {/* ✅ Z1 BODY BASE (no wool, no limbs) */}
-      <img
-        src="/body-base.svg"
-        alt=""
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          zIndex: 1,
-        }}
-      />
-
-      {/* ✅ Z2 WOOL COLOUR (MASK ✅) */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          backgroundColor: woolColor,
-
-          WebkitMaskImage: "url(/body-mask.svg)",
-          WebkitMaskRepeat: "no-repeat",
-          WebkitMaskPosition: "center",
-          WebkitMaskSize: "contain",
-
-          maskImage: "url(/body-mask.svg)",
-          maskRepeat: "no-repeat",
-          maskPosition: "center",
-          maskSize: "contain",
-
-          zIndex: 2,
-        }}
-      />
-
-      {/* ✅ Z3 LIMBS (THIS WAS MISSING VISUALLY) */}
-      <img
-        src="/body-limbs.svg"
-        alt=""
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          zIndex: 3,
-        }}
-      />
-
-      {/* ✅ Z4 HEAD */}
-      <img
-        src="/profile/head-nelson-base.svg"
-        alt=""
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          zIndex: 4,
-        }}
-      />
-
-      {/* ✅ Z5 GLASSES */}
-      {has("glasses") && (
+    <div className={"relative " + className}>
+      <div className="relative w-full h-full overflow-hidden">
+        {/* BODY BASE */}
         <img
-          src="/glasses-basic.svg"
+          src="/profile/body-base-nohead.svg"
           alt=""
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          style={{ objectFit: "contain", zIndex: 1 }}
+        />
+
+        {/* WOOL COLOUR MASK */}
+        <div
           style={{
             position: "absolute",
             inset: 0,
-            width: "100%",
-            height: "100%",
-            zIndex: 5,
+            backgroundColor: woolColor,
+            WebkitMaskImage: "url(/body-mask.svg)",
+            WebkitMaskRepeat: "no-repeat",
+            WebkitMaskPosition: "center",
+            WebkitMaskSize: "contain",
+            maskImage: "url(/body-mask.svg)",
+            maskRepeat: "no-repeat",
+            maskPosition: "center",
+            maskSize: "contain",
+            zIndex: 2,
           }}
         />
-      )}
 
-      {/* ✅ Z6 HATS */}
-      {has("cap") && (
+        {/* HEAD */}
         <img
-          src="/hat-cap.svg"
+          src="/profile/head-nelson-base.svg"
           alt=""
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-            zIndex: 6,
-          }}
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          style={{ objectFit: "contain", zIndex: 3 }}
         />
-      )}
+
+        {/* GLASSES */}
+        {has("glasses") && (
+          <img
+            src="/glasses-basic.svg"
+            alt=""
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            style={{ objectFit: "contain", zIndex: 4 }}
+          />
+        )}
+
+        {has("starGlasses") && (
+          <img
+            src="/glasses-star.svg"
+            alt=""
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            style={{ objectFit: "contain", zIndex: 4 }}
+          />
+        )}
+
+        {/* HATS */}
+        {has("cap") && (
+          <img
+            src="/hat-cap.svg"
+            alt=""
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            style={{ objectFit: "contain", zIndex: 5 }}
+          />
+        )}
+
+        {has("pirateHat") && (
+          <img
+            src="/hat-pirate.svg"
+            alt=""
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            style={{ objectFit: "contain", zIndex: 5 }}
+          />
+        )}
+
+        {has("sunhat") && (
+          <img
+            src="/hat-sun.svg"
+            alt=""
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            style={{ objectFit: "contain", zIndex: 5 }}
+          />
+        )}
+      </div>
     </div>
   );
 };
