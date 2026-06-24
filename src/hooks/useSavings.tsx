@@ -216,6 +216,27 @@ export const useSavings = () => {
     [persist, userId],
   );
 
+  const refundAccessory = useCallback(
+    (id: string, cost: number) => {
+      const s = latest.current;
+      if (!s.accessories.includes(id)) return false;
+      void persist({
+        ...s,
+        woolPoints: s.woolPoints + cost,
+        accessories: s.accessories.filter((a) => a !== id),
+      });
+      if (userId) {
+        void spendPoints({ user_id: userId, woolDelta: -cost, reason: `accessory:refund:${id}` })
+          .catch((e) => console.error('[useSavings] spendPoints refund failed', e))
+          .finally(() =>
+            window.dispatchEvent(new CustomEvent('points:updated', { detail: { userId } })),
+          );
+      }
+      return true;
+    },
+    [persist, userId],
+  );
+
   const plantTree = useCallback(
     (cost = 100) => {
       const s = latest.current;
