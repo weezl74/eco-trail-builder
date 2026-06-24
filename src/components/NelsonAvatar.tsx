@@ -49,8 +49,8 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [], head, clas
           transform: `translateX(${HORIZONTAL_SHIFT_PERCENT}%)`,
         }}
       >
-        {/* Z1 BODY BASE */}
-        <Layer src="/body-base.svg" z={1} />
+        {/* Z1 BODY BASE (headless so the head layer fully swaps) */}
+        <Layer src="/profile/body-base-nohead.svg" z={1} />
 
         {/* Z2 WOOL COLOUR (masked) */}
         <div
