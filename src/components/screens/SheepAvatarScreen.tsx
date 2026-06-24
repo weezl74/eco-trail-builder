@@ -49,8 +49,6 @@ type AccessoryId =
   | "hornsB"
   // legacy emoji
   | "umbrella"
-  | "wellies"
-  | "scarf"
   | "sunhat"
   | "raincoat"
   | "bowtie";
@@ -141,20 +139,7 @@ const ACCESSORIES: Accessory[] = [
     cost: 55,
     carbonNote: "Flash floods in Wales have roughly tripled since 2000 as storms grow more intense.",
   },
-  {
-    id: "wellies",
-    label: "Wellies",
-    emoji: "🥾",
-    cost: 50,
-    carbonNote: "UK winter rainfall is up 17% since 1990 — wellies are basically climate kit now.",
-  },
-  {
-    id: "scarf",
-    label: "Scarf",
-    emoji: "🧣",
-    cost: 30,
-    carbonNote: "Layering up lets you turn the thermostat down 1°C — saving around 300kg of CO₂ a year per home.",
-  },
+
   {
     id: "bowtie",
     label: "Bow Tie",
