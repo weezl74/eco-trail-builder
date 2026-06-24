@@ -35,13 +35,9 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [] }) => {
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
 
       {/* Z1 BODY BASE */}
-      <img
-        src="/body-base.svg"
-        alt=""
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
-      />
+      /body-base.svg
 
-      {/* Z2 WOOL COLOUR (MASK) */}
+      {/* Z2 WOOL COLOUR */}
       <div
         style={{
           position: "absolute",
@@ -59,59 +55,33 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [] }) => {
       />
 
       {/* Z3 LIMBS */}
-      <img
-        src="/body-limbs.svg"
-        alt=""
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
-      />
+      /body-limbs.svg
 
-      {/* ✅ Z4 HEAD (FIXED ✅) */}
-      <img
-        src={getHeadFile(accessories)}
-        alt=""
+      {/* ✅ Z4 HEAD (THIS IS THE FIX) */}
+      {getHeadFile(accessories)}        alt=""
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
       />
 
       {/* GLASSES */}
       {has("glasses") && (
-        <img
-          src="/glasses-basic.svg"
-          alt=""
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
-        />
+        /glasses-basic.svg
       )}
 
       {has("starGlasses") && (
-        <img
-          src="/glasses-star.svg"
-          alt=""
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
-        />
+        /glasses-star.svg
       )}
 
       {/* HATS */}
       {has("cap") && (
-        <img
-          src="/hat-cap.svg"
-          alt=""
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
-        />
+        /hat-cap.svg
       )}
 
       {has("pirateHat") && (
-        <img
-          src="/hat-pirate.svg"
-          alt=""
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
-        />
+        /hat-pirate.svg
       )}
 
       {has("sunhat") && (
-        <img
-          src="/hat-sun.svg"
-          alt=""
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
-        />
+        /hat-sun.svg
       )}
 
     </div>
