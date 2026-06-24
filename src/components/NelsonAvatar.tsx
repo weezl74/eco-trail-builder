@@ -38,6 +38,14 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor = "#e8d9b8", accessories = []
           }}
         />
 
+        {/* Z3 LIMBS */}
+        <img
+          src="/body-limbs.svg"
+          alt=""
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          style={{ objectFit: "contain", zIndex: 3 }}
+        />
+
         {/* HEAD */}
         <img
           src="/profile/head-nelson-base.svg"
