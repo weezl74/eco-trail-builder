@@ -57,10 +57,19 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [] }) => {
       {/* Z3 LIMBS */}
       /body-limbs.svg
 
-      {/* ✅ Z4 HEAD (THIS IS THE FIX) */}
-      {getHeadFile(accessories)}        alt=""
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
-      />
+   
+{/* Z4 HEAD ✅ FIXED */}
+<img
+  src={getHeadFile(accessories)}
+  alt=""
+  style={{
+    position: "absolute",
+    inset: 0,
+    width: "100%",
+    height: "100%"
+  }}
+/>
+
 
       {/* GLASSES */}
       {has("glasses") && (
