@@ -125,13 +125,7 @@ const ACCESSORIES: Accessory[] = [
     cost: 35,
     carbonNote: "2022 was the UK's hottest year on record — 40°C was reached for the first time ever.",
   },
-  {
-    id: "umbrella",
-    label: "Umbrella",
-    emoji: "☂️",
-    cost: 45,
-    carbonNote: "A 1°C warmer planet holds about 8% more water in the air — so when it rains, it pours much harder.",
-  },
+
   {
     id: "raincoat",
     label: "Raincoat",
