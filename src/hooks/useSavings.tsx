@@ -184,10 +184,25 @@ export const useSavings = () => {
         treePoints: s.treePoints + 2,
       };
       void persist(next);
+      if (userId) {
+        void api
+          .post('/update-points', {
+            user_id: userId,
+            woolDelta: 25,
+            treeDelta: 2,
+            source: 'pledge.created',
+            reference_id: id,
+          })
+          .catch((e) => console.error('[useSavings] addPledge update-points failed', e))
+          .finally(() =>
+            window.dispatchEvent(new CustomEvent('points:updated', { detail: { userId } })),
+          );
+      }
       return true;
     },
-    [persist],
+    [persist, userId],
   );
+
 
   const buyRenewable = useCallback(
     (type: RenewableType, x: number, y: number, lat?: number, lng?: number) => {
