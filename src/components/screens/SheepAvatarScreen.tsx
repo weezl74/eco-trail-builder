@@ -152,7 +152,7 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const pickHead = (h: "nelson" | "barb") => {
     void setSheepHead(h);
   };
-  const { woolPoints, accessories, buyAccessory, cardColor, setCardColor, woolColor, setWoolColor } = useSavings();
+  const { woolPoints, accessories, buyAccessory, refundAccessory, cardColor, setCardColor, woolColor, setWoolColor } = useSavings();
   const palette = getPalette(cardColor);
   const { t } = useTranslations();
 
