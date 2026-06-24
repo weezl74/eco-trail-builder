@@ -78,8 +78,31 @@ export const useSavings = () => {
   const { user } = useAuth();
   const userId = user?.id ?? null;
   const [state, setState] = useState<State>(() => readCache(userId));
+  const [apiPoints, setApiPoints] = useState<{ wool: number; tree: number } | null>(null);
   const latest = useRef(state);
   latest.current = state;
+
+  // Pull points from the API (single source of truth) and broadcast.
+  const refreshPoints = useCallback(async () => {
+    if (!userId) {
+      setApiPoints(null);
+      return;
+    }
+    try {
+      const p = await fetchMyProfile(userId);
+      if (p) setApiPoints({ wool: p.wool_points ?? 0, tree: p.tree_points ?? 0 });
+    } catch (e) {
+      console.error('[useSavings] refreshPoints failed', e);
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    void refreshPoints();
+    const onUpd = () => void refreshPoints();
+    window.addEventListener('points:updated', onUpd);
+    return () => window.removeEventListener('points:updated', onUpd);
+  }, [refreshPoints]);
+
 
   // Load from cloud on user change.
   useEffect(() => {
