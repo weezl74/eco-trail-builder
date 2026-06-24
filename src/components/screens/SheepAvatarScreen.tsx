@@ -269,30 +269,51 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                 const owned = has(a.id);
                 const afford = woolPoints >= a.cost;
                 return (
-                  <button
-                    key={a.id}
-                    onClick={() => handleBuy(a)}
-                    disabled={!owned && !afford}
-                    className={`rounded-xl p-3 text-[11px] font-serif font-bold flex flex-col items-center gap-2 ${
-                      owned ? "bg-[#F4971D] text-black" : afford ? "bg-white text-black" : "bg-white/30 text-white"
-                    }`}
-                  >
-                    {ACCESSORY_IMAGES[a.id] ? (
-                      <img
-                        src={ACCESSORY_IMAGES[a.id]!}
-                        alt={a.label}
-                        className="h-32 w-32 object-contain"
-                        draggable={false}
-                      />
-                    ) : (
-                      <span className="text-6xl leading-none">{a.emoji}</span>
-                    )}
+                  <div key={a.id} className="relative">
+                    <button
+                      onClick={() => handleBuy(a)}
+                      disabled={!owned && !afford}
+                      className={`w-full rounded-xl p-3 text-[11px] font-serif font-bold flex flex-col items-center gap-2 ${
+                        owned ? "bg-[#F4971D] text-black" : afford ? "bg-white text-black" : "bg-white/30 text-white"
+                      }`}
+                    >
+                      {ACCESSORY_IMAGES[a.id] ? (
+                        <img
+                          src={ACCESSORY_IMAGES[a.id]!}
+                          alt={a.label}
+                          className="h-32 w-32 object-contain"
+                          draggable={false}
+                        />
+                      ) : (
+                        <span className="text-6xl leading-none">{a.emoji}</span>
+                      )}
 
-                    <span className="flex items-center gap-1 text-[10px]">
-                      {!owned && !afford && <Lock className="h-3 w-3" />}
-                      {owned ? `✓ ${t("owned")}` : `${a.cost} ${t("wool")}`}
-                    </span>
-                  </button>
+                      <span className="flex items-center gap-1 text-[10px]">
+                        {!owned && !afford && <Lock className="h-3 w-3" />}
+                        {owned ? `✓ ${t("owned")}` : `${a.cost} ${t("wool")}`}
+                      </span>
+                    </button>
+
+                    {owned && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const ok = refundAccessory(a.id, a.cost);
+                          if (ok) {
+                            if (openNote === a.id) setOpenNote(null);
+                            toast({
+                              title: `${t(a.label)} ${t("removed")}`,
+                              description: `${t("Refunded")} ${a.cost} ${t("wool")}.`,
+                            });
+                          }
+                        }}
+                        aria-label={`${t("Remove")} ${t(a.label)}`}
+                        className="absolute top-1 right-1 bg-black/80 hover:bg-black text-white rounded-full p-1.5 shadow-md"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                  </div>
                 );
               })}
             </div>
