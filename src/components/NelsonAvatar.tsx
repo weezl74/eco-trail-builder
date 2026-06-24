@@ -30,7 +30,7 @@ const getHeadFile = (accessories: string[]) => {
 
 const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [] }) => {
   const has = (id: string) => accessories.includes(id);
-
+console.log("Accessories:", accessories);
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
 
