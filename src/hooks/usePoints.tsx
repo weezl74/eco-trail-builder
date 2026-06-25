@@ -83,10 +83,19 @@ export const usePoints = () => {
     [user, refresh]
   );
 
+  // ✅ Alias used by older callers (e.g. quizzes)
+  const award = useCallback(
+    (points: number, type: PointsType, source: string, referenceId?: string) =>
+      update(points, type, source, referenceId, true),
+    [update],
+  );
+
   return {
     ...breakdown,
     loading,
     refresh,
     update,
+    award,
   };
 };
+
