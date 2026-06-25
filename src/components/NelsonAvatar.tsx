@@ -5,11 +5,10 @@ interface Props {
   accessories?: string[];
   head?: string;
   className?: string;
+  /** Horizontal shift % of width. Negative = left. Default 0 (centred). */
+  shiftPercent?: number;
 }
 
-// Tweak this single value to nudge the whole avatar stack left/right.
-// Negative = left. All layers move together so alignment is preserved.
-const HORIZONTAL_SHIFT_PERCENT = -6;
 
 const getHeadFile = (accessories: string[], head?: string) => {
   const base = "/profile/";
