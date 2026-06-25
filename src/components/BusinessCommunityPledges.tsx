@@ -401,7 +401,7 @@ const caerphillyBusinesses: Business[] = [
     travel_footprint: 90,
     energy_footprint: 140,
     pledges: [
-      { action: 'Save 1M plastic items from landfill', category: 'Waste', impact: 300 },
+      { action: 'Stop 1M plastic items being binned or burned', category: 'Waste', impact: 300 },
       { action: 'Partner with 30 local producers', category: 'Community', impact: 85 },
       { action: 'Monthly zero-waste workshops', category: 'Community', impact: 55 }
     ],
