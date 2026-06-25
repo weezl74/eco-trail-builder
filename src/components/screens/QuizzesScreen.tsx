@@ -44,7 +44,7 @@ const TOPICS: Topic[] = [
       { q: 'The greenhouse effect is…', options: ['Always harmful', 'A natural process that keeps Earth warm', 'Caused only by humans', 'Cooling the Earth'], answer: 1, explain: 'Without it Earth would be about 33°C colder — humans are now strengthening it.' },
       { q: 'Which is NOT a greenhouse gas?', options: ['Carbon dioxide', 'Methane', 'Oxygen', 'Nitrous oxide'], answer: 2, explain: 'Oxygen does not trap infrared heat the way greenhouse gases do.' },
       { q: 'Methane is, over 20 years, roughly how much more potent than CO₂?', options: ['2×', '10×', '80×', '500×'], answer: 2, explain: 'Methane is about 80× more warming than CO₂ over a 20-year window.' },
-      { q: 'Which everyday source produces methane?', options: ['Solar panels', 'Landfill food waste', 'LED bulbs', 'Tap water'], answer: 1, explain: 'Food waste breaking down without air releases methane.' },
+      { q: 'Which everyday source produces methane?', options: ['Solar panels', 'Food waste left to rot', 'LED bulbs', 'Tap water'], answer: 1, explain: 'Food waste breaking down without air releases methane.' },
       { q: 'Trees help by…', options: ['Releasing CO₂', 'Absorbing CO₂ and storing carbon', 'Generating methane', 'Reflecting sunlight only'], answer: 1, explain: 'They lock carbon away in wood, roots and soil.' },
     ],
   },

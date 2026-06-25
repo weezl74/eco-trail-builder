@@ -262,14 +262,14 @@ const caerphillyBusinesses: Business[] = [
     location: 'Caerphilly Town Centre',
     year_established: 2020,
     employees: 5,
-    climate_goals: 'Save 10,000 items from landfill annually',
+    climate_goals: 'Save 10,000 items from being binned or burned annually',
     pen_portrait: 'Social enterprise teaching repair skills and extending product lifespans.',
     waste_footprint: 30,
     travel_footprint: 120,
     energy_footprint: 180,
     pledges: [
       { action: 'Free repair workshops monthly', category: 'Community', impact: 120 },
-      { action: 'Divert 10k items from landfill', category: 'Waste', impact: 200 },
+      { action: "Let's reduce, reuse, recycle — not bin or burn 10,000 items!", category: 'Waste', impact: 200 },
       { action: 'Partner with 20 local schools', category: 'Community', impact: 80 }
     ],
     kudos: 91
@@ -401,7 +401,7 @@ const caerphillyBusinesses: Business[] = [
     travel_footprint: 90,
     energy_footprint: 140,
     pledges: [
-      { action: 'Save 1M plastic items from landfill', category: 'Waste', impact: 300 },
+      { action: 'Stop 1M plastic items being binned or burned', category: 'Waste', impact: 300 },
       { action: 'Partner with 30 local producers', category: 'Community', impact: 85 },
       { action: 'Monthly zero-waste workshops', category: 'Community', impact: 55 }
     ],

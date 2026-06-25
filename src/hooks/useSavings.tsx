@@ -185,3 +185,101 @@ export const useSavings = () => {
           source: 'renewable_purchase',
           reference_id: type,
         });
+
+        await persist({
+          ...s,
+          renewables: [
+            ...s.renewables,
+            { id: `${type}-${Date.now()}`, type, x, y, lat, lng },
+          ],
+        });
+
+        await refreshPoints();
+        return true;
+      } catch (e) {
+        console.error('buyRenewable failed', e);
+        return false;
+      }
+    },
+    [userId, persist, refreshPoints, points],
+  );
+
+  // ✅ PLEDGES (local-only ledger; wool awarded via API)
+  const [pledged, setPledged] = useState<string[]>([]);
+  const [savings, setSavings] = useState<{ money: number; co2: number; water: number }>({
+    money: 0,
+    co2: 0,
+    water: 0,
+  });
+
+  const addPledge = useCallback(
+    (id: string, delta: { money: number; co2: number; water: number }) => {
+      if (pledged.includes(id)) return false;
+      setPledged((p) => [...p, id]);
+      setSavings((s) => ({
+        money: s.money + (delta.money || 0),
+        co2: s.co2 + (delta.co2 || 0),
+        water: s.water + (delta.water || 0),
+      }));
+      if (userId) {
+        api.post('/update-points', {
+          user_id: userId,
+          woolDelta: -25,
+          source: 'pledge',
+          reference_id: id,
+        }).then(refreshPoints).catch((e) => console.error('addPledge points failed', e));
+      }
+      return true;
+    },
+    [pledged, userId, refreshPoints],
+  );
+
+  // ✅ TREES
+  const [treesPlanted, setTreesPlanted] = useState(0);
+  const plantTree = useCallback((cost: number) => {
+    if (points.wool < cost) return false;
+    setTreesPlanted((n) => n + 1);
+    if (userId) {
+      api.post('/update-points', {
+        user_id: userId,
+        woolDelta: cost,
+        source: 'plant_tree',
+        reference_id: 'tree',
+      }).then(refreshPoints).catch((e) => console.error('plantTree failed', e));
+    }
+    return true;
+  }, [points, userId, refreshPoints]);
+
+  const setCardColor = useCallback(
+    (id: string) => persist({ ...latest.current, cardColor: id }),
+    [persist],
+  );
+  const setWoolColor = useCallback(
+    (hex: string) => persist({ ...latest.current, woolColor: hex }),
+    [persist],
+  );
+
+  return {
+    // state
+    accessories: state.accessories,
+    renewables: state.renewables,
+    cardColor: state.cardColor,
+    woolColor: state.woolColor,
+    pledged,
+    treesPlanted,
+    savings,
+    // points
+    woolPoints: points.wool,
+    treePoints: points.tree,
+    refreshPoints,
+    // actions
+    buyAccessory,
+    refundAccessory,
+    buyRenewable,
+    addPledge,
+    plantTree,
+    setCardColor,
+    setWoolColor,
+  };
+};
+

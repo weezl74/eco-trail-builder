@@ -27,7 +27,7 @@ const TEMPLATES: SprintTemplate[] = [
   { id: 'meeting-walk', title: 'Walking Meetings', description: 'Replace at least one meeting a day with a walking meeting.', durations: [7, 14] },
   { id: 'no-fly', title: 'No-Fly Period', description: 'Replace any flights with trains or virtual meetings.', durations: [30] },
   { id: 'plant-menu', title: 'Plant-Forward Catering', description: 'Default all team meals and client catering to plant-based.', durations: [7, 14, 30] },
-  { id: 'waste-zero', title: 'Waste Zero Sprint', description: 'Send nothing to landfill — recycle, compost, refuse.', durations: [7, 14] },
+  { id: 'waste-zero', title: 'Waste Zero Sprint', description: 'Reduce, reuse, recycle — don\u2019t bin or burn it.', durations: [7, 14] },
   { id: 'commute-swap', title: 'Commute Swap', description: 'Whole team logs at least one active or public-transport commute per week.', durations: [14, 30] },
 ];
 

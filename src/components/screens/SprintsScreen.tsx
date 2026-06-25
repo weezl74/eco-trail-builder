@@ -23,7 +23,7 @@ interface ActiveSprint {
 const TEMPLATES: SprintTemplate[] = [
   { id: 'meat-free', title: 'Meat Free', description: 'Cut out meat for the duration of the sprint.', durations: [1, 3, 7] },
   { id: 'ditch-drive', title: 'Ditch My Drive', description: 'Use public transport or active travel instead of the car.', durations: [3, 7] },
-  { id: 'zero-waste', title: 'Zero Waste', description: 'Send nothing to landfill — recycle, compost or refuse.', durations: [1, 3, 7] },
+  { id: 'zero-waste', title: 'Zero Waste', description: 'Reduce, reuse, recycle — don\u2019t bin or burn it.', durations: [1, 3, 7] },
   { id: 'unplugged', title: 'Unplugged', description: 'Switch off non-essential electronics at the wall every night.', durations: [1, 3, 7] },
   { id: 'shop-local-only', title: 'Local Only', description: 'Only buy from independent local shops and producers.', durations: [3, 7] },
   { id: 'second-hand', title: 'Second-Hand First', description: 'Buy nothing new — borrow, swap or buy preloved.', durations: [7] },
