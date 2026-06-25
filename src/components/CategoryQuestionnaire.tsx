@@ -70,7 +70,7 @@ const categoryQuestions: Record<string, Question[]> = {
         { value: 'yes-home', label: 'Yes, I compost at home', impact: 0 },
         { value: 'yes-service', label: 'Yes, through municipal service', impact: 50 },
         { value: 'sometimes', label: 'Sometimes', impact: 150 },
-        { value: 'no', label: 'No, it goes to landfill', impact: 300 }
+        { value: 'no', label: 'No, it goes in the general bin', impact: 300 }
       ]
     },
     {
