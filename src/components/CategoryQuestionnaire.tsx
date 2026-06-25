@@ -486,20 +486,12 @@ const CategoryQuestionnaire: React.FC<CategoryQuestionnaireProps> = ({
     );
   }
 
-  const handleAnswer = (value: string, checked: boolean) => {
+  const handleAnswer = (value: string) => {
     const questionId = currentQuestion.id;
-    const currentAnswers = answers[questionId] || [];
-    
-    if (checked) {
-      // Add to answers if not already present
-      if (!currentAnswers.includes(value)) {
-        setAnswers({ ...answers, [questionId]: [...currentAnswers, value] });
-      }
-    } else {
-      // Remove from answers
-      setAnswers({ ...answers, [questionId]: currentAnswers.filter(a => a !== value) });
-    }
+    // Single-select: only one option may be active at a time.
+    setAnswers({ ...answers, [questionId]: [value] });
   };
+
 
   const handleNext = async () => {
     if (currentQuestionIndex < questions.length - 1) {
