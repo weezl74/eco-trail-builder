@@ -5,11 +5,10 @@ interface Props {
   accessories?: string[];
   head?: string;
   className?: string;
+  /** Horizontal shift % of width. Negative = left. Default 0 (centred). */
+  shiftPercent?: number;
 }
 
-// Tweak this single value to nudge the whole avatar stack left/right.
-// Negative = left. All layers move together so alignment is preserved.
-const HORIZONTAL_SHIFT_PERCENT = -6;
 
 const getHeadFile = (accessories: string[], head?: string) => {
   const base = "/profile/";
@@ -37,7 +36,7 @@ const Layer: React.FC<{ src: string; alt?: string; z: number }> = ({ src, alt = 
   <img src={src} alt={alt} draggable={false} style={{ ...layerStyle, zIndex: z }} />
 );
 
-const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [], head, className }) => {
+const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [], head, className, shiftPercent = 0 }) => {
   const has = (id: string) => accessories.includes(id);
 
   return (
@@ -46,9 +45,10 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [], head, clas
         style={{
           position: "absolute",
           inset: 0,
-          transform: `translateX(${HORIZONTAL_SHIFT_PERCENT}%)`,
+          transform: `translateX(${shiftPercent}%)`,
         }}
       >
+
         {/* Z1 BODY BASE (headless so the head layer fully swaps) */}
         <Layer src="/profile/body-base-nohead.svg" z={1} />
 

@@ -216,6 +216,7 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
 
       {tab === "avatar" && (
         <>
+          {/* Nelson/Barb toggle hidden for now — Barb head returning in a later build.
           <div className="flex items-center justify-center gap-2 mb-2">
             <button
               onClick={() => pickHead("nelson")}
@@ -230,6 +231,8 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
               Barb
             </button>
           </div>
+          */}
+
           <div className="flex items-center justify-center mb-3">
             <NelsonAvatar
               woolColor={woolColor}

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { X, Calculator } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+
 
 interface Question {
   id: string;
@@ -485,20 +486,12 @@ const CategoryQuestionnaire: React.FC<CategoryQuestionnaireProps> = ({
     );
   }
 
-  const handleAnswer = (value: string, checked: boolean) => {
+  const handleAnswer = (value: string) => {
     const questionId = currentQuestion.id;
-    const currentAnswers = answers[questionId] || [];
-    
-    if (checked) {
-      // Add to answers if not already present
-      if (!currentAnswers.includes(value)) {
-        setAnswers({ ...answers, [questionId]: [...currentAnswers, value] });
-      }
-    } else {
-      // Remove from answers
-      setAnswers({ ...answers, [questionId]: currentAnswers.filter(a => a !== value) });
-    }
+    // Single-select: only one option may be active at a time.
+    setAnswers({ ...answers, [questionId]: [value] });
   };
+
 
   const handleNext = async () => {
     if (currentQuestionIndex < questions.length - 1) {
@@ -616,19 +609,20 @@ const CategoryQuestionnaire: React.FC<CategoryQuestionnaireProps> = ({
             
             <div className="space-y-3">
               <p className="text-sm text-slate-400 mb-3">
-                Select all that apply to you:
+                Select one option:
               </p>
-              {currentQuestion.options.map((option) => {
-                const isChecked = (answers[currentQuestion.id] || []).includes(option.value);
-                return (
+              <RadioGroup
+                value={(answers[currentQuestion.id] || [])[0] || ''}
+                onValueChange={(v) => handleAnswer(v)}
+              >
+                {currentQuestion.options.map((option) => (
                   <div key={option.value} className="flex items-center space-x-3">
-                    <Checkbox
+                    <RadioGroupItem
                       id={option.value}
-                      checked={isChecked}
-                      onCheckedChange={(checked) => handleAnswer(option.value, checked as boolean)}
-                      className="border-slate-500 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                      value={option.value}
+                      className="border-slate-500 text-blue-500"
                     />
-                    <Label 
+                    <Label
                       htmlFor={option.value}
                       className="text-slate-300 cursor-pointer flex-1"
                     >
@@ -638,8 +632,9 @@ const CategoryQuestionnaire: React.FC<CategoryQuestionnaireProps> = ({
                       </span>
                     </Label>
                   </div>
-                );
-              })}
+                ))}
+              </RadioGroup>
+
               
               {currentQuestion.allowCustom && (
                 <div className="mt-6 p-4 bg-slate-700/50 rounded-lg border border-slate-600">

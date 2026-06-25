@@ -98,8 +98,10 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
         <NelsonAvatar
           woolColor={woolColor}
           accessories={accessories}
+          shiftPercent={-6}
           className="absolute bottom-28 -left-2 w-[180px] h-[180px] pointer-events-none"
         />
+
       </div>
 
       {/* CTA button */}
