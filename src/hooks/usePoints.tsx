@@ -11,20 +11,21 @@ export type PointsBreakdown = {
 };
 
 /**
- * Two-tier points system — backed by the Caerphilly API.
+ * Two-tier points system — backend is ALWAYS source of truth.
  *
- * Backend is ALWAYS the source of truth.
- * All updates go through POST /update-points using SIGNED values:
- *  - spend = negative
- *  - refund / award = positive
+ * ALL updates go through POST /update-points using SIGNED values:
+ *  - Spend → negative
+ *  - Refund / Award → positive
  */
 export const usePoints = () => {
   const { user } = useAuth();
+
   const [breakdown, setBreakdown] = useState<PointsBreakdown>({
     wool: 0,
     tree: 0,
     total: 0,
   });
+
   const [loading, setLoading] = useState(false);
 
   const refresh = useCallback(async () => {
@@ -37,6 +38,7 @@ export const usePoints = () => {
 
     try {
       const profile = await fetchMyProfile(user.id);
+
       const wool = profile?.wool_points ?? 0;
       const tree = profile?.tree_points ?? 0;
       const total = profile?.total_points ?? wool + tree;
@@ -63,8 +65,8 @@ export const usePoints = () => {
       try {
         await api.post("/update-points", {
           user_id: user.id,
-          woolDelta: type === "wool" ? points : 0,
-          treeDelta: type === "tree" ? points : 0,
+          woolDelta: type === "wool" ? Math.abs(points) : 0,
+          treeDelta: type === "tree" ? Math.abs(points) : 0,
           source: source || "award",
           reference_id: referenceId,
         });
@@ -73,6 +75,7 @@ export const usePoints = () => {
       }
 
       await refresh();
+
       window.dispatchEvent(new CustomEvent("points:updated", { detail: { userId: user.id } }));
     },
     [user, refresh],
@@ -83,19 +86,26 @@ export const usePoints = () => {
    *
    * spend → negative
    * refund → positive
+   *
+   * IMPORTANT:
+   * Callers ALWAYS pass positive numbers
+   * This function enforces the correct sign centrally
    */
   const spend = useCallback(
     async (points: number, type: PointsType, source?: string, referenceId?: string, isRefund: boolean = false) => {
       if (!user || points <= 0) return;
 
-      const signedPoints = isRefund ? points : -points;
+      // ✅ CENTRAL FIX: enforce correct sign no matter what callers pass
+      const signedPoints = isRefund
+        ? Math.abs(points) // refund → +
+        : -Math.abs(points); // spend → -
 
       try {
         await api.post("/update-points", {
           user_id: user.id,
           woolDelta: type === "wool" ? signedPoints : 0,
           treeDelta: type === "tree" ? signedPoints : 0,
-          source: source || (isRefund ? "refund" : "spend"),
+          source: source || (isRefund ? "accessory_refund" : "accessory_purchase"),
           reference_id: referenceId,
         });
       } catch (e) {
@@ -103,6 +113,7 @@ export const usePoints = () => {
       }
 
       await refresh();
+
       window.dispatchEvent(new CustomEvent("points:updated", { detail: { userId: user.id } }));
     },
     [user, refresh],
