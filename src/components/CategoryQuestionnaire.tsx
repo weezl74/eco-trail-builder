@@ -558,6 +558,7 @@ const CategoryQuestionnaire: React.FC<CategoryQuestionnaireProps> = ({
           } else if (question.id === 'home-size') {
             // UK average ~818 sq ft → ~330 kg/yr footprint contribution from floor area
             return total + (customValue * 0.4);
+          }
           return total + customValue;
         }
         
