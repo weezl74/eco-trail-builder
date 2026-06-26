@@ -24,7 +24,8 @@ const NelsonJourneyScreen: React.FC<Props> = ({ totalPoints, groupBoost = 0, onB
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
-  const routeLineRef = useRef<L.Polyline | null>(null);
+  const traveledLineRef = useRef<L.Polyline | null>(null);
+  const remainingLineRef = useRef<L.Polyline | null>(null);
   const [route, setRoute] = useState<[number, number][] | null>(null);
 
   // Fetch a realistic driving route from OSRM. Falls back to a straight line
@@ -57,18 +58,23 @@ const NelsonJourneyScreen: React.FC<Props> = ({ totalPoints, groupBoost = 0, onB
       dragging: true,
       scrollWheelZoom: false,
     });
-    // Fit the whole journey so user sees how far Nelson has travelled
-    map.fitBounds(
-      [
-        [Math.min(START[0], HOME[0]) - 0.5, Math.min(START[1], HOME[1]) - 0.5],
-        [Math.max(START[0], HOME[0]) + 0.5, Math.max(START[1], HOME[1]) + 0.5],
-      ],
-      { padding: [20, 20] },
-    );
+    // Focus on Scotland where Nelson started — closer view, not the whole UK.
+    map.setView(START, 6);
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap',
     }).addTo(map);
+
+    // Starting point pin (where Nelson fled to)
+    const startIcon = L.divIcon({
+      className: '',
+      html: `<div style="transform:translate(-50%,-100%);">
+        <svg width="22" height="30" viewBox="0 0 22 30"><path d="M11 0C5 0 0 5 0 11c0 8 11 19 11 19s11-11 11-19C22 5 17 0 11 0z" fill="#4C1D95" stroke="white" stroke-width="1.5"/><circle cx="11" cy="11" r="4" fill="white"/></svg>
+      </div>`,
+      iconSize: [22, 30],
+      iconAnchor: [11, 30],
+    });
+    L.marker(START, { icon: startIcon }).addTo(map).bindPopup('Start — Scottish Highlands');
 
     const homeIcon = L.divIcon({
       className: '',
@@ -88,23 +94,6 @@ const NelsonJourneyScreen: React.FC<Props> = ({ totalPoints, groupBoost = 0, onB
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Draw / update the journey polyline once the route is known.
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map) return;
-    if (routeLineRef.current) {
-      routeLineRef.current.remove();
-      routeLineRef.current = null;
-    }
-    const coords: [number, number][] = route ?? [START, HOME];
-    routeLineRef.current = L.polyline(coords, {
-      color: '#F4971D',
-      weight: 3,
-      dashArray: '6 6',
-      opacity: 0.8,
-    }).addTo(map);
-  }, [route]);
-
   // Position Nelson along the real route (or straight-line fallback) by progress t.
   const path: [number, number][] = route ?? [START, HOME];
   const segLengths = path.slice(1).map((p, i) => {
@@ -115,17 +104,48 @@ const NelsonJourneyScreen: React.FC<Props> = ({ totalPoints, groupBoost = 0, onB
   let target = totalLen * t;
   let nelsonLat = path[0][0];
   let nelsonLng = path[0][1];
+  let splitIndex = 0; // last full path point already traversed
   for (let i = 0; i < segLengths.length; i++) {
     if (target <= segLengths[i]) {
       const f = segLengths[i] === 0 ? 0 : target / segLengths[i];
       nelsonLat = path[i][0] + (path[i + 1][0] - path[i][0]) * f;
       nelsonLng = path[i][1] + (path[i + 1][1] - path[i][1]) * f;
+      splitIndex = i;
       break;
     }
     target -= segLengths[i];
     nelsonLat = path[i + 1][0];
     nelsonLng = path[i + 1][1];
+    splitIndex = i + 1;
   }
+
+  // Draw / update the two journey polylines (traveled vs remaining).
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    traveledLineRef.current?.remove();
+    remainingLineRef.current?.remove();
+
+    const here: [number, number] = [nelsonLat, nelsonLng];
+    const traveled: [number, number][] = [...path.slice(0, splitIndex + 1), here];
+    const remaining: [number, number][] = [here, ...path.slice(splitIndex + 1)];
+
+    traveledLineRef.current = L.polyline(traveled, {
+      color: '#4C1D95', // dark purple — journey to date
+      weight: 4,
+      dashArray: '6 8',
+      opacity: 0.95,
+      lineCap: 'round',
+    }).addTo(map);
+
+    remainingLineRef.current = L.polyline(remaining, {
+      color: '#F4971D', // orange — where he's going next
+      weight: 4,
+      dashArray: '2 8',
+      opacity: 0.95,
+      lineCap: 'round',
+    }).addTo(map);
+  }, [route, nelsonLat, nelsonLng, splitIndex, path]);
 
   // Update / animate Nelson's pin as points / route change
   useEffect(() => {
@@ -142,11 +162,16 @@ const NelsonJourneyScreen: React.FC<Props> = ({ totalPoints, groupBoost = 0, onB
     if (!markerRef.current) {
       markerRef.current = L.marker([nelsonLat, nelsonLng], { icon: nelsonIcon })
         .addTo(map)
-        .bindPopup('Nelson the sheep');
+        .bindPopup('Nelson is here');
     } else {
       markerRef.current.setLatLng([nelsonLat, nelsonLng]);
       markerRef.current.setIcon(nelsonIcon);
     }
+
+    // Keep the view focused on Scotland + Nelson's current position so the
+    // user can always see both the start pin and where he is now.
+    const bounds = L.latLngBounds([START, [nelsonLat, nelsonLng]]).pad(0.25);
+    map.fitBounds(bounds, { padding: [30, 30], maxZoom: 7, animate: false });
   }, [nelsonLat, nelsonLng]);
 
   const milesRemaining = Math.round((1 - t) * 600);
