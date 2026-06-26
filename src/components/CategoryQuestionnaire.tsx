@@ -555,7 +555,9 @@ const CategoryQuestionnaire: React.FC<CategoryQuestionnaireProps> = ({
             return total + (customValue * 12 * 0.21); // kWh/month * months * UK grid factor
           } else if (question.id === 'daily-distance') {
             return total + (customValue * 365 * 0.2); // km/day * days * avg car emissions
-          }
+          } else if (question.id === 'home-size') {
+            // UK average ~818 sq ft → ~330 kg/yr footprint contribution from floor area
+            return total + (customValue * 0.4);
           return total + customValue;
         }
         
