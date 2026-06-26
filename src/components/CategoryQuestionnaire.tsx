@@ -152,13 +152,17 @@ const categoryQuestions: Record<string, Question[]> = {
   buildings: [
     {
       id: 'home-size',
-      question: 'What is the size of your primary residence?',
+      question: 'What is the floor area of your home? (Enter square footage below — or pick by number of rooms if you don\'t know)',
       options: [
-        { value: 'small', label: 'Small (under 100m²)', impact: 0 },
-        { value: 'medium', label: 'Medium (100-200m²)', impact: 300 },
-        { value: 'large', label: 'Large (200-300m²)', impact: 600 },
-        { value: 'very-large', label: 'Very large (over 300m²)', impact: 1000 }
-      ]
+        { value: 'rooms-1-2', label: '1–2 rooms (flat / studio · ~450 sq ft)', impact: 180 },
+        { value: 'rooms-3-4', label: '3–4 rooms (~650 sq ft)', impact: 260 },
+        { value: 'rooms-5-6', label: '5–6 rooms (UK average · ~900 sq ft)', impact: 360 },
+        { value: 'rooms-7-8', label: '7–8 rooms (~1,300 sq ft)', impact: 520 },
+        { value: 'rooms-9-plus', label: '9+ rooms (~1,800 sq ft)', impact: 720 }
+      ],
+      allowCustom: true,
+      customUnit: 'sq ft',
+      customLabel: 'Enter your home\'s floor area in square feet (UK average is ~818 sq ft)'
     },
     {
       id: 'insulation',
@@ -551,6 +555,9 @@ const CategoryQuestionnaire: React.FC<CategoryQuestionnaireProps> = ({
             return total + (customValue * 12 * 0.21); // kWh/month * months * UK grid factor
           } else if (question.id === 'daily-distance') {
             return total + (customValue * 365 * 0.2); // km/day * days * avg car emissions
+          } else if (question.id === 'home-size') {
+            // UK average ~818 sq ft → ~330 kg/yr footprint contribution from floor area
+            return total + (customValue * 0.4);
           }
           return total + customValue;
         }
