@@ -1,0 +1,1 @@
+DELETE FROM public.user_stories a USING public.user_stories b WHERE a.user_id = b.user_id AND a.title = b.title AND a.created_at > b.created_at; CREATE UNIQUE INDEX IF NOT EXISTS user_stories_user_title_unique ON public.user_stories (user_id, title);
