@@ -87,7 +87,7 @@ const NelsonJourneyScreen: React.FC<Props> = ({ totalPoints, groupBoost = 0, onB
       scrollWheelZoom: false,
     });
     // Focus on Scotland where Nelson started — closer view, not the whole UK.
-    map.setView(START, 6);
+    map.setView(START, 10);
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap',
@@ -206,8 +206,9 @@ const NelsonJourneyScreen: React.FC<Props> = ({ totalPoints, groupBoost = 0, onB
 
     // Keep the view focused on Scotland + Nelson's current position so the
     // user can always see both the start pin and where he is now.
-    const bounds = L.latLngBounds([START, [nelsonLat, nelsonLng]]).pad(0.25);
-    map.fitBounds(bounds, { padding: [30, 30], maxZoom: 7, animate: false });
+    // Keep the initial view zoomed in around Nelson's current location so the
+    // user lands on a recognisable place (town/road level), not a UK-wide view.
+    map.setView([nelsonLat, nelsonLng], 11, { animate: false });
   }, [nelsonLat, nelsonLng]);
 
   const milesRemaining = Math.round((1 - t) * 600);
