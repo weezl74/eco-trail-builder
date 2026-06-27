@@ -95,7 +95,11 @@ const EventsCalendarScreen: React.FC<Props> = ({ onBack }) => {
       <h2 className="font-serif font-bold text-lg mb-2">{t('Upcoming events')}</h2>
       <p className="text-white/50 text-xs mb-2">{t('Tap an event to add it to your phone calendar.')}</p>
       <div className="space-y-2">
-        {EVENTS.map((e, i) => {
+        {EVENTS.filter(e => {
+          const ev = new Date(e.date); ev.setHours(0,0,0,0);
+          const now = new Date(); now.setHours(0,0,0,0);
+          return ev >= now;
+        }).map((e, i) => {
           const d = new Date(e.date);
           return (
             <button
