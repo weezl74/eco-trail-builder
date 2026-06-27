@@ -28,21 +28,49 @@ const NelsonJourneyScreen: React.FC<Props> = ({ totalPoints, groupBoost = 0, onB
   const remainingLineRef = useRef<L.Polyline | null>(null);
   const [route, setRoute] = useState<[number, number][] | null>(null);
 
-  // Fetch a realistic driving route from OSRM. Falls back to a straight line
-  // if the public router is unreachable.
+  // Fetch a realistic driving route. Try multiple OSRM mirrors; if all fail,
+  // fall back to a hand-curved path that hugs the western UK road corridor
+  // (M74 → M6 → M5 → M50 → A465) instead of a straight line.
   useEffect(() => {
     let cancelled = false;
+    const mirrors = [
+      `https://router.project-osrm.org/route/v1/driving/${START[1]},${START[0]};${HOME[1]},${HOME[0]}?overview=full&geometries=geojson`,
+      `https://routing.openstreetmap.de/routed-car/route/v1/driving/${START[1]},${START[0]};${HOME[1]},${HOME[0]}?overview=full&geometries=geojson`,
+    ];
     (async () => {
-      try {
-        const url = `https://router.project-osrm.org/route/v1/driving/${START[1]},${START[0]};${HOME[1]},${HOME[0]}?overview=full&geometries=geojson`;
-        const res = await fetch(url);
-        const json = await res.json();
-        const coords: [number, number][] = json?.routes?.[0]?.geometry?.coordinates?.map(
-          (c: [number, number]) => [c[1], c[0]],
-        );
-        if (!cancelled && coords?.length) setRoute(coords);
-      } catch {
-        /* fall back to straight line */
+      for (const url of mirrors) {
+        try {
+          const res = await fetch(url);
+          if (!res.ok) continue;
+          const json = await res.json();
+          const coords: [number, number][] = json?.routes?.[0]?.geometry?.coordinates?.map(
+            (c: [number, number]) => [c[1], c[0]],
+          );
+          if (!cancelled && coords?.length) {
+            setRoute(coords);
+            return;
+          }
+        } catch {
+          /* try next mirror */
+        }
+      }
+      // Fallback: approximate UK west-coast motorway corridor.
+      if (!cancelled) {
+        setRoute([
+          START,
+          [57.4, -4.2],   // Inverness
+          [56.8, -4.0],   // Cairngorms
+          [56.1, -3.95],  // Stirling
+          [55.86, -4.25], // Glasgow
+          [55.0, -3.6],   // Gretna / M74
+          [54.32, -2.74], // Tebay (M6)
+          [53.48, -2.24], // Manchester
+          [52.48, -1.9],  // Birmingham
+          [52.0, -2.2],   // Worcester
+          [51.83, -2.78], // Ross-on-Wye
+          [51.78, -3.2],  // Brecon Beacons
+          HOME,
+        ]);
       }
     })();
     return () => {
