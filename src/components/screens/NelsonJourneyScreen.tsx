@@ -115,7 +115,15 @@ const NelsonJourneyScreen: React.FC<Props> = ({ totalPoints, groupBoost = 0, onB
     L.marker(HOME, { icon: homeIcon }).addTo(map).bindPopup('Nelson, Caerphilly — home');
 
     mapRef.current = map;
+
+    // Container often has 0 size on first paint inside flex/scroll layouts —
+    // force Leaflet to re-measure so tiles actually get requested.
+    const sizers = [60, 250, 600, 1200].map((ms) =>
+      setTimeout(() => map.invalidateSize(), ms),
+    );
+
     return () => {
+      sizers.forEach(clearTimeout);
       map.remove();
       mapRef.current = null;
     };
