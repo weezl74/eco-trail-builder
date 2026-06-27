@@ -45,7 +45,7 @@ const CATEGORY_INFO: Record<
   },
   eco: {
     label: 'Eco-friendly Businesses',
-    color: '#f59e0b',
+    color: '#15803d',
     message: 'Invest your pound locally to keep supply-chain travel emissions low.',
     delta: { money: 18, co2: 14, water: 25 },
   },
