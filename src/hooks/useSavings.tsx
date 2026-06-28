@@ -1,10 +1,9 @@
+import { useCallback, useEffect, useState, useRef } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { api, fetchMyProfile } from "@/lib/api";
 
-import { useCallback, useEffect, useState, useRef } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
-import { api, fetchMyProfile } from '@/lib/api';
-
-export type RenewableType = 'solar' | 'wind' | 'mine_water';
+export type RenewableType = "solar" | "wind" | "mine_water";
 
 export type Renewable = {
   id: string;
@@ -25,8 +24,8 @@ type State = {
 const DEFAULT: State = {
   accessories: [],
   renewables: [],
-  cardColor: 'midnight',
-  woolColor: '#e8d9b8',
+  cardColor: "midnight",
+  woolColor: "#e8d9b8",
 };
 
 export const RENEWABLE_COSTS: Record<RenewableType, number> = {
@@ -60,7 +59,7 @@ export const useSavings = () => {
         tree: p?.tree_points ?? 0,
       });
     } catch (e) {
-      console.error('[useSavings] refreshPoints failed', e);
+      console.error("[useSavings] refreshPoints failed", e);
     }
   }, [userId]);
 
@@ -76,11 +75,7 @@ export const useSavings = () => {
     }
 
     (async () => {
-      const { data } = await supabase
-        .from('user_state')
-        .select('data')
-        .eq('user_id', userId)
-        .maybeSingle();
+      const { data } = await supabase.from("user_state").select("data").eq("user_id", userId).maybeSingle();
 
       if (data?.data) {
         setState({ ...DEFAULT, ...(data.data as Partial<State>) });
@@ -94,9 +89,7 @@ export const useSavings = () => {
 
       if (!userId) return;
 
-      await supabase
-        .from('user_state')
-        .upsert({ user_id: userId, data: next as any }, { onConflict: 'user_id' });
+      await supabase.from("user_state").upsert({ user_id: userId, data: next as any }, { onConflict: "user_id" });
     },
     [userId],
   );
@@ -112,13 +105,6 @@ export const useSavings = () => {
       if (points.wool < cost) return false;
 
       try {
-        await api.post('/update-points', {
-          user_id: userId,
-          woolDelta: cost,
-          source: 'accessory_purchase',
-          reference_id: id,
-        });
-
         await persist({
           ...s,
           accessories: [...s.accessories, id],
@@ -128,7 +114,7 @@ export const useSavings = () => {
 
         return true;
       } catch (e) {
-        console.error('buyAccessory failed', e);
+        console.error("buyAccessory failed", e);
         return false;
       }
     },
@@ -145,10 +131,10 @@ export const useSavings = () => {
       if (!s.accessories.includes(id)) return false;
 
       try {
-        await api.post('/update-points', {
+        await api.post("/update-points", {
           user_id: userId,
           woolDelta: cost,
-          source: 'accessory_refund',
+          source: "accessory_refund",
           reference_id: id,
         });
 
@@ -161,7 +147,7 @@ export const useSavings = () => {
 
         return true;
       } catch (e) {
-        console.error('refundAccessory failed', e);
+        console.error("refundAccessory failed", e);
         return false;
       }
     },
@@ -179,25 +165,22 @@ export const useSavings = () => {
       if (points.wool < cost) return false;
 
       try {
-        await api.post('/update-points', {
+        await api.post("/update-points", {
           user_id: userId,
           woolDelta: cost,
-          source: 'renewable_purchase',
+          source: "renewable_purchase",
           reference_id: type,
         });
 
         await persist({
           ...s,
-          renewables: [
-            ...s.renewables,
-            { id: `${type}-${Date.now()}`, type, x, y, lat, lng },
-          ],
+          renewables: [...s.renewables, { id: `${type}-${Date.now()}`, type, x, y, lat, lng }],
         });
 
         await refreshPoints();
         return true;
       } catch (e) {
-        console.error('buyRenewable failed', e);
+        console.error("buyRenewable failed", e);
         return false;
       }
     },
@@ -222,12 +205,15 @@ export const useSavings = () => {
         water: s.water + (delta.water || 0),
       }));
       if (userId) {
-        api.post('/update-points', {
-          user_id: userId,
-          woolDelta: -25,
-          source: 'pledge',
-          reference_id: id,
-        }).then(refreshPoints).catch((e) => console.error('addPledge points failed', e));
+        api
+          .post("/update-points", {
+            user_id: userId,
+            woolDelta: -25,
+            source: "pledge",
+            reference_id: id,
+          })
+          .then(refreshPoints)
+          .catch((e) => console.error("addPledge points failed", e));
       }
       return true;
     },
@@ -236,28 +222,28 @@ export const useSavings = () => {
 
   // ✅ TREES
   const [treesPlanted, setTreesPlanted] = useState(0);
-  const plantTree = useCallback((cost: number) => {
-    if (points.wool < cost) return false;
-    setTreesPlanted((n) => n + 1);
-    if (userId) {
-      api.post('/update-points', {
-        user_id: userId,
-        woolDelta: cost,
-        source: 'plant_tree',
-        reference_id: 'tree',
-      }).then(refreshPoints).catch((e) => console.error('plantTree failed', e));
-    }
-    return true;
-  }, [points, userId, refreshPoints]);
+  const plantTree = useCallback(
+    (cost: number) => {
+      if (points.wool < cost) return false;
+      setTreesPlanted((n) => n + 1);
+      if (userId) {
+        api
+          .post("/update-points", {
+            user_id: userId,
+            woolDelta: cost,
+            source: "plant_tree",
+            reference_id: "tree",
+          })
+          .then(refreshPoints)
+          .catch((e) => console.error("plantTree failed", e));
+      }
+      return true;
+    },
+    [points, userId, refreshPoints],
+  );
 
-  const setCardColor = useCallback(
-    (id: string) => persist({ ...latest.current, cardColor: id }),
-    [persist],
-  );
-  const setWoolColor = useCallback(
-    (hex: string) => persist({ ...latest.current, woolColor: hex }),
-    [persist],
-  );
+  const setCardColor = useCallback((id: string) => persist({ ...latest.current, cardColor: id }), [persist]);
+  const setWoolColor = useCallback((hex: string) => persist({ ...latest.current, woolColor: hex }), [persist]);
 
   return {
     // state
@@ -282,4 +268,3 @@ export const useSavings = () => {
     setWoolColor,
   };
 };
-
