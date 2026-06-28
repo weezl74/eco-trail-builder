@@ -5,7 +5,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { X, Calculator } from "lucide-react";
-import { api } from "@/lib/api";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Question {
   id: string;
@@ -415,11 +415,9 @@ const CategoryQuestionnaire: React.FC<CategoryQuestionnaireProps> = ({ category,
       }
 
       try {
-       
-const data = await api.get(
-  `/responses?user_id=${user.id}&category=${category.id}`
-);
-
+        const { data } = await supabase
+          .from("user_responses")
+          .select("question_id, answer_value")
           .eq("user_id", user.id)
           .eq("category", category.id);
 
