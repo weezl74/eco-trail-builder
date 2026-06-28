@@ -6,7 +6,7 @@ import { Heart } from "lucide-react";
 
 import { api } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
-import AddStoryDialog from "./AddStoryDialogue"; // ✅ FIXED IMPORT
+import AddStoryDialog from "./screens/AddStoryDialog";
 
 interface Story {
   id: string;
