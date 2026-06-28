@@ -41,6 +41,7 @@ import caerphillyBusinessLogo from "@/assets/caerphilly-business-club-logo.png";
 import caerphillyCouncilLogo from "@/assets/caerphilly-council-logo.png";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 
 type UserMode = "resident" | "business";
@@ -171,10 +172,10 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
       }
 
       // ✅ Use API instead of Supabase
-      const responses = await api.get(`/responses?user_id=${user.id}`);
+      const responses = (await api.get(`/responses?user_id=${user.id}`)) as Array<{ category: string }>;
 
       if (responses) {
-        const completed = [...new Set(responses.map((r) => r.category))];
+        const completed = [...new Set(responses.map((r) => r.category))] as string[];
         setCompletedCategories(completed);
       }
     } catch (error) {
@@ -427,7 +428,16 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
         points = 15; // Low impact = 15 points
       else points = 5; // Quick wins = 5 points
 
-      // Update user's total points
+      // Update user's total points via API
+      const newTotalPoints = (userProfile?.total_points || 0) + points;
+      try {
+        await api.post('/profile/update', {
+          user_id: user.id,
+          total_points: newTotalPoints,
+        });
+      } catch (e) {
+        console.error('Failed to update points:', e);
+      }
 
       const newPledge = {
         id: data.id,

@@ -65,7 +65,7 @@ export interface ApiLeaderboardEntry {
 // ✅ PROFILE
 export const fetchMyProfile = async (userId: string) => {
   if (!userId) return null;
-  return api.get(`/profile/${userId}`);
+  return api.get(`/profile?user_id=${encodeURIComponent(userId)}`);
 };
 
 
