@@ -415,9 +415,7 @@ const CategoryQuestionnaire: React.FC<CategoryQuestionnaireProps> = ({ category,
       }
 
       try {
-        const responses = await api.get(`/responses?user_id=${user.id}&category=${category.id}`);
-
-        const data = responses || [];
+        const data = await api.get(`/responses?user_id=${user.id}&category=${category.id}`);
 
         if (data) {
           const existingAnswers = data.reduce(
