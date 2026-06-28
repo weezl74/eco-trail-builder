@@ -67,12 +67,27 @@ const PledgesScreen: React.FC<{ onBack?: () => void; userGroup?: "resident" | "b
   const activate = async (p: Pledge) => {
     if (activated[p.key]) return;
 
-    await addPledge(p.key, {
-      money: Number(p.money_saved ?? 0),
-      co2: Number(p.co2_saved ?? 0),
-      water: Number(p.water_saved ?? 0),
-      wool: Number(p.wool_points ?? 0),
-    });
+    try {
+      // ✅ Call backend directly (bypass broken hook)
+      await api.post("/pledges", {
+        user_id: user.id,
+        category: "general",
+        action: p.key,
+        points_earned: Number(p.wool_points ?? 0),
+      });
+
+      // ✅ keep existing behaviour
+      addPledge(p.key, {
+        money: Number(p.money_saved ?? 0),
+        co2: Number(p.co2_saved ?? 0),
+        water: Number(p.water_saved ?? 0),
+      });
+
+      // ✅ force UI refresh
+      window.location.reload();
+    } catch (e) {
+      console.error("pledge failed", e);
+    }
   };
 
   const visible = pledges.filter((p) => {
