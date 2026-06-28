@@ -143,11 +143,12 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
       }
 
       // Load user renewables
-      const { data: renewables } = await supabase.from("user_renewables").select("*").eq("user_id", user.id);
+      const renewables = await api.get(`/renewables?user_id=${user.id}`);
 
-      if (renewables) {
+      if (Array.isArray(renewables)) {
         setUserRenewables(renewables);
       }
+
 
       // Load user pledges to get count
       const pledges = await api.get(`/pledges?user_id=${user.id}`);
@@ -467,17 +468,14 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
 
     try {
       // Save to database (position left null — user places it next on the map)
-      const { data, error } = await supabase
-        .from("user_renewables")
-        .insert({
-          user_id: user.id,
-          technology_type: tech.type,
-          points_cost: tech.pointsCost,
-        })
-        .select()
-        .single();
+      const data = await api.post(`/renewables`, {
+        user_id: user.id,
+        technology_type: tech.type,
+        points_cost: tech.pointsCost,
+      });
 
-      if (error) throw error;
+      if (!data) throw new Error("Failed to create renewable");
+
 
       // Deduct points from user's total
       const newTotalPoints = (userProfile?.total_points || 0) - tech.pointsCost;
@@ -508,17 +506,20 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
 
   const handlePlaceRenewable = async (renewableId: string, x: number, y: number) => {
     if (!user) return;
-    const { error } = await (supabase as any)
-      .from("user_renewables")
-      .update({ position_x: x, position_y: y })
-      .eq("id", renewableId)
-      .eq("user_id", user.id);
-    if (error) {
-      toast({ title: "Could not save placement", description: error.message, variant: "destructive" });
+    try {
+      await api.patch(`/renewables`, {
+        id: renewableId,
+        user_id: user.id,
+        position_x: x,
+        position_y: y,
+      });
+    } catch (error: any) {
+      toast({ title: "Could not save placement", description: error?.message || "Request failed", variant: "destructive" });
       return;
     }
     setUserRenewables((prev) => prev.map((r) => (r.id === renewableId ? { ...r, position_x: x, position_y: y } : r)));
   };
+
 
   const addSprint = async (title: string, impact: number, frequency: string, costSaving: number = 0) => {
     if (!user) return;
