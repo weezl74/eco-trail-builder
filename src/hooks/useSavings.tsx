@@ -131,13 +131,6 @@ export const useSavings = () => {
       if (!s.accessories.includes(id)) return false;
 
       try {
-        await api.post("/update-points", {
-          user_id: userId,
-          woolDelta: cost,
-          source: "accessory_refund",
-          reference_id: id,
-        });
-
         await persist({
           ...s,
           accessories: s.accessories.filter((a) => a !== id),
