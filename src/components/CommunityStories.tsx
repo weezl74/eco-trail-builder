@@ -6,7 +6,7 @@ import { Heart } from "lucide-react";
 
 import { api } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
-import { useTranslations } from "@/hooks/useTranslations";
+import AddStoryDialog from "./AddStoryDialog";
 
 // ✅ Story type
 interface Story {
@@ -25,11 +25,11 @@ interface Story {
 export default function CommunityStories() {
   const [stories, setStories] = useState<Story[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   const { user } = useAuth();
-  const { t } = useTranslations();
 
-  // ✅ Load stories from API
+  // ✅ Load stories
   useEffect(() => {
     if (!user) return;
 
@@ -51,7 +51,7 @@ export default function CommunityStories() {
     }
   };
 
-  // ✅ Toggle kudos (API)
+  // ✅ Toggle kudos
   const toggleKudos = async (id: string, has: boolean) => {
     if (!user) return;
 
@@ -88,14 +88,16 @@ export default function CommunityStories() {
   };
 
   if (!user) {
-    return <div className="text-center text-muted-foreground">{t("Please sign in")}</div>;
+    return <div>Please sign in</div>;
   }
 
   return (
     <div className="space-y-4">
-      {/* ✅ IMPORTANT: KEEP ORIGINAL BUTTON ONLY */}
-      {/* This button should trigger your existing dropdown logic */}
-      <Button>Add Story</Button>
+      {/* ✅ SINGLE ADD STORY BUTTON */}
+      <Button onClick={() => setIsOpen(true)}>Add Story</Button>
+
+      {/* ✅ DIALOG */}
+      <AddStoryDialog open={isOpen} onOpenChange={setIsOpen} onPosted={fetchStories} />
 
       {loading ? (
         <p className="text-sm text-muted-foreground">Loading…</p>
