@@ -209,14 +209,20 @@ export const useSavings = () => {
     setTreesPlanted(lsGet(`${ns}:treesPlanted`, 0));
   }, [ns]);
 
-  const plantTree = useCallback(() => {
-    setTreesPlanted((n) => {
-      const next = n + 1;
-      lsSet(`${ns}:treesPlanted`, next);
-      return next;
-    });
-    setTreePoints((p) => p + 1);
-  }, [ns]);
+  const plantTree = useCallback(
+    (cost: number = 0) => {
+      if (cost > 0 && woolPoints < cost) return false;
+      setTreesPlanted((n) => {
+        const next = n + 1;
+        lsSet(`${ns}:treesPlanted`, next);
+        return next;
+      });
+      setTreePoints((p) => p + 1);
+      if (cost > 0) setWoolPoints((p) => p - cost);
+      return true;
+    },
+    [ns, woolPoints],
+  );
 
   return {
     // points
