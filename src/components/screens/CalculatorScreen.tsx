@@ -108,10 +108,7 @@ const CalculatorScreen: React.FC = () => {
     }
     const wasFirstTime = !scores[categoryId];
     // Recompute footprint from all responses to keep it accurate
-    const { data: responses } = await supabase
-      .from("user_responses")
-      .select("category, impact_value")
-      .eq("user_id", user.id);
+    const responses: any[] = await api.get(`/responses?user_id=${user.id}`);
     const agg: Record<string, number> = {};
     let total = 0;
     (responses || []).forEach((r: any) => {
@@ -125,25 +122,19 @@ const CalculatorScreen: React.FC = () => {
     let pointsAwarded = 0;
     if (wasFirstTime) pointsAwarded += 25;
     const completedCount = Object.keys(agg).length;
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("total_points, calc_bonus_awarded")
-      .eq("user_id", user.id)
-      .maybeSingle();
+    const profile: any = await fetchMyProfile(user.id);
     const currentPoints = profile?.total_points || 0;
     let newPoints = currentPoints + pointsAwarded;
     if (completedCount >= 6 && !profile?.calc_bonus_awarded) {
       newPoints += 50;
       pointsAwarded += 50;
     }
-    await supabase
-      .from("profiles")
-      .update({
-        current_footprint: total,
-        total_points: newPoints,
-        ...(completedCount >= 6 ? { calc_bonus_awarded: true } : {}),
-      })
-      .eq("user_id", user.id);
+    await api.post(`/profile/update`, {
+      user_id: user.id,
+      current_footprint: total,
+      total_points: newPoints,
+      ...(completedCount >= 6 ? { calc_bonus_awarded: true } : {}),
+    });
 
     toast({
       title: pointsAwarded > 0 ? `+${pointsAwarded} ${t("points!")}` : t("Score updated"),
