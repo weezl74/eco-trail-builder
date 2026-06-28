@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/lib/api';
 import { markPasswordResetDone } from '@/components/ForcePasswordResetGate';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff } from 'lucide-react';
@@ -88,7 +89,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onComplete }) => {
     // Set account_type on profile (best-effort; trigger creates the row).
     if (data.user && isBusiness) {
       try {
-        const { api } = await import('@/lib/api');
         await api.post('/profile/update', {
           user_id: data.user.id,
           account_type: 'business',
