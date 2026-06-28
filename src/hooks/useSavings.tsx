@@ -183,7 +183,7 @@ export const useSavings = () => {
   }, [ns]);
 
   const buyRenewable = useCallback(
-    (type: RenewableType, lat?: number, lng?: number) => {
+    (type: RenewableType, _x?: number, _y?: number, lat?: number, lng?: number) => {
       const cost = RENEWABLE_COSTS[type];
       if (woolPoints < cost) return false;
       const item: PlacedRenewable = {
