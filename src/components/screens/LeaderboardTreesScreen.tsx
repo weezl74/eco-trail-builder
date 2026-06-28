@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import nelsonHead from "@/assets/sheep/NelsonHead.svg.asset.json";
@@ -17,7 +18,6 @@ interface Row {
   isMe?: boolean;
 }
 
-// ✅ Oak tree icon
 const OakTreeIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="0 0 64 64" className={className} aria-hidden>
     <g fill="#3f8a3a">
@@ -43,44 +43,50 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
   const { t } = useTranslations();
   const { user } = useAuth();
 
+  // ✅ CLEAN API-ONLY FETCH (NO SUPABASE)
   useEffect(() => {
     let cancelled = false;
 
     const load = async () => {
       try {
         const data: ApiLeaderboardEntry[] = await fetchLeaderboard(100);
+
         if (cancelled) return;
 
-        const mapped: Row[] = data
-          .map((u) => {
-            const isMe = u.user_id === user?.id;
-            const wool = Number(u.wool_points) || 0;
-            const tree = Number(u.tree_points) || 0;
+        const mapped: Row[] = data.map((u) => {
+          const isMe = u.user_id === user?.id;
 
-            return {
-              user_id: u.user_id,
-              name: u.display_name || u.username || `User ${String(u.user_id).slice(0, 6)}`,
-              points: mode === "wool" ? wool : tree,
-              isMe,
-            };
-          })
-          .sort((a, b) => b.points - a.points);
+          const wool = Number(u.wool_points) || 0;
+          const tree = Number(u.tree_points) || 0;
 
-        setRows(mapped);
+          return {
+            user_id: u.user_id,
+            name:
+              u.display_name ||
+              u.username ||
+              `User ${String(u.user_id).slice(0, 6)}`,
+            points: mode === "wool" ? wool : tree,
+            isMe,
+          };
+        });
+
+        setRows(mapped.sort((a, b) => b.points - a.points));
         setError(false);
-      } catch {
+
+        console.log("✅ Leaderboard loaded:", mapped.length);
+      } catch (e) {
         if (cancelled) return;
+
+        console.error("❌ Leaderboard failed:", e);
         setRows([]);
         setError(true);
       }
     };
 
     load();
-    window.addEventListener("points:updated", load);
 
     return () => {
       cancelled = true;
-      window.removeEventListener("points:updated", load);
     };
   }, [mode, user?.id]);
 
@@ -102,27 +108,33 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
 
   return (
     <div className="min-h-screen bg-[#f5a623] pb-20 px-4 pt-3">
+
       {/* Back */}
       {onBack && (
-        <button onClick={onBack} className="text-black mb-2 flex items-center gap-1 font-serif font-bold">
+        <button
+          onClick={onBack}
+          className="text-black mb-2 flex items-center gap-1 font-serif font-bold"
+        >
           <ArrowLeft className="h-5 w-5" /> {t("Back")}
         </button>
       )}
 
-      {/* ✅ HEADER */}
+      {/* Header */}
       <div className="text-center text-black font-serif mb-4">
         <p className="text-sm opacity-70">Estimated Impact</p>
         <p className="text-xl font-bold">25,500 kg CO₂e</p>
       </div>
 
-      {/* ✅ TOGGLE */}
+      {/* Toggle */}
       <div className="bg-[#1f1f1f] rounded-full mt-3 p-1 flex text-sm font-serif font-bold">
         {(["wool", "tree"] as Mode[]).map((m) => (
           <button
             key={m}
             onClick={() => setMode(m)}
             className={`flex-1 py-1.5 rounded-full transition ${
-              mode === m ? "bg-[#f5a623] text-black" : "text-white opacity-80"
+              mode === m
+                ? "bg-[#f5a623] text-black"
+                : "text-white opacity-80"
             }`}
           >
             {m === "wool" ? t("Wool Points") : t("Tree Points")}
@@ -130,8 +142,9 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
         ))}
       </div>
 
-      {/* ✅ LEADERBOARD */}
+      {/* Leaderboard */}
       <div className="bg-[#1f1f1f] rounded-2xl mt-3 overflow-hidden">
+
         <div className="grid grid-cols-3 text-white text-center py-2 border-b border-white/20 text-[10px] uppercase tracking-wide opacity-70 font-serif">
           <span>{t("POSITION")}</span>
           <span>{t("USER")}</span>
@@ -140,7 +153,9 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
 
         {rows.length === 0 ? (
           <div className="text-white text-center py-4 text-sm opacity-80">
-            {error ? t("Unable to load leaderboard.") : t("No participants yet.")}
+            {error
+              ? t("Unable to load leaderboard.")
+              : t("No participants yet.")}
           </div>
         ) : (
           rows.map((r, i) => (
@@ -154,7 +169,9 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
 
               <span>
                 {r.name}
-                {r.isMe && <span className="ml-1 text-yellow-300">(you)</span>}
+                {r.isMe && (
+                  <span className="ml-1 text-yellow-300">(you)</span>
+                )}
               </span>
 
               <span>{r.points}</span>
@@ -163,7 +180,7 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
         )}
       </div>
 
-      {/* TREE MODE */}
+      {/* Tree mode */}
       {mode === "tree" && (
         <>
           <div className="flex justify-center my-6">
@@ -183,11 +200,10 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
         </>
       )}
 
-      {/* WOOL MODE */}
+      {/* Wool mode */}
       {mode === "wool" && (
         <>
           <div className="flex justify-center my-4">
-            {/* ✅ FIXED IMAGE */}
             <img src={nelsonHead.url} alt="Sheep" className="h-20 w-20 object-contain" />
           </div>
 
