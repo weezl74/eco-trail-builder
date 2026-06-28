@@ -41,7 +41,7 @@ import caerphillyBusinessLogo from "@/assets/caerphilly-business-club-logo.png";
 import caerphillyCouncilLogo from "@/assets/caerphilly-council-logo.png";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { api } from "@/lib/api";
+import { api, fetchMyProfile } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 
 type UserMode = "resident" | "business";
@@ -133,7 +133,7 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
 
     try {
       // Load user profile
-      const { data: profile } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
+      const profile = await fetchMyProfile(user.id);
 
       if (profile) {
         setUserProfile(profile);
@@ -429,7 +429,7 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
 
       // Update user's total points
       const newTotalPoints = (userProfile?.total_points || 0) + points;
-      await supabase.from("profiles").update({ total_points: newTotalPoints }).eq("user_id", user.id);
+      await api.post(`/profile/update`, { user_id: user.id, total_points: newTotalPoints });
 
       const newPledge = {
         id: data.id,
@@ -479,7 +479,7 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
 
       // Deduct points from user's total
       const newTotalPoints = (userProfile?.total_points || 0) - tech.pointsCost;
-      await supabase.from("profiles").update({ total_points: newTotalPoints }).eq("user_id", user.id);
+      await api.post(`/profile/update`, { user_id: user.id, total_points: newTotalPoints });
 
       // Update local state
       setUserRenewables((prev) => [...prev, data]);
@@ -569,7 +569,7 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
     try {
       // Award points to user
       const newTotalPoints = (userProfile?.total_points || 0) + (sprint.points || 0);
-      await supabase.from("profiles").update({ total_points: newTotalPoints }).eq("user_id", user.id);
+      await api.post(`/profile/update`, { user_id: user.id, total_points: newTotalPoints });
 
       // Update local state
       const updatedSprints = sprints.map((sprint) => (sprint.id === id ? { ...sprint, completed: true } : sprint));
