@@ -468,17 +468,14 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
 
     try {
       // Save to database (position left null — user places it next on the map)
-      const { data, error } = await supabase
-        .from("user_renewables")
-        .insert({
-          user_id: user.id,
-          technology_type: tech.type,
-          points_cost: tech.pointsCost,
-        })
-        .select()
-        .single();
+      const data = await api.post(`/renewables`, {
+        user_id: user.id,
+        technology_type: tech.type,
+        points_cost: tech.pointsCost,
+      });
 
-      if (error) throw error;
+      if (!data) throw new Error("Failed to create renewable");
+
 
       // Deduct points from user's total
       const newTotalPoints = (userProfile?.total_points || 0) - tech.pointsCost;
