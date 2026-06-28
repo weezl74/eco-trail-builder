@@ -41,6 +41,7 @@ import caerphillyBusinessLogo from "@/assets/caerphilly-business-club-logo.png";
 import caerphillyCouncilLogo from "@/assets/caerphilly-council-logo.png";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 
 type UserMode = "resident" | "business";
@@ -171,7 +172,7 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
       }
 
       // ✅ Use API instead of Supabase
-      const responses = await api.get(`/responses?user_id=${user.id}`);
+      const responses: { category: string }[] = await api.get(`/responses?user_id=${user.id}`);
 
       if (responses) {
         const completed = [...new Set(responses.map((r) => r.category))];
