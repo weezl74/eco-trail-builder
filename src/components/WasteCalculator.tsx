@@ -143,11 +143,12 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
       }
 
       // Load user renewables
-      const { data: renewables } = await supabase.from("user_renewables").select("*").eq("user_id", user.id);
+      const renewables = await api.get(`/renewables?user_id=${user.id}`);
 
-      if (renewables) {
+      if (Array.isArray(renewables)) {
         setUserRenewables(renewables);
       }
+
 
       // Load user pledges to get count
       const pledges = await api.get(`/pledges?user_id=${user.id}`);
