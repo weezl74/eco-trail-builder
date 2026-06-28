@@ -2,6 +2,8 @@ import React, { useEffect, useState, useCallback } from "react";
 import { Home, Lightbulb, Wheat, Trash2, ShoppingCart, Car } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { api, fetchMyProfile } from "@/lib/api";
+import { usePoints } from "@/hooks/usePoints";
 import CategoryQuestionnaire from "@/components/CategoryQuestionnaire";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/hooks/useTranslations";
