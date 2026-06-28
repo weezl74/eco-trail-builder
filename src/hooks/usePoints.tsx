@@ -1,9 +1,8 @@
+import { useCallback, useEffect, useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { api, fetchMyProfile } from "@/lib/api";
 
-import { useCallback, useEffect, useState } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import { api, fetchMyProfile } from '@/lib/api';
-
-export type PointsType = 'wool' | 'tree';
+export type PointsType = "wool" | "tree";
 
 export type PointsBreakdown = {
   wool: number;
@@ -36,9 +35,8 @@ export const usePoints = () => {
       const total = profile?.total_points ?? wool + tree;
 
       setBreakdown({ wool, tree, total });
-
     } catch (e) {
-      console.error('[usePoints] refresh failed', e);
+      console.error("[usePoints] refresh failed", e);
     } finally {
       setLoading(false);
     }
@@ -52,35 +50,21 @@ export const usePoints = () => {
    * ✅ CENTRAL UPDATE FUNCTION
    */
   const update = useCallback(
-    async (
-      points: number,
-      type: PointsType,
-      source: string,
-      referenceId?: string,
-      isRefund: boolean = false
-    ) => {
+    async (points: number, type: PointsType, source: string, referenceId?: string, isRefund: boolean = false) => {
       if (!user || points <= 0) return;
 
       // ✅ enforce correct sign BEFORE sending
       const signedPoints = isRefund ? Math.abs(points) : -Math.abs(points);
 
       try {
-        await api.post('/update-points', {
-          user_id: user.id,
-          woolDelta: type === 'wool' ? signedPoints : 0,
-          treeDelta: type === 'tree' ? signedPoints : 0,
-          source,
-          reference_id: referenceId,
-        });
-
       } catch (e) {
-        console.error('[usePoints] update failed', e);
+        console.error("[usePoints] update failed", e);
       }
 
       // ✅ CRITICAL FIX: force refresh AFTER update
       await refresh();
     },
-    [user, refresh]
+    [user, refresh],
   );
 
   // ✅ Alias used by older callers (e.g. quizzes)
@@ -98,4 +82,3 @@ export const usePoints = () => {
     award,
   };
 };
-
