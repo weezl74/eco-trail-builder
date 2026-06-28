@@ -1,16 +1,30 @@
 
-export const API_BASE_URL =
+// ✅ CONTROLLED API BASE URL
+// Use env if explicitly set, otherwise default to known working API
+
+const ENV_URL =
   (import.meta.env.VITE_API_URL as string | undefined) ||
-  (import.meta.env.VITE_API_BASE_URL as string | undefined) ||
-  'https://caerphilly-api.onrender.com';
+  (import.meta.env.VITE_API_BASE_URL as string | undefined);
+
+// ✅ FORCE FALLBACK TO RENDER (CURRENT WORKING API)
+export const API_BASE_URL =
+  ENV_URL && ENV_URL.includes("caerphilly-api")
+    ? ENV_URL
+    : "https://caerphilly-api.onrender.com";
 
 const API_BASE = API_BASE_URL;
+
 
 // ✅ GENERIC API
 export const api = {
   get: async (path: string) => {
     const res = await fetch(`${API_BASE}${path}`);
-    if (!res.ok) throw new Error(`GET ${path} failed`);
+
+    if (!res.ok) {
+      console.error(`GET failed: ${path}`, res.status);
+      throw new Error(`GET ${path} failed`);
+    }
+
     return res.json();
   },
 
@@ -22,6 +36,7 @@ export const api = {
     });
 
     if (!res.ok) {
+      console.error(`POST failed: ${path}`, res.status);
       throw new Error(`POST ${path} failed: ${res.status}`);
     }
 
@@ -29,11 +44,13 @@ export const api = {
   },
 };
 
+
 // ✅ PROFILE
 export const fetchMyProfile = async (userId: string) => {
   if (!userId) return null;
   return api.get(`/profile/${userId}`);
 };
+
 
 // ✅ LEADERBOARD
 export interface ApiLeaderboardEntry {
@@ -48,7 +65,9 @@ export interface ApiLeaderboardEntry {
 export const fetchLeaderboard = async (limit = 100): Promise<ApiLeaderboardEntry[]> => {
   try {
     const data = await api.get('/profile');
+
     const arr: ApiLeaderboardEntry[] = Array.isArray(data) ? data : [];
+
     return arr
       .slice()
       .sort(
@@ -57,13 +76,15 @@ export const fetchLeaderboard = async (limit = 100): Promise<ApiLeaderboardEntry
           ((a.wool_points || 0) + (a.tree_points || 0)),
       )
       .slice(0, limit);
+
   } catch (e) {
     console.error('[api] fetchLeaderboard failed', e);
     return [];
   }
 };
 
-// ✅ CREATE USER (idempotent)
+
+// ✅ CREATE USER
 export const createUser = async (payload: { user_id: string; display_name?: string | null }) => {
   try {
     return await api.post('/create-user', payload);
@@ -73,6 +94,7 @@ export const createUser = async (payload: { user_id: string; display_name?: stri
   }
 };
 
+
 // ✅ SPEND POINTS
 export const spendPoints = async (payload: {
   user_id: string;
@@ -80,4 +102,7 @@ export const spendPoints = async (payload: {
   treeDelta?: number;
   source: string;
   reference_id?: string;
-}) => api.post('/spend-points', payload);
+}) => {
+  return api.post('/spend-points', payload);
+};
+``
