@@ -3,7 +3,6 @@ import { Home, Lightbulb, Wheat, Trash2, ShoppingCart, Car } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { api, fetchMyProfile } from "@/lib/api";
-import { usePoints } from "@/hooks/usePoints";
 import CategoryQuestionnaire from "@/components/CategoryQuestionnaire";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/hooks/useTranslations";
@@ -87,17 +86,10 @@ const CalculatorScreen: React.FC = () => {
 
   const load = useCallback(async () => {
     if (!user) return;
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("current_footprint")
-      .eq("user_id", user.id)
-      .maybeSingle();
+    const profile = await fetchMyProfile(user.id);
     setFootprint(profile?.current_footprint || 0);
 
-    const { data: responses } = await supabase
-      .from("user_responses")
-      .select("category, impact_value")
-      .eq("user_id", user.id);
+    const responses: any[] = await api.get(`/responses?user_id=${user.id}`);
     const agg: Record<string, number> = {};
     (responses || []).forEach((r: any) => {
       agg[r.category] = (agg[r.category] || 0) + (r.impact_value || 0);
