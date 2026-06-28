@@ -415,9 +415,11 @@ const CategoryQuestionnaire: React.FC<CategoryQuestionnaireProps> = ({ category,
       }
 
       try {
-        const { data } = await supabase
-          .from("user_responses")
-          .select("question_id, answer_value")
+       
+const data = await api.get(
+  `/responses?user_id=${user.id}&category=${category.id}`
+);
+
           .eq("user_id", user.id)
           .eq("category", category.id);
 
