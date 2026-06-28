@@ -41,7 +41,7 @@ import caerphillyBusinessLogo from "@/assets/caerphilly-business-club-logo.png";
 import caerphillyCouncilLogo from "@/assets/caerphilly-council-logo.png";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { api } from "@/lib/api";
+import { api, fetchMyProfile } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 
 type UserMode = "resident" | "business";
