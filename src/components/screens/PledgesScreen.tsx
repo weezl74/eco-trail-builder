@@ -13,7 +13,7 @@ type Pledge = {
   co2_saved: number | null;
   money_saved: number | null;
   water_saved: number | null;
-  wool_points: number | null; // ✅ IMPORTANT
+  wool_points: number | null;
   tag: string | null;
   key: string;
   category: string | null;
@@ -27,8 +27,7 @@ const PledgesScreen: React.FC<{ onBack?: () => void; userGroup?: "resident" | "b
   const [pledges, setPledges] = useState<Pledge[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const { pledged, addPledge, woolPoints } = useSavings(); // ✅ includes woolPoints
-
+  const { pledged, addPledge } = useSavings();
   const { t } = useTranslations();
 
   const activated = pledged.reduce<Record<string, boolean>>((acc, id) => {
@@ -36,7 +35,7 @@ const PledgesScreen: React.FC<{ onBack?: () => void; userGroup?: "resident" | "b
     return acc;
   }, {});
 
-  // ✅ LOAD STATIC PLEDGES LIST
+  // ✅ LOAD STATIC PLEDGES
   useEffect(() => {
     let mounted = true;
 
@@ -62,32 +61,16 @@ const PledgesScreen: React.FC<{ onBack?: () => void; userGroup?: "resident" | "b
     };
   }, [userGroup]);
 
-  // ✅ FIXED ACTIVATION FUNCTION
-
+  // ✅ SIMPLE + SAFE ACTIVATION (NO NEW IMPORTS)
   const activate = async (p: Pledge) => {
     if (activated[p.key]) return;
 
-    try {
-      // ✅ Call backend directly (bypass broken hook)
-      await api.post("/pledges", {
-        user_id: user.id,
-        category: "general",
-        action: p.key,
-        points_earned: Number(p.wool_points ?? 0),
-      });
-
-      // ✅ keep existing behaviour
-      addPledge(p.key, {
-        money: Number(p.money_saved ?? 0),
-        co2: Number(p.co2_saved ?? 0),
-        water: Number(p.water_saved ?? 0),
-      });
-
-      // ✅ force UI refresh
-      window.location.reload();
-    } catch (e) {
-      console.error("pledge failed", e);
-    }
+    await addPledge(p.key, {
+      money: Number(p.money_saved ?? 0),
+      co2: Number(p.co2_saved ?? 0),
+      water: Number(p.water_saved ?? 0),
+      wool: Number(p.wool_points ?? 0), // ✅ crucial fix
+    });
   };
 
   const visible = pledges.filter((p) => {
@@ -120,6 +103,7 @@ const PledgesScreen: React.FC<{ onBack?: () => void; userGroup?: "resident" | "b
         </div>
       </div>
 
+      {/* Groups */}
       <div className="flex justify-center mb-4">
         <button
           onClick={() => setTab("groups")}
@@ -139,9 +123,10 @@ const PledgesScreen: React.FC<{ onBack?: () => void; userGroup?: "resident" | "b
           {visible.map((p) => (
             <div key={p.id} className="bg-[#1f1f1f] rounded-2xl p-5 text-white">
               <h3 className="font-serif font-bold text-2xl text-center">{t(p.title)}</h3>
+
               <p className="text-center mt-1 font-serif">{p.description ? t(p.description) : ""}</p>
 
-              {/* ✅ ACTIVATE BUTTON */}
+              {/* ✅ BUTTON */}
               <div className="flex justify-center mt-4">
                 <button
                   onClick={() => activate(p)}
@@ -154,7 +139,7 @@ const PledgesScreen: React.FC<{ onBack?: () => void; userGroup?: "resident" | "b
                 </button>
               </div>
 
-              {/* ✅ INFO BOX */}
+              {/* ✅ INFO */}
               <div className="border border-white/40 rounded-xl mt-4 p-3 grid grid-cols-2 gap-2 text-sm font-serif">
                 <div className="border-r border-white/40 pr-2">
                   <p className="text-center font-bold mb-1">{t("App Rewards")}</p>
