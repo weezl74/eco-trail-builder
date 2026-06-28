@@ -428,7 +428,16 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
         points = 15; // Low impact = 15 points
       else points = 5; // Quick wins = 5 points
 
-      // Update user's total points
+      // Update user's total points via API
+      const newTotalPoints = (userProfile?.total_points || 0) + points;
+      try {
+        await api.post('/profile/update', {
+          user_id: user.id,
+          total_points: newTotalPoints,
+        });
+      } catch (e) {
+        console.error('Failed to update points:', e);
+      }
 
       const newPledge = {
         id: data.id,
