@@ -1,16 +1,7 @@
 
-// ✅ CONTROLLED API BASE URL
-// Use env if explicitly set, otherwise default to known working API
+// ✅ FORCE SINGLE WORKING API (NO ENV VARIABLES)
 
-const ENV_URL =
-  (import.meta.env.VITE_API_URL as string | undefined) ||
-  (import.meta.env.VITE_API_BASE_URL as string | undefined);
-
-// ✅ FORCE FALLBACK TO RENDER (CURRENT WORKING API)
-export const API_BASE_URL =
-  ENV_URL && ENV_URL.includes("caerphilly-api")
-    ? ENV_URL
-    : "https://caerphilly-api.onrender.com";
+export const API_BASE_URL = "https://caerphilly-api.onrender.com";
 
 const API_BASE = API_BASE_URL;
 
@@ -30,19 +21,29 @@ export const api = {
 
   post: async (path: string, body: any) => {
     const res = await fetch(`${API_BASE}${path}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
 
     if (!res.ok) {
       console.error(`POST failed: ${path}`, res.status);
-      throw new Error(`POST ${path} failed: ${res.status}`);
+      throw new Error(`POST ${path} failed`);
     }
 
     return res.json();
   },
 };
+
+
+// ✅ TYPES
+export interface ApiLeaderboardEntry {
+  user_id: string;
+  display_name?: string | null;
+  username?: string | null;
+  wool_points?: number | null;
+  tree_points?: number | null;
+}
 
 
 // ✅ PROFILE
@@ -53,19 +54,9 @@ export const fetchMyProfile = async (userId: string) => {
 
 
 // ✅ LEADERBOARD
-export interface ApiLeaderboardEntry {
-  user_id: string;
-  display_name?: string | null;
-  username?: string | null;
-  wool_points?: number | null;
-  tree_points?: number | null;
-  total_points?: number | null;
-}
-
 export const fetchLeaderboard = async (limit = 100): Promise<ApiLeaderboardEntry[]> => {
   try {
-    const data = await api.get('/profile');
-
+    const data = await api.get(`/profile`);
     const arr: ApiLeaderboardEntry[] = Array.isArray(data) ? data : [];
 
     return arr
@@ -73,12 +64,12 @@ export const fetchLeaderboard = async (limit = 100): Promise<ApiLeaderboardEntry
       .sort(
         (a, b) =>
           ((b.wool_points || 0) + (b.tree_points || 0)) -
-          ((a.wool_points || 0) + (a.tree_points || 0)),
+          ((a.wool_points || 0) + (a.tree_points || 0))
       )
       .slice(0, limit);
 
   } catch (e) {
-    console.error('[api] fetchLeaderboard failed', e);
+    console.error("[api] fetchLeaderboard failed", e);
     return [];
   }
 };
@@ -87,9 +78,9 @@ export const fetchLeaderboard = async (limit = 100): Promise<ApiLeaderboardEntry
 // ✅ CREATE USER
 export const createUser = async (payload: { user_id: string; display_name?: string | null }) => {
   try {
-    return await api.post('/create-user', payload);
+    return await api.post("/create-user", payload);
   } catch (e) {
-    console.error('[api] createUser failed', e);
+    console.error("[api] createUser failed", e);
     return null;
   }
 };
@@ -103,6 +94,5 @@ export const spendPoints = async (payload: {
   source: string;
   reference_id?: string;
 }) => {
-  return api.post('/spend-points', payload);
+  return api.post("/spend-points", payload);
 };
-``
