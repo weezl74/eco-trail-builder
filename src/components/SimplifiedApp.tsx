@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { fetchMyProfile } from '@/lib/api';
 import BottomNavigation from './BottomNavigation';
 import CalculatorScreen from './screens/CalculatorScreen';
 import HomeScreen from './HomeScreen';
@@ -26,11 +27,7 @@ const SimplifiedApp = ({ onBackToLanding, language = 'en' }: SimplifiedAppProps)
   const loadUserData = async () => {
     if (!user) return;
     try {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
+      const profile = await fetchMyProfile(user.id);
       if (profile) setUserProfile(profile);
     } catch (error) {
       console.error('Error loading user data:', error);
