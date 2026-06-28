@@ -6,6 +6,7 @@ import { ExternalLink, Award, Brain, BookOpen } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/lib/api';
 
 interface KnowledgeArticle {
   id: string;
@@ -274,10 +275,11 @@ const KnowledgeBase: React.FC<KnowledgeBaseProps> = ({ userProfile, setUserProfi
     if (score >= 75 && !quizCompleted.includes(currentQuiz)) {
       try {
         const newTotalPoints = (userProfile?.total_points || 0) + article.points;
-        await supabase
-          .from('profiles')
-          .update({ total_points: newTotalPoints })
-          .eq('user_id', user.id);
+        await api.post('/profile/update', {
+          user_id: user.id,
+          total_points: newTotalPoints,
+        });
+
 
         setUserProfile(prev => ({
           ...prev,

@@ -88,10 +88,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onComplete }) => {
     // Set account_type on profile (best-effort; trigger creates the row).
     if (data.user && isBusiness) {
       try {
-        await supabase
-          .from('profiles')
-          .update({ account_type: 'business' })
-          .eq('user_id', data.user.id);
+        const { api } = await import('@/lib/api');
+        await api.post('/profile/update', {
+          user_id: data.user.id,
+          account_type: 'business',
+        });
       } catch {}
     }
     setLoading(false);

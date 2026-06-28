@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Trees, MapPin, Calendar, CheckCircle, Clock, ExternalLink } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 
@@ -87,14 +88,11 @@ const TreePlanting: React.FC<TreePlantingProps> = ({ totalPoints, onPointsUpdate
       if (error) throw error;
 
       // Deduct points from user's profile
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({ 
-          total_points: totalPoints - POINTS_REQUIRED 
-        })
-        .eq('user_id', user.id);
+      await api.post('/profile/update', {
+        user_id: user.id,
+        total_points: totalPoints - POINTS_REQUIRED,
+      });
 
-      if (profileError) throw profileError;
 
       onPointsUpdate(totalPoints - POINTS_REQUIRED);
       setIsDialogOpen(false);
