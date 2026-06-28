@@ -402,20 +402,17 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
 
     try {
       // Save to database
-      const { data, error } = await supabase
-        .from("user_pledges")
-        .insert({
-          user_id: user.id,
-          category,
-          action,
-          points_earned: impact,
-        })
-        .select()
-        .single();
+      const data = await api.post("/pledges", {
+        user_id: user.id,
+        category,
+        action,
+        points_earned: impact,
+      });
 
-      if (error) throw error;
+      if (!data) throw new Error("Failed to create pledge");
 
       // Calculate points based on difficulty/time/cost
+
       let points = impact;
       if (impact >= 5000)
         points = 150; // Very high impact (car free, no flying) = 150 points
