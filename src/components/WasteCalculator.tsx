@@ -150,9 +150,9 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
       }
 
       // Load user pledges to get count
-      const { data: pledges } = await supabase.from("user_pledges").select("*").eq("user_id", user.id);
+      const pledges = await api.get(`/pledges?user_id=${user.id}`);
 
-      if (pledges) {
+      if (Array.isArray(pledges)) {
         setPledges(
           pledges.map((p) => {
             // Find the matching pledge from categories to get costSaving
@@ -170,6 +170,7 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
           }),
         );
       }
+
 
       // ✅ Use API instead of Supabase
       const responses: { category: string }[] = await api.get(`/responses?user_id=${user.id}`);
