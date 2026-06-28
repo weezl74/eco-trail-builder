@@ -204,15 +204,6 @@ export const useSavings = () => {
       if (points.wool < cost) return false;
       setTreesPlanted((n) => n + 1);
       if (userId) {
-        api
-          .post("/update-points", {
-            user_id: userId,
-            woolDelta: cost,
-            source: "plant_tree",
-            reference_id: "tree",
-          })
-          .then(refreshPoints)
-          .catch((e) => console.error("plantTree failed", e));
       }
       return true;
     },
