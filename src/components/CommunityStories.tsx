@@ -6,9 +6,8 @@ import { Heart } from "lucide-react";
 
 import { api } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
-import AddStoryDialog from "./AddStoryDialog";
+import AddStoryDialog from "./AddStoryDialogue"; // ✅ FIXED IMPORT
 
-// ✅ Story type
 interface Story {
   id: string;
   title: string;
@@ -29,7 +28,6 @@ export default function CommunityStories() {
 
   const { user } = useAuth();
 
-  // ✅ Load stories
   useEffect(() => {
     if (!user) return;
 
@@ -51,7 +49,6 @@ export default function CommunityStories() {
     }
   };
 
-  // ✅ Toggle kudos
   const toggleKudos = async (id: string, has: boolean) => {
     if (!user) return;
 
@@ -93,16 +90,16 @@ export default function CommunityStories() {
 
   return (
     <div className="space-y-4">
-      {/* ✅ SINGLE ADD STORY BUTTON */}
+      {/* ✅ SINGLE BUTTON */}
       <Button onClick={() => setIsOpen(true)}>Add Story</Button>
 
       {/* ✅ DIALOG */}
       <AddStoryDialog open={isOpen} onOpenChange={setIsOpen} onPosted={fetchStories} />
 
       {loading ? (
-        <p className="text-sm text-muted-foreground">Loading…</p>
+        <p>Loading...</p>
       ) : stories.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No stories yet</p>
+        <p>No stories yet</p>
       ) : (
         stories.map((s) => (
           <div key={s.id} className="bg-white p-4 rounded-xl shadow-sm">
