@@ -1,13 +1,11 @@
-import { useState, useEffect, useRef } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Heart, Plus, Clock, Zap, Camera, X } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { Heart, Clock, Zap } from "lucide-react";
+
+import { api } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/hooks/useTranslations";
@@ -21,338 +19,182 @@ interface Story {
   created_at: string;
   user_id: string;
   image_url?: string;
-  profiles: {
-    username: string;
-    avatar_level: number;
-  } | null;
-  kudos_count: number;
-  user_has_kudos: boolean;
-}
 
-interface NewStory {
-  title: string;
-  content: string;
-  run_type: string;
-  points_earned: number;
-  image?: File | null;
+  display_name?: string;
+
+  kudos_count: number;
+  user_has_kudos?: boolean;
 }
 
 export default function CommunityStories() {
   const [stories, setStories] = useState<Story[]>([]);
   const [loading, setLoading] = useState(true);
-  const [newStory, setNewStory] = useState<NewStory>({
-    title: "",
-    content: "",
-    run_type: "sprint",
-    points_earned: 0,
-    image: null
-  });
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const { user } = useAuth();
   const { toast } = useToast();
   const { t } = useTranslations();
 
   useEffect(() => {
-    fetchStories();
     if (!user) return;
-    // Reel-style: poll for new stories every 20s so the feed feels live.
-    const id = setInterval(fetchStories, 20000);
-    return () => clearInterval(id);
+
+    fetchStories();
+
+    const interval = setInterval(fetchStories, 20000);
+    return () => clearInterval(interval);
   }, [user]);
 
+  // ✅ Fetch stories from API
   const fetchStories = async () => {
-    if (!user) return;
-    
     try {
-      // First get stories
-      const { data: storiesData, error: storiesError } = await supabase
-        .from('user_stories')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (storiesError) throw storiesError;
-
-      // Then get profiles for each story
-      const storiesWithProfiles = await Promise.all(
-        (storiesData || []).map(async (story) => {
-          const { data: profileRows } = await supabase
-            .rpc('get_public_profile', { _user_id: story.user_id });
-          const profile = profileRows?.[0]
-            ? { username: profileRows[0].username, avatar_level: profileRows[0].avatar_level }
-            : null;
-
-          const { data: kudosData } = await supabase
-            .from('story_kudos')
-            .select('user_id')
-            .eq('story_id', story.id);
-
-          return {
-            ...story,
-            profiles: profile,
-            kudos_count: kudosData?.length || 0,
-            user_has_kudos: kudosData?.some(k => k.user_id === user.id) || false
-          } as Story;
-        })
-      );
-
-      setStories(storiesWithProfiles);
-    } catch (error) {
-      console.error('Error fetching stories:', error);
+      const data = await api.get("/stories");
+      setStories(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("❌ Failed to load stories:", err);
+      setStories([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        toast({
-          title: "File too large",
-          description: "Please select an image smaller than 5MB.",
-          variant: "destructive"
-        });
-        return;
-      }
-      
-      setNewStory(prev => ({ ...prev, image: file }));
-      
-      // Create preview
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImagePreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const removeImage = () => {
-    setNewStory(prev => ({ ...prev, image: null }));
-    setImagePreview(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
-
-  const handleSubmitStory = async () => {
-    if (!user || !newStory.title.trim() || !newStory.content.trim()) return;
-
-    setSubmitting(true);
-    try {
-      let imageUrl = null;
-      
-      // Upload image if present
-      if (newStory.image) {
-        const fileName = `story_${Date.now()}_${newStory.image.name}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('story-images')
-          .upload(fileName, newStory.image);
-          
-        if (uploadError) {
-          console.error('Image upload error:', uploadError);
-          // Continue without image rather than failing completely
-        } else {
-          const { data: { publicUrl } } = supabase.storage
-            .from('story-images')
-            .getPublicUrl(fileName);
-          imageUrl = publicUrl;
-        }
-      }
-
-      const { error } = await supabase
-        .from('user_stories')
-        .insert({
-          user_id: user.id,
-          title: newStory.title.trim(),
-          content: newStory.content.trim(),
-          run_type: newStory.run_type,
-          points_earned: newStory.points_earned,
-          image_url: imageUrl
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: "Success!",
-        description: "Your story has been shared with the community.",
-      });
-
-      setNewStory({
-        title: "",
-        content: "",
-        run_type: "sprint",
-        points_earned: 0,
-        image: null
-      });
-      setImagePreview(null);
-      setIsDialogOpen(false);
-      fetchStories();
-    } catch (error) {
-      console.error('Error submitting story:', error);
-      toast({
-        title: "Error",
-        description: "Failed to share your story. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleToggleKudos = async (storyId: string, currentlyHasKudos: boolean) => {
+  // ✅ Toggle kudos
+  const handleToggleKudos = async (storyId: string, current: boolean) => {
     if (!user) return;
 
     try {
-      if (currentlyHasKudos) {
-        await supabase
-          .from('story_kudos')
-          .delete()
-          .eq('story_id', storyId)
-          .eq('user_id', user.id);
-      } else {
-        await supabase
-          .from('story_kudos')
-          .insert({
-            story_id: storyId,
-            user_id: user.id
-          });
-      }
+      await api.post(`/stories/${storyId}/kudos`, {
+        user_id: user.id,
+        remove: current
+      });
 
-      // Update local state
-      setStories(prev => prev.map(story => 
-        story.id === storyId 
-          ? {
-              ...story,
-              kudos_count: currentlyHasKudos ? story.kudos_count - 1 : story.kudos_count + 1,
-              user_has_kudos: !currentlyHasKudos
-            }
-          : story
-      ));
-    } catch (error) {
-      console.error('Error toggling kudos:', error);
+      setStories((prev) =>
+        prev.map((s) =>
+          s.id === storyId
+            ? {
+                ...s,
+                kudos_count: current ? s.kudos_count - 1 : s.kudos_count + 1,
+                user_has_kudos: !current
+              }
+            : s
+        )
+      );
+    } catch (err) {
+      console.error("❌ Kudos failed:", err);
       toast({
         title: "Error",
-        description: "Failed to update kudos. Please try again.",
+        description: "Could not update kudos",
         variant: "destructive"
       });
     }
   };
 
-  const formatTimeAgo = (dateString: string) => {
+  const formatTime = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
-    const diffInSeconds = Math.max(0, Math.floor((now.getTime() - date.getTime()) / 1000));
-    if (diffInSeconds < 45) return t('Just now');
-    const diffInMinutes = Math.floor(diffInSeconds / 60);
-    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) return `${diffInHours}h ago`;
-    const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7) return `${diffInDays}d ago`;
+    const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diff < 60) return t("Just now");
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
+
     return date.toLocaleDateString();
   };
 
-  const getRunTypeIcon = (runType: string) => {
-    switch (runType) {
-      case 'sprint':
-        return <Zap className="h-4 w-4" />;
-      default:
-        return <Clock className="h-4 w-4" />;
-    }
-  };
+  const runIcon = (runType: string) =>
+    runType === "sprint" ? (
+      <Zap className="h-4 w-4" />
+    ) : (
+      <Clock className="h-4 w-4" />
+    );
 
   if (!user) {
     return (
       <div className="bg-white rounded-2xl p-6 text-center text-muted-foreground">
-        {t('Please sign in to view and share community stories.')}
+        {t("Please sign in to view stories.")}
       </div>
     );
   }
 
   return (
-    <div className="community-feed max-h-[60vh] overflow-y-auto pr-2 -mr-2">
+    <div className="max-h-[60vh] overflow-y-auto pr-2 -mr-2">
+      
       {loading ? (
-        <div className="space-y-4">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="bg-white rounded-2xl p-4 animate-pulse shadow-sm">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="h-10 w-10 bg-muted rounded-full"></div>
-                <div className="space-y-2">
-                  <div className="h-4 w-24 bg-muted rounded"></div>
-                  <div className="h-3 w-16 bg-muted rounded"></div>
-                </div>
-              </div>
-              <div className="h-4 w-full bg-muted rounded mb-2"></div>
-              <div className="h-4 w-3/4 bg-muted rounded"></div>
-            </div>
-          ))}
+        <p className="text-center text-sm text-muted-foreground">
+          Loading…
+        </p>
+
+      ) : stories.length === 0 ? (
+        <div className="text-center py-6 text-muted-foreground">
+          {t("No stories yet")}
         </div>
+
       ) : (
         <div className="space-y-4">
+
           {stories.map((story) => (
-            <div key={story.id} className="bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow animate-in fade-in slide-in-from-top-2 duration-500">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-10 w-10">
-                    <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                      {story.profiles?.username?.substring(0, 2).toUpperCase() || "?"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium truncate">{story.profiles?.username || "Anonymous"}</p>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <span>{formatTimeAgo(story.created_at)}</span>
-                      <Badge variant="outline" className="text-xs flex items-center gap-1">
-                        {getRunTypeIcon(story.run_type)}
-                        {story.run_type}
-                      </Badge>
-                    </div>
+            <div
+              key={story.id}
+              className="bg-white rounded-2xl p-4 shadow-sm"
+            >
+              {/* Header */}
+              <div className="flex items-center gap-3 mb-3">
+                <Avatar>
+                  <AvatarFallback>
+                    {story.display_name?.substring(0, 2)?.toUpperCase() || "??"}
+                  </AvatarFallback>
+                </Avatar>
+
+                <div className="flex-1">
+                  <p className="font-medium">
+                    {story.display_name || "Anonymous"}
+                  </p>
+
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <span>{formatTime(story.created_at)}</span>
+
+                    <Badge variant="outline" className="flex items-center gap-1">
+                      {runIcon(story.run_type)}
+                      {story.run_type}
+                    </Badge>
                   </div>
                 </div>
-                <Badge variant="secondary" className="text-xs">
-                  +{story.points_earned} pts
-                </Badge>
+
+                <Badge>+{story.points_earned}</Badge>
               </div>
 
-              <h3 className="font-semibold mb-2">{story.title}</h3>
-              <p className="text-sm text-muted-foreground mb-3">{story.content}</p>
+              {/* Content */}
+              <h3 className="font-semibold">{story.title}</h3>
 
+              <p className="text-sm text-muted-foreground mb-3">
+                {story.content}
+              </p>
+
+              {/* Image */}
               {story.image_url && (
-                <div className="mb-3">
-                  <img
-                    src={story.image_url}
-                    alt="Story image"
-                    className="w-full h-48 object-cover rounded-md border"
-                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                  />
-                </div>
+                <img
+                  src={story.image_url}
+                  className="w-full h-48 object-cover rounded-md mb-3"
+                  alt=""
+                />
               )}
 
-              <div className="flex items-center justify-between">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  disabled={story.user_id === user?.id}
-                  onClick={() => handleToggleKudos(story.id, story.user_has_kudos)}
-                  className={`flex items-center gap-2 ${story.user_has_kudos ? 'text-red-500' : ''}`}
-                  title={story.user_id === user?.id ? "You can't kudos your own story" : 'Give one kudos'}
-                >
-                  <Heart className={`h-4 w-4 ${story.user_has_kudos ? 'fill-current' : ''}`} />
-                  {story.kudos_count} {t('kudos')}
-                </Button>
-              </div>
+              {/* Kudos */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() =>
+                  handleToggleKudos(
+                    story.id,
+                    !!story.user_has_kudos
+                  )
+                }
+              >
+                <Heart className="h-4 w-4 mr-1" />
+                {story.kudos_count} {t("kudos")}
+              </Button>
             </div>
           ))}
 
-          {stories.length === 0 && (
-            <div className="bg-white rounded-2xl text-center py-8 text-muted-foreground">
-              <Heart className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>{t('No stories shared yet. Be the first to share your success!')}</p>
-            </div>
-          )}
         </div>
       )}
     </div>
