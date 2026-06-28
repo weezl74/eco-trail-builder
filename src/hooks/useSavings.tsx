@@ -158,13 +158,6 @@ export const useSavings = () => {
       if (points.wool < cost) return false;
 
       try {
-        await api.post("/update-points", {
-          user_id: userId,
-          woolDelta: cost,
-          source: "renewable_purchase",
-          reference_id: type,
-        });
-
         await persist({
           ...s,
           renewables: [...s.renewables, { id: `${type}-${Date.now()}`, type, x, y, lat, lng }],
