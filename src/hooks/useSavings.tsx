@@ -74,7 +74,7 @@ export const useSavings = () => {
   }, [ns]);
 
   const addPledge = useCallback(
-    async (id: string, data: { wool: number; money: number; co2: number; water: number }) => {
+    async (id: string, data: { wool?: number; money: number; co2: number; water: number }) => {
       if (!userId) return false;
       if (pledged.includes(id)) return false;
       try {
