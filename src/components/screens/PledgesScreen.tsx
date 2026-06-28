@@ -63,7 +63,6 @@ const PledgesScreen: React.FC<{ onBack?: () => void; userGroup?: "resident" | "b
   }, [userGroup]);
 
   // ✅ FIXED ACTIVATION FUNCTION
-
   const activate = async (p: Pledge) => {
     if (activated[p.key]) return;
 
@@ -71,7 +70,7 @@ const PledgesScreen: React.FC<{ onBack?: () => void; userGroup?: "resident" | "b
       money: Number(p.money_saved ?? 0),
       co2: Number(p.co2_saved ?? 0),
       water: Number(p.water_saved ?? 0),
-      wool: Number(p.wool_points ?? 0), // ✅ THIS LINE ADDED
+      wool: Number(p.wool_points ?? 0), // ✅ CRITICAL FIX
     });
   };
 
