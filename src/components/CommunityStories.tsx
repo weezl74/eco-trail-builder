@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -63,7 +62,7 @@ export default function CommunityStories() {
     try {
       await api.post(`/stories/${storyId}/kudos`, {
         user_id: user.id,
-        remove: current
+        remove: current,
       });
 
       setStories((prev) =>
@@ -72,17 +71,17 @@ export default function CommunityStories() {
             ? {
                 ...s,
                 kudos_count: current ? s.kudos_count - 1 : s.kudos_count + 1,
-                user_has_kudos: !current
+                user_has_kudos: !current,
               }
-            : s
-        )
+            : s,
+        ),
       );
     } catch (err) {
       console.error("❌ Kudos failed:", err);
       toast({
         title: "Error",
         description: "Could not update kudos",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
@@ -101,11 +100,7 @@ export default function CommunityStories() {
   };
 
   const runIcon = (runType: string) =>
-    runType === "sprint" ? (
-      <Zap className="h-4 w-4" />
-    ) : (
-      <Clock className="h-4 w-4" />
-    );
+    runType === "sprint" ? <Zap className="h-4 w-4" /> : <Clock className="h-4 w-4" />;
 
   if (!user) {
     return (
@@ -117,37 +112,22 @@ export default function CommunityStories() {
 
   return (
     <div className="max-h-[60vh] overflow-y-auto pr-2 -mr-2">
-      
       {loading ? (
-        <p className="text-center text-sm text-muted-foreground">
-          Loading…
-        </p>
-
+        <p className="text-center text-sm text-muted-foreground">Loading…</p>
       ) : stories.length === 0 ? (
-        <div className="text-center py-6 text-muted-foreground">
-          {t("No stories yet")}
-        </div>
-
+        <div className="text-center py-6 text-muted-foreground">{t("No stories yet")}</div>
       ) : (
         <div className="space-y-4">
-
           {stories.map((story) => (
-            <div
-              key={story.id}
-              className="bg-white rounded-2xl p-4 shadow-sm"
-            >
+            <div key={story.id} className="bg-white rounded-2xl p-4 shadow-sm">
               {/* Header */}
               <div className="flex items-center gap-3 mb-3">
                 <Avatar>
-                  <AvatarFallback>
-                    {story.display_name?.substring(0, 2)?.toUpperCase() || "??"}
-                  </AvatarFallback>
+                  <AvatarFallback>{story.display_name?.substring(0, 2)?.toUpperCase() || "??"}</AvatarFallback>
                 </Avatar>
 
                 <div className="flex-1">
-                  <p className="font-medium">
-                    {story.display_name || "Anonymous"}
-                  </p>
+                  <p className="font-medium">{story.display_name || "Anonymous"}</p>
 
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <span>{formatTime(story.created_at)}</span>
@@ -165,36 +145,20 @@ export default function CommunityStories() {
               {/* Content */}
               <h3 className="font-semibold">{story.title}</h3>
 
-              <p className="text-sm text-muted-foreground mb-3">
-                {story.content}
-              </p>
+              <p className="text-sm text-muted-foreground mb-3">{story.content}</p>
 
               {/* Image */}
               {story.image_url && (
-                <img
-                  src={story.image_url}
-                  className="w-full h-48 object-cover rounded-md mb-3"
-                  alt=""
-                />
+                <img src={story.image_url} className="w-full h-48 object-cover rounded-md mb-3" alt="" />
               )}
 
               {/* Kudos */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() =>
-                  handleToggleKudos(
-                    story.id,
-                    !!story.user_has_kudos
-                  )
-                }
-              >
+              <Button variant="ghost" size="sm" onClick={() => handleToggleKudos(story.id, !!story.user_has_kudos)}>
                 <Heart className="h-4 w-4 mr-1" />
                 {story.kudos_count} {t("kudos")}
               </Button>
             </div>
           ))}
-
         </div>
       )}
     </div>
