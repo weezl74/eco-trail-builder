@@ -41,7 +41,6 @@ import caerphillyBusinessLogo from "@/assets/caerphilly-business-club-logo.png";
 import caerphillyCouncilLogo from "@/assets/caerphilly-council-logo.png";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { api, fetchMyProfile } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 
 type UserMode = "resident" | "business";
@@ -133,7 +132,7 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
 
     try {
       // Load user profile
-      const profile = await fetchMyProfile(user.id);
+      const { data: profile } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
 
       if (profile) {
         setUserProfile(profile);
@@ -143,17 +142,16 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
       }
 
       // Load user renewables
-      const renewables = await api.get(`/renewables?user_id=${user.id}`);
+      const { data: renewables } = await supabase.from("user_renewables").select("*").eq("user_id", user.id);
 
-      if (Array.isArray(renewables)) {
+      if (renewables) {
         setUserRenewables(renewables);
       }
 
-
       // Load user pledges to get count
-      const pledges = await api.get(`/pledges?user_id=${user.id}`);
+      const { data: pledges } = await supabase.from("user_pledges").select("*").eq("user_id", user.id);
 
-      if (Array.isArray(pledges)) {
+      if (pledges) {
         setPledges(
           pledges.map((p) => {
             // Find the matching pledge from categories to get costSaving
@@ -172,9 +170,8 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
         );
       }
 
-
       // ✅ Use API instead of Supabase
-      const responses: { category: string }[] = await api.get(`/responses?user_id=${user.id}`);
+      const responses = await api.get(`/responses?user_id=${user.id}`);
 
       if (responses) {
         const completed = [...new Set(responses.map((r) => r.category))];
@@ -403,17 +400,20 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
 
     try {
       // Save to database
-      const data = await api.post("/pledges", {
-        user_id: user.id,
-        category,
-        action,
-        points_earned: impact,
-      });
+      const { data, error } = await supabase
+        .from("user_pledges")
+        .insert({
+          user_id: user.id,
+          category,
+          action,
+          points_earned: impact,
+        })
+        .select()
+        .single();
 
-      if (!data) throw new Error("Failed to create pledge");
+      if (error) throw error;
 
       // Calculate points based on difficulty/time/cost
-
       let points = impact;
       if (impact >= 5000)
         points = 150; // Very high impact (car free, no flying) = 150 points
@@ -428,8 +428,6 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
       else points = 5; // Quick wins = 5 points
 
       // Update user's total points
-      const newTotalPoints = (userProfile?.total_points || 0) + points;
-      await api.post(`/profile/update`, { user_id: user.id, total_points: newTotalPoints });
 
       const newPledge = {
         id: data.id,
@@ -468,18 +466,21 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
 
     try {
       // Save to database (position left null — user places it next on the map)
-      const data = await api.post(`/renewables`, {
-        user_id: user.id,
-        technology_type: tech.type,
-        points_cost: tech.pointsCost,
-      });
+      const { data, error } = await supabase
+        .from("user_renewables")
+        .insert({
+          user_id: user.id,
+          technology_type: tech.type,
+          points_cost: tech.pointsCost,
+        })
+        .select()
+        .single();
 
-      if (!data) throw new Error("Failed to create renewable");
-
+      if (error) throw error;
 
       // Deduct points from user's total
       const newTotalPoints = (userProfile?.total_points || 0) - tech.pointsCost;
-      await api.post(`/profile/update`, { user_id: user.id, total_points: newTotalPoints });
+      await supabase.from("profiles").update({ total_points: newTotalPoints }).eq("user_id", user.id);
 
       // Update local state
       setUserRenewables((prev) => [...prev, data]);
@@ -506,20 +507,17 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
 
   const handlePlaceRenewable = async (renewableId: string, x: number, y: number) => {
     if (!user) return;
-    try {
-      await api.patch(`/renewables`, {
-        id: renewableId,
-        user_id: user.id,
-        position_x: x,
-        position_y: y,
-      });
-    } catch (error: any) {
-      toast({ title: "Could not save placement", description: error?.message || "Request failed", variant: "destructive" });
+    const { error } = await (supabase as any)
+      .from("user_renewables")
+      .update({ position_x: x, position_y: y })
+      .eq("id", renewableId)
+      .eq("user_id", user.id);
+    if (error) {
+      toast({ title: "Could not save placement", description: error.message, variant: "destructive" });
       return;
     }
     setUserRenewables((prev) => prev.map((r) => (r.id === renewableId ? { ...r, position_x: x, position_y: y } : r)));
   };
-
 
   const addSprint = async (title: string, impact: number, frequency: string, costSaving: number = 0) => {
     if (!user) return;
@@ -569,7 +567,7 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
     try {
       // Award points to user
       const newTotalPoints = (userProfile?.total_points || 0) + (sprint.points || 0);
-      await api.post(`/profile/update`, { user_id: user.id, total_points: newTotalPoints });
+      await supabase.from("profiles").update({ total_points: newTotalPoints }).eq("user_id", user.id);
 
       // Update local state
       const updatedSprints = sprints.map((sprint) => (sprint.id === id ? { ...sprint, completed: true } : sprint));
