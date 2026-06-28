@@ -506,17 +506,20 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
 
   const handlePlaceRenewable = async (renewableId: string, x: number, y: number) => {
     if (!user) return;
-    const { error } = await (supabase as any)
-      .from("user_renewables")
-      .update({ position_x: x, position_y: y })
-      .eq("id", renewableId)
-      .eq("user_id", user.id);
-    if (error) {
-      toast({ title: "Could not save placement", description: error.message, variant: "destructive" });
+    try {
+      await api.patch(`/renewables`, {
+        id: renewableId,
+        user_id: user.id,
+        position_x: x,
+        position_y: y,
+      });
+    } catch (error: any) {
+      toast({ title: "Could not save placement", description: error?.message || "Request failed", variant: "destructive" });
       return;
     }
     setUserRenewables((prev) => prev.map((r) => (r.id === renewableId ? { ...r, position_x: x, position_y: y } : r)));
   };
+
 
   const addSprint = async (title: string, impact: number, frequency: string, costSaving: number = 0) => {
     if (!user) return;
