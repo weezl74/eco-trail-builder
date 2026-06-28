@@ -191,15 +191,6 @@ export const useSavings = () => {
         water: s.water + (delta.water || 0),
       }));
       if (userId) {
-        api
-          .post("/update-points", {
-            user_id: userId,
-            woolDelta: -25,
-            source: "pledge",
-            reference_id: id,
-          })
-          .then(refreshPoints)
-          .catch((e) => console.error("addPledge points failed", e));
       }
       return true;
     },
