@@ -2,13 +2,13 @@ import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Clock, Zap } from "lucide-react";
+import { Heart } from "lucide-react";
 
 import { api } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/hooks/useTranslations";
 
+// ✅ Story type
 interface Story {
   id: string;
   title: string;
@@ -26,19 +26,10 @@ export default function CommunityStories() {
   const [stories, setStories] = useState<Story[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Add story form state
-  const [newStory, setNewStory] = useState({
-    title: "",
-    content: "",
-    run_type: "sprint",
-    points_earned: 0,
-  });
-
   const { user } = useAuth();
-  const { toast } = useToast();
   const { t } = useTranslations();
 
-  // ✅ Fetch stories
+  // ✅ Load stories from API
   useEffect(() => {
     if (!user) return;
 
@@ -60,63 +51,23 @@ export default function CommunityStories() {
     }
   };
 
-  // ✅ ADD STORY (FULLY WIRED)
-  const handleSubmitStory = async () => {
-    if (!user || !newStory.title.trim() || !newStory.content.trim()) return;
-
-    try {
-      await api.post("/stories", {
-        user_id: user.id,
-        title: newStory.title.trim(),
-        content: newStory.content.trim(),
-        run_type: newStory.run_type,
-        points_earned: newStory.points_earned,
-        image_url: null,
-      });
-
-      toast({
-        title: "Story added!",
-        description: "Your story was shared.",
-      });
-
-      // reset form
-      setNewStory({
-        title: "",
-        content: "",
-        run_type: "sprint",
-        points_earned: 0,
-      });
-
-      // reload feed
-      fetchStories();
-    } catch (err) {
-      console.error("❌ submit failed:", err);
-
-      toast({
-        title: "Error",
-        description: "Could not submit story",
-        variant: "destructive",
-      });
-    }
-  };
-
-  // ✅ TOGGLE KUDOS
-  const toggleKudos = async (storyId: string, hasKudos: boolean) => {
+  // ✅ Toggle kudos (API)
+  const toggleKudos = async (id: string, has: boolean) => {
     if (!user) return;
 
     try {
-      await api.post(`/stories/${storyId}/kudos`, {
+      await api.post(`/stories/${id}/kudos`, {
         user_id: user.id,
-        remove: hasKudos,
+        remove: has,
       });
 
       setStories((prev) =>
         prev.map((s) =>
-          s.id === storyId
+          s.id === id
             ? {
                 ...s,
-                kudos_count: hasKudos ? s.kudos_count - 1 : s.kudos_count + 1,
-                user_has_kudos: !hasKudos,
+                kudos_count: has ? s.kudos_count - 1 : s.kudos_count + 1,
+                user_has_kudos: !has,
               }
             : s,
         ),
@@ -136,37 +87,20 @@ export default function CommunityStories() {
     return `${Math.floor(diff / 86400)}d ago`;
   };
 
-  const icon = (type: string) => (type === "sprint" ? <Zap className="h-4 w-4" /> : <Clock className="h-4 w-4" />);
-
   if (!user) {
-    return <div>Please sign in</div>;
+    return <div className="text-center text-muted-foreground">{t("Please sign in")}</div>;
   }
 
   return (
     <div className="space-y-4">
-      {/* ✅ SIMPLE ADD STORY UI */}
-      <div className="bg-white p-3 rounded-lg space-y-2">
-        <input
-          placeholder="Title"
-          value={newStory.title}
-          onChange={(e) => setNewStory({ ...newStory, title: e.target.value })}
-          className="w-full border p-2"
-        />
-
-        <textarea
-          placeholder="Share your story..."
-          value={newStory.content}
-          onChange={(e) => setNewStory({ ...newStory, content: e.target.value })}
-          className="w-full border p-2"
-        />
-
-        <Button onClick={handleSubmitStory}>Add Story</Button>
-      </div>
+      {/* ✅ IMPORTANT: KEEP ORIGINAL BUTTON ONLY */}
+      {/* This button should trigger your existing dropdown logic */}
+      <Button>Add Story</Button>
 
       {loading ? (
-        <p>Loading...</p>
+        <p className="text-sm text-muted-foreground">Loading…</p>
       ) : stories.length === 0 ? (
-        <p>No stories yet</p>
+        <p className="text-sm text-muted-foreground">No stories yet</p>
       ) : (
         stories.map((s) => (
           <div key={s.id} className="bg-white p-4 rounded-xl shadow-sm">
@@ -176,15 +110,16 @@ export default function CommunityStories() {
               </Avatar>
 
               <div>
-                <div>{s.display_name || "Anonymous"}</div>
-                <div className="text-xs text-gray-500">{formatTime(s.created_at)}</div>
+                <div className="font-medium">{s.display_name || "Anonymous"}</div>
+                <div className="text-xs text-muted-foreground">{formatTime(s.created_at)}</div>
               </div>
 
               <Badge className="ml-auto">+{s.points_earned}</Badge>
             </div>
 
-            <h3>{s.title}</h3>
-            <p>{s.content}</p>
+            <h3 className="font-semibold">{s.title}</h3>
+
+            <p className="text-sm text-muted-foreground mb-2">{s.content}</p>
 
             <Button variant="ghost" size="sm" onClick={() => toggleKudos(s.id, !!s.user_has_kudos)}>
               <Heart className="h-4 w-4 mr-1" />
