@@ -150,9 +150,9 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
       }
 
       // Load user pledges to get count
-      const { data: pledges } = await supabase.from("user_pledges").select("*").eq("user_id", user.id);
+      const pledges = await api.get(`/pledges?user_id=${user.id}`);
 
-      if (pledges) {
+      if (Array.isArray(pledges)) {
         setPledges(
           pledges.map((p) => {
             // Find the matching pledge from categories to get costSaving
@@ -170,6 +170,7 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
           }),
         );
       }
+
 
       // ✅ Use API instead of Supabase
       const responses: { category: string }[] = await api.get(`/responses?user_id=${user.id}`);
@@ -401,20 +402,17 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
 
     try {
       // Save to database
-      const { data, error } = await supabase
-        .from("user_pledges")
-        .insert({
-          user_id: user.id,
-          category,
-          action,
-          points_earned: impact,
-        })
-        .select()
-        .single();
+      const data = await api.post("/pledges", {
+        user_id: user.id,
+        category,
+        action,
+        points_earned: impact,
+      });
 
-      if (error) throw error;
+      if (!data) throw new Error("Failed to create pledge");
 
       // Calculate points based on difficulty/time/cost
+
       let points = impact;
       if (impact >= 5000)
         points = 150; // Very high impact (car free, no flying) = 150 points
