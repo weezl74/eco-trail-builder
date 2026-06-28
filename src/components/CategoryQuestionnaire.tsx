@@ -5,7 +5,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { X, Calculator } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 
 interface Question {
   id: string;
@@ -497,9 +497,6 @@ const CategoryQuestionnaire: React.FC<CategoryQuestionnaireProps> = ({ category,
       // Save all responses to database
       if (user) {
         try {
-          // Delete existing responses for this category first
-          await supabase.from("user_responses").delete().eq("user_id", user.id).eq("category", category.id);
-
           const responsesToSave = questions.flatMap((question) => {
             const questionAnswers = answers[question.id] || [];
             if (questionAnswers.length === 0) return [];
@@ -522,9 +519,13 @@ const CategoryQuestionnaire: React.FC<CategoryQuestionnaireProps> = ({ category,
             ];
           });
 
-          // Insert new responses
+          // Save new responses via API (replaces previous responses for this category)
           if (responsesToSave.length > 0) {
-            await supabase.from("user_responses").insert(responsesToSave);
+            await api.post("/responses/save", {
+              user_id: user.id,
+              category: category.id,
+              responses: responsesToSave,
+            });
           }
         } catch (error) {
           console.error("Error saving responses:", error);
