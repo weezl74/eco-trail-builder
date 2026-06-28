@@ -33,7 +33,23 @@ export const api = {
 
     return res.json();
   },
+
+  patch: async (path: string, body: any) => {
+    const res = await fetch(`${API_BASE}${path}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      console.error(`PATCH failed: ${path}`, res.status);
+      throw new Error(`PATCH ${path} failed`);
+    }
+
+    return res.json();
+  },
 };
+
 
 
 // ✅ TYPES
