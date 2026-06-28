@@ -172,10 +172,10 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
       }
 
       // ✅ Use API instead of Supabase
-      const responses = await api.get(`/responses?user_id=${user.id}`);
+      const responses = (await api.get(`/responses?user_id=${user.id}`)) as Array<{ category: string }>;
 
       if (responses) {
-        const completed = [...new Set(responses.map((r) => r.category))];
+        const completed = [...new Set(responses.map((r) => r.category))] as string[];
         setCompletedCategories(completed);
       }
     } catch (error) {
