@@ -25,14 +25,25 @@ const Row: React.FC<{ label: string; danger?: boolean; warn?: boolean; onClick?:
   </button>
 );
 
-const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
-  <div className="mb-5">
-    <p className="font-serif font-bold text-black text-base mb-2 px-1">{title}</p>
-    <div className="bg-[#1f1f1f] rounded-2xl px-5 divide-y divide-white/10">{children}</div>
-  </div>
-);
+interface AccountScreenProps {
+  name?: string;
+  memberSince?: string;
+  totalPoints?: number;
+  currentFootprint?: number;
+  badges?: { id: string; label: string; icon?: React.ReactNode }[];
+  rewards?: { id: string; label: string; value?: string }[];
+  onLogOut?: () => void;
+}
 
-const AccountScreen: React.FC = () => {
+const AccountScreen: React.FC<AccountScreenProps> = ({
+  name: nameProp,
+  memberSince: memberSinceProp,
+  totalPoints: totalPointsProp,
+  currentFootprint: currentFootprintProp,
+  badges: badgesProp,
+  rewards: rewardsProp,
+  onLogOut,
+}) => {
   const [editingAvatar, setEditingAvatar] = useState(false);
   const [subPage, setSubPage] = useState<SubPage | null>(null);
   const [showGroups, setShowGroups] = useState(false);
