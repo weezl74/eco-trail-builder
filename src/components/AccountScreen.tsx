@@ -145,4 +145,4 @@ const AccountScreen: React.FC<AccountScreenProps> = ({
 };
 
 export default AccountScreen;
-``;
+
