@@ -86,10 +86,7 @@ export default function SprintChallenges() {
     setActiveSprints(sprints);
     if (!user) return;
     try { localStorage.setItem(CACHE_KEY(user.id), JSON.stringify(sprints)); } catch {}
-    void supabase.from('user_sprints').upsert(
-      { user_id: user.id, sprint_key: SPRINT_KEY, data: { list: sprints } as any },
-      { onConflict: 'user_id,sprint_key' },
-    );
+    void saveUserSprintData(user.id, SPRINT_KEY, { list: sprints });
   };
 
   const loadActiveSprints = async () => {
@@ -101,15 +98,10 @@ export default function SprintChallenges() {
         if (cached) setActiveSprints(hydrate(JSON.parse(cached)));
       } catch {}
 
-      const { data } = await supabase
-        .from('user_sprints')
-        .select('data')
-        .eq('user_id', user.id)
-        .eq('sprint_key', SPRINT_KEY)
-        .maybeSingle();
+      const data = await fetchUserSprintData(user.id, SPRINT_KEY);
 
-      if (data?.data) {
-        const list = (data.data as any).list as any[] | undefined;
+      if (data) {
+        const list = (data as any).list as any[] | undefined;
         if (Array.isArray(list)) {
           const sprints = hydrate(list);
           setActiveSprints(sprints);
@@ -123,10 +115,7 @@ export default function SprintChallenges() {
         const legacy = localStorage.getItem(LEGACY_KEY(user.id));
         if (legacy) {
           const sprints = hydrate(JSON.parse(legacy));
-          await supabase.from('user_sprints').upsert(
-            { user_id: user.id, sprint_key: SPRINT_KEY, data: { list: sprints } as any },
-            { onConflict: 'user_id,sprint_key' },
-          );
+          await saveUserSprintData(user.id, SPRINT_KEY, { list: sprints });
           setActiveSprints(sprints);
           try { localStorage.setItem(CACHE_KEY(user.id), JSON.stringify(sprints)); } catch {}
           localStorage.removeItem(LEGACY_KEY(user.id));
