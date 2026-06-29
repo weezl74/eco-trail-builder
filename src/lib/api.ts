@@ -51,10 +51,11 @@ export const api = {
 // ✅ TYPES
 export interface ApiLeaderboardEntry {
   user_id: string;
-  display_name?: string | null;
   username?: string | null;
+  display_name?: string | null;
   wool_points?: number | null;
   tree_points?: number | null;
+  total_points?: number | null;
 }
 
 // ✅ PROFILE
@@ -66,12 +67,12 @@ export const fetchMyProfile = async (userId: string) => {
 // ✅ LEADERBOARD
 export const fetchLeaderboard = async (limit = 100): Promise<ApiLeaderboardEntry[]> => {
   try {
-    const data = await api.get(`/profile`);
+    const data = await api.get(`/leaderboard`);
     const arr: ApiLeaderboardEntry[] = Array.isArray(data) ? data : [];
 
     return arr
       .slice()
-      .sort((a, b) => (b.wool_points || 0) + (b.tree_points || 0) - ((a.wool_points || 0) + (a.tree_points || 0)))
+      .sort((a, b) => (b.total_points || 0) - (a.total_points || 0))
       .slice(0, limit);
   } catch (e) {
     console.error("[api] fetchLeaderboard failed", e);
