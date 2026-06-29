@@ -99,4 +99,47 @@ export const spendPoints = async (payload: {
 }) => {
   return api.post("/spend-points", payload);
 };
-// ✅ SPRINTS2 3export const fetchUserSprintData = async (userId: string) => {4  if (!userId) return [];5 6  try {7    return await api.get(`/sprints?user_id=${encodeURIComponent(userId)}`);8  } catch (e) {9    console.error("[api] fetchUserSprintData failed", e);10    return [];11  }12};13 14export const saveUserSprintData = async (payload: {15  user_id: string;16  sprint_key: string;17  data: any;18}) => {19  try {20    return await api.post("/sprints/save", payload);21  } catch (e) {22    console.error("[api] saveUserSprintData failed", e);23    return null;24  }25};
+
+// ✅ SPRINTS
+const parseSprintData = (raw: any): any => {
+  if (raw == null) return null;
+  if (typeof raw === "string") {
+    try { return JSON.parse(raw); } catch { return null; }
+  }
+  return raw;
+};
+
+export const fetchUserSprintData = async (
+  userId: string,
+  sprintKey: string
+): Promise<any | null> => {
+  if (!userId) return null;
+  try {
+    const rows = await api.get(`/sprints?user_id=${encodeURIComponent(userId)}`);
+    const list: any[] = Array.isArray(rows) ? rows : [];
+    const row = list.find((r) => r?.sprint_key === sprintKey);
+    if (!row) return null;
+    return parseSprintData(row.data);
+  } catch (e) {
+    console.error("[api] fetchUserSprintData failed", e);
+    return null;
+  }
+};
+
+export const saveUserSprintData = async (
+  userId: string,
+  sprintKey: string,
+  data: any
+) => {
+  if (!userId) return null;
+  try {
+    return await api.post(`/sprints/save`, {
+      user_id: userId,
+      sprint_key: sprintKey,
+      data: typeof data === "string" ? data : JSON.stringify(data),
+    });
+  } catch (e) {
+    console.error("[api] saveUserSprintData failed", e);
+    return null;
+  }
+};
