@@ -105,11 +105,11 @@ export default function CommunityStories() {
           <div key={s.id} className="bg-white p-4 rounded-xl shadow-sm">
             <div className="flex items-center gap-3 mb-2">
               <Avatar>
-                <AvatarFallback>{s.author_name?.substring(0, 2) || "??"}</AvatarFallback>
+                <AvatarFallback>{s.display_name?.substring(0, 2) || "??"}</AvatarFallback>
               </Avatar>
 
               <div>
-                <div className="font-medium">{s.author_name || "Anonymous"}</div>
+                <div className="font-medium">{s.display_name || "Anonymous"}</div>
                 <div className="text-xs text-muted-foreground">{formatTime(s.created_at)}</div>
               </div>
 
