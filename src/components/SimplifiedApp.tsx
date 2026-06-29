@@ -36,7 +36,7 @@ const SimplifiedApp = ({ onBackToLanding, language = 'en' }: SimplifiedAppProps)
 
   const totalPoints = userProfile?.total_points || 0;
   const currentFootprint = userProfile?.current_footprint || 0;
-  const displayName = userProfile?.display_name || user?.email?.split('@')[0] || 'Green Member';
+  const displayName = userProfile?.display_name || userProfile?.username || 'Member';
   const memberSince = userProfile?.created_at
     ? new Date(userProfile.created_at).getFullYear().toString()
     : '2026';
