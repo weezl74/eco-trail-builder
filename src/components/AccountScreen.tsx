@@ -25,6 +25,13 @@ const Row: React.FC<{ label: string; danger?: boolean; warn?: boolean; onClick?:
   </button>
 );
 
+const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
+  <div className="mb-5">
+    <p className="font-serif font-bold text-black text-base mb-2 px-1">{title}</p>
+    <div className="bg-[#1f1f1f] rounded-2xl px-5 divide-y divide-white/10">{children}</div>
+  </div>
+);
+
 interface AccountScreenProps {
   name?: string;
   memberSince?: string;
