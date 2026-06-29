@@ -1,10 +1,8 @@
-
 // ✅ FORCE SINGLE WORKING API (NO ENV VARIABLES)
 
 export const API_BASE_URL = "https://caerphilly-api.onrender.com";
 
 const API_BASE = API_BASE_URL;
-
 
 // ✅ GENERIC API
 export const api = {
@@ -50,8 +48,6 @@ export const api = {
   },
 };
 
-
-
 // ✅ TYPES
 export interface ApiLeaderboardEntry {
   user_id: string;
@@ -61,13 +57,11 @@ export interface ApiLeaderboardEntry {
   tree_points?: number | null;
 }
 
-
 // ✅ PROFILE
 export const fetchMyProfile = async (userId: string) => {
   if (!userId) return null;
   return api.get(`/profile?user_id=${encodeURIComponent(userId)}`);
 };
-
 
 // ✅ LEADERBOARD
 export const fetchLeaderboard = async (limit = 100): Promise<ApiLeaderboardEntry[]> => {
@@ -77,19 +71,13 @@ export const fetchLeaderboard = async (limit = 100): Promise<ApiLeaderboardEntry
 
     return arr
       .slice()
-      .sort(
-        (a, b) =>
-          ((b.wool_points || 0) + (b.tree_points || 0)) -
-          ((a.wool_points || 0) + (a.tree_points || 0))
-      )
+      .sort((a, b) => (b.wool_points || 0) + (b.tree_points || 0) - ((a.wool_points || 0) + (a.tree_points || 0)))
       .slice(0, limit);
-
   } catch (e) {
     console.error("[api] fetchLeaderboard failed", e);
     return [];
   }
 };
-
 
 // ✅ CREATE USER
 export const createUser = async (payload: { user_id: string; display_name?: string | null }) => {
@@ -101,7 +89,6 @@ export const createUser = async (payload: { user_id: string; display_name?: stri
   }
 };
 
-
 // ✅ SPEND POINTS
 export const spendPoints = async (payload: {
   user_id: string;
@@ -112,58 +99,4 @@ export const spendPoints = async (payload: {
 }) => {
   return api.post("/spend-points", payload);
 };
-
-
-// ✅ SPRINTS
-const SPRINT_API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) || "https://caerphilly-api.onrender.com";
-
-export const fetchUserSprintData = async (
-  userId: string,
-  sprintKey: string,
-): Promise<any | null> => {
-  try {
-    const res = await fetch(`${SPRINT_API_BASE}/sprints?user_id=${encodeURIComponent(userId)}`);
-    if (!res.ok) {
-      console.error("[api] fetchUserSprintData failed", res.status);
-      return null;
-    }
-    const data = await res.json();
-    const list = Array.isArray(data) ? data : [];
-    const row = list.find((r: any) => r?.sprint_key === sprintKey);
-    if (!row) return null;
-    const raw = row.data;
-    if (typeof raw === "string") {
-      try { return JSON.parse(raw); } catch { return null; }
-    }
-    return raw ?? null;
-  } catch (e) {
-    console.error("[api] fetchUserSprintData failed", e);
-    return null;
-  }
-};
-
-export const saveUserSprintData = async (
-  userId: string,
-  sprintKey: string,
-  data: any,
-) => {
-  try {
-    const res = await fetch(`${SPRINT_API_BASE}/sprints/save`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        user_id: userId,
-        sprint_key: sprintKey,
-        data,
-      }),
-    });
-    if (!res.ok) {
-      console.error("[api] saveUserSprintData failed", res.status);
-      return null;
-    }
-    return res.json();
-  } catch (e) {
-    console.error("[api] saveUserSprintData failed", e);
-    return null;
-  }
-};
+// ✅ SPRINTS2 3export const fetchUserSprintData = async (userId: string) => {4  if (!userId) return [];5 6  try {7    return await api.get(`/sprints?user_id=${encodeURIComponent(userId)}`);8  } catch (e) {9    console.error("[api] fetchUserSprintData failed", e);10    return [];11  }12};13 14export const saveUserSprintData = async (payload: {15  user_id: string;16  sprint_key: string;17  data: any;18}) => {19  try {20    return await api.post("/sprints/save", payload);21  } catch (e) {22    console.error("[api] saveUserSprintData failed", e);23    return null;24  }25};
