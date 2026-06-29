@@ -115,12 +115,19 @@ export const spendPoints = async (payload: {
 
 
 // ✅ SPRINTS
+const SPRINT_API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) || "https://caerphilly-api.onrender.com";
+
 export const fetchUserSprintData = async (
   userId: string,
   sprintKey: string,
 ): Promise<any | null> => {
   try {
-    const data = await api.get(`/sprints?user_id=${encodeURIComponent(userId)}`);
+    const res = await fetch(`${SPRINT_API_BASE}/sprints?user_id=${encodeURIComponent(userId)}`);
+    if (!res.ok) {
+      console.error("[api] fetchUserSprintData failed", res.status);
+      return null;
+    }
+    const data = await res.json();
     const list = Array.isArray(data) ? data : [];
     const row = list.find((r: any) => r?.sprint_key === sprintKey);
     if (!row) return null;
@@ -141,11 +148,20 @@ export const saveUserSprintData = async (
   data: any,
 ) => {
   try {
-    return await api.post("/sprints/save", {
-      user_id: userId,
-      sprint_key: sprintKey,
-      data,
+    const res = await fetch(`${SPRINT_API_BASE}/sprints/save`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        user_id: userId,
+        sprint_key: sprintKey,
+        data,
+      }),
     });
+    if (!res.ok) {
+      console.error("[api] saveUserSprintData failed", res.status);
+      return null;
+    }
+    return res.json();
   } catch (e) {
     console.error("[api] saveUserSprintData failed", e);
     return null;
