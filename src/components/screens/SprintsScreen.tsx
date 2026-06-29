@@ -3,7 +3,7 @@ import { ArrowLeft, Check } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from '@/hooks/useTranslations';
-import { supabase } from '@/integrations/supabase/client';
+import { fetchUserSprintData, saveUserSprintData } from '@/lib/api';
 
 interface SprintTemplate {
   id: string;
@@ -48,15 +48,10 @@ const useSprints = (uid: string | null) => {
       if (cached) setSprints(JSON.parse(cached));
     } catch {}
     (async () => {
-      const { data } = await supabase
-        .from('user_sprints')
-        .select('data')
-        .eq('user_id', uid)
-        .eq('sprint_key', SPRINT_KEY)
-        .maybeSingle();
+      const data = await fetchUserSprintData(uid, SPRINT_KEY);
       if (cancelled) return;
-      if (data?.data) {
-        const list = (data.data as any).list as ActiveSprint[] | undefined;
+      if (data) {
+        const list = (data as any).list as ActiveSprint[] | undefined;
         if (Array.isArray(list)) {
           setSprints(list);
           try { localStorage.setItem(CACHE_KEY(uid), JSON.stringify(list)); } catch {}
@@ -68,10 +63,7 @@ const useSprints = (uid: string | null) => {
         const raw = localStorage.getItem(LEGACY_KEY(uid));
         if (raw) {
           const list = JSON.parse(raw) as ActiveSprint[];
-          await supabase.from('user_sprints').upsert(
-            { user_id: uid, sprint_key: SPRINT_KEY, data: { list } as any },
-            { onConflict: 'user_id,sprint_key' },
-          );
+          await saveUserSprintData(uid, SPRINT_KEY, { list });
           setSprints(list);
           try { localStorage.setItem(CACHE_KEY(uid), JSON.stringify(list)); } catch {}
           localStorage.removeItem(LEGACY_KEY(uid));
@@ -85,10 +77,7 @@ const useSprints = (uid: string | null) => {
     setSprints(next);
     if (uid) {
       try { localStorage.setItem(CACHE_KEY(uid), JSON.stringify(next)); } catch {}
-      void supabase.from('user_sprints').upsert(
-        { user_id: uid, sprint_key: SPRINT_KEY, data: { list: next } as any },
-        { onConflict: 'user_id,sprint_key' },
-      );
+      void saveUserSprintData(uid, SPRINT_KEY, { list: next });
     }
   };
 

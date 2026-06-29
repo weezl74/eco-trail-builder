@@ -3,7 +3,7 @@ import { ArrowLeft, Check } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from '@/hooks/useTranslations';
-import { supabase } from '@/integrations/supabase/client';
+import { fetchUserSprintData, saveUserSprintData } from '@/lib/api';
 
 interface SprintTemplate {
   id: string;
@@ -52,15 +52,10 @@ const BusinessSprintsScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =>
       if (cached) setSprints(JSON.parse(cached));
     } catch {}
     (async () => {
-      const { data } = await supabase
-        .from('user_sprints')
-        .select('data')
-        .eq('user_id', user.id)
-        .eq('sprint_key', SPRINT_KEY)
-        .maybeSingle();
+      const data = await fetchUserSprintData(user.id, SPRINT_KEY);
       if (cancelled) return;
-      if (data?.data) {
-        const list = (data.data as any).list as ActiveSprint[] | undefined;
+      if (data) {
+        const list = (data as any).list as ActiveSprint[] | undefined;
         if (Array.isArray(list)) {
           setSprints(list);
           try { localStorage.setItem(CACHE_KEY(user.id), JSON.stringify(list)); } catch {}
@@ -71,10 +66,7 @@ const BusinessSprintsScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =>
         const raw = localStorage.getItem(LEGACY_KEY(user.id));
         if (raw) {
           const list = JSON.parse(raw) as ActiveSprint[];
-          await supabase.from('user_sprints').upsert(
-            { user_id: user.id, sprint_key: SPRINT_KEY, data: { list } as any },
-            { onConflict: 'user_id,sprint_key' },
-          );
+          await saveUserSprintData(user.id, SPRINT_KEY, { list });
           setSprints(list);
           try { localStorage.setItem(CACHE_KEY(user.id), JSON.stringify(list)); } catch {}
           localStorage.removeItem(LEGACY_KEY(user.id));
@@ -93,10 +85,7 @@ const BusinessSprintsScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =>
     setSprints(next);
     if (user) {
       try { localStorage.setItem(CACHE_KEY(user.id), JSON.stringify(next)); } catch {}
-      void supabase.from('user_sprints').upsert(
-        { user_id: user.id, sprint_key: SPRINT_KEY, data: { list: next } as any },
-        { onConflict: 'user_id,sprint_key' },
-      );
+      void saveUserSprintData(user.id, SPRINT_KEY, { list: next });
     }
   };
 

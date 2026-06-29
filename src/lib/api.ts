@@ -112,3 +112,42 @@ export const spendPoints = async (payload: {
 }) => {
   return api.post("/spend-points", payload);
 };
+
+
+// ✅ SPRINTS
+export const fetchUserSprintData = async (
+  userId: string,
+  sprintKey: string,
+): Promise<any | null> => {
+  try {
+    const data = await api.get(`/sprints?user_id=${encodeURIComponent(userId)}`);
+    const list = Array.isArray(data) ? data : [];
+    const row = list.find((r: any) => r?.sprint_key === sprintKey);
+    if (!row) return null;
+    const raw = row.data;
+    if (typeof raw === "string") {
+      try { return JSON.parse(raw); } catch { return null; }
+    }
+    return raw ?? null;
+  } catch (e) {
+    console.error("[api] fetchUserSprintData failed", e);
+    return null;
+  }
+};
+
+export const saveUserSprintData = async (
+  userId: string,
+  sprintKey: string,
+  data: any,
+) => {
+  try {
+    return await api.post("/sprints/save", {
+      user_id: userId,
+      sprint_key: sprintKey,
+      data,
+    });
+  } catch (e) {
+    console.error("[api] saveUserSprintData failed", e);
+    return null;
+  }
+};
