@@ -3,7 +3,7 @@ import { ArrowLeft, Check } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from '@/hooks/useTranslations';
-import { supabase } from '@/integrations/supabase/client';
+import { fetchUserSprintData, saveUserSprintData } from '@/lib/api';
 
 interface SprintTemplate {
   id: string;
