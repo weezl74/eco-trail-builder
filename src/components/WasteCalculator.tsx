@@ -551,12 +551,11 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
     try {
       localStorage.setItem(`cloudrow:user_sprints:waste_calculator:${user.id}`, JSON.stringify(nextSprints));
     } catch {}
-    void supabase
-      .from("user_sprints")
-      .upsert(
-        { user_id: user.id, sprint_key: "waste_calculator", data: { list: nextSprints } as any },
-        { onConflict: "user_id,sprint_key" },
-      );
+    void api.post("/sprints/save", {
+      user_id: user.id,
+      sprint_key: "waste_calculator",
+      data: { list: nextSprints },
+    });
   };
 
   const completeSprint = async (id: string) => {
@@ -568,7 +567,7 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
     try {
       // Award points to user
       const newTotalPoints = (userProfile?.total_points || 0) + (sprint.points || 0);
-      await supabase.from("profiles").update({ total_points: newTotalPoints }).eq("user_id", user.id);
+      await api.post("/profile/update", { user_id: user.id, total_points: newTotalPoints });
 
       // Update local state
       const updatedSprints = sprints.map((sprint) => (sprint.id === id ? { ...sprint, completed: true } : sprint));
@@ -578,12 +577,11 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
       try {
         localStorage.setItem(`cloudrow:user_sprints:waste_calculator:${user.id}`, JSON.stringify(updatedSprints));
       } catch {}
-      void supabase
-        .from("user_sprints")
-        .upsert(
-          { user_id: user.id, sprint_key: "waste_calculator", data: { list: updatedSprints } as any },
-          { onConflict: "user_id,sprint_key" },
-        );
+      void api.post("/sprints/save", {
+        user_id: user.id,
+        sprint_key: "waste_calculator",
+        data: { list: updatedSprints },
+      });
 
       setUserProfile((prev) => ({
         ...prev,
