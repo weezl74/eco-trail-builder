@@ -32,7 +32,25 @@ const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title
   </div>
 );
 
-const AccountScreen: React.FC = () => {
+interface AccountScreenProps {
+  name?: string;
+  memberSince?: string;
+  totalPoints?: number;
+  currentFootprint?: number;
+  badges?: { id: string; label: string; icon?: React.ReactNode }[];
+  rewards?: { id: string; label: string; value?: string }[];
+  onLogOut?: () => void;
+}
+
+const AccountScreen: React.FC<AccountScreenProps> = ({
+  name: nameProp,
+  memberSince: memberSinceProp,
+  totalPoints: totalPointsProp,
+  currentFootprint: currentFootprintProp,
+  badges: badgesProp,
+  rewards: rewardsProp,
+  onLogOut,
+}) => {
   const [editingAvatar, setEditingAvatar] = useState(false);
   const [subPage, setSubPage] = useState<SubPage | null>(null);
   const [showGroups, setShowGroups] = useState(false);
@@ -58,11 +76,13 @@ const AccountScreen: React.FC = () => {
 
   const handleLogOut = async () => {
     await supabase.auth.signOut();
+    onLogOut?.();
   };
 
   const handleDelete = async () => {
     if (!confirm("Delete your account? This cannot be undone.")) return;
     await supabase.auth.signOut();
+    onLogOut?.();
   };
 
   if (editingAvatar) {
@@ -77,11 +97,13 @@ const AccountScreen: React.FC = () => {
     return <AccountSubScreen page={subPage} onBack={() => setSubPage(null)} />;
   }
 
-  // ✅ SAFE VALUES (avoid null errors)
-  const name = profile?.display_name || "Member";
-  const totalPoints = profile?.wool_points ?? 0;
-  const footprint = profile?.footprint ?? 0;
-  const memberSince = "2026"; // or calculate later if needed
+  // ✅ SAFE VALUES — prefer API profile, fall back to props
+  const name = profile?.display_name || nameProp || "Member";
+  const totalPoints = profile?.wool_points ?? totalPointsProp ?? 0;
+  const footprint = profile?.footprint ?? currentFootprintProp ?? 0;
+  const memberSince = memberSinceProp || "2026";
+  const badges = badgesProp ?? [];
+  const rewards = rewardsProp ?? [];
 
   return (
     <div className="min-h-screen bg-[#f5a623] pb-24 px-4 pt-6">
@@ -91,10 +113,11 @@ const AccountScreen: React.FC = () => {
           memberSince={memberSince}
           totalPoints={totalPoints}
           currentFootprint={footprint}
-          badges={[]}
-          rewards={[]}
+          badges={badges}
+          rewards={rewards}
         />
       </WoollyWallet>
+
 
       <Section title={t("Account")}>
         <Row label={t("Edit Carbon Card")} onClick={() => setEditingAvatar(true)} />
@@ -122,4 +145,4 @@ const AccountScreen: React.FC = () => {
 };
 
 export default AccountScreen;
-``;
+
