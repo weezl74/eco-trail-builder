@@ -107,7 +107,7 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
 
     try {
       // Load user profile
-      const { data: profile } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
+      const profile = await fetchMyProfile(user.id).catch(() => null);
 
       if (profile) {
         setUserProfile(profile);
@@ -117,16 +117,21 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
       }
 
       // Load user renewables
-      const { data: renewables } = await supabase.from("user_renewables").select("*").eq("user_id", user.id);
+      const renewables = await api
+        .get(`/renewables?user_id=${encodeURIComponent(user.id)}`)
+        .catch(() => [] as any[]);
 
-      if (renewables) {
+      if (Array.isArray(renewables)) {
         setUserRenewables(renewables);
       }
 
       // Load user pledges to get count
-      const { data: pledges } = await supabase.from("user_pledges").select("*").eq("user_id", user.id);
+      const pledges = await api
+        .get(`/pledges?user_id=${encodeURIComponent(user.id)}`)
+        .catch(() => [] as any[]);
 
-      if (pledges) {
+      if (Array.isArray(pledges)) {
+
         setPledges(
           pledges.map((p) => {
             // Find the matching pledge from categories to get costSaving
