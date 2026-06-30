@@ -40,7 +40,13 @@ export default function CommunityStories() {
   const fetchStories = async () => {
     try {
       const data = await api.get("/stories");
-      setStories(Array.isArray(data) ? data : []);
+      const arr = Array.isArray(data) ? data : [];
+      setStories(
+        arr.map((s: any) => ({
+          ...s,
+          kudos_count: Number(s?.kudos_count) || 0,
+        })),
+      );
     } catch (err) {
       console.error("❌ load stories failed:", err);
       setStories([]);
@@ -59,15 +65,12 @@ export default function CommunityStories() {
       });
 
       setStories((prev) =>
-        prev.map((s) =>
-          s.id === id
-            ? {
-                ...s,
-                kudos_count: has ? s.kudos_count - 1 : s.kudos_count + 1,
-                user_has_kudos: !has,
-              }
-            : s,
-        ),
+        prev.map((s) => {
+          if (s.id !== id) return s;
+          const current = Number(s.kudos_count) || 0;
+          const next = has ? Math.max(0, current - 1) : current + 1;
+          return { ...s, kudos_count: next, user_has_kudos: !has };
+        }),
       );
     } catch (err) {
       console.error("❌ kudos failed:", err);
@@ -122,7 +125,7 @@ export default function CommunityStories() {
 
             <Button variant="ghost" size="sm" onClick={() => toggleKudos(s.id, !!s.user_has_kudos)}>
               <Heart className="h-4 w-4 mr-1" />
-              {s.kudos_count}
+              {Number(s.kudos_count) || 0}
             </Button>
           </div>
         ))
