@@ -295,7 +295,8 @@ export const useSavings = () => {
   const plantTree = useCallback(
     async (cost: number = 0) => {
       if (!userId) return false;
-      if (cost > 0 && woolPoints < cost) return false;
+      // Tree planting is verified — it must be paid for in TREE points, not wool.
+      if (cost > 0 && treePoints < cost) return false;
 
       try {
         await createTreeRequest({
@@ -312,7 +313,7 @@ export const useSavings = () => {
         return false;
       }
     },
-    [userId, woolPoints, refreshTreeRequests, refreshPoints],
+    [userId, treePoints, refreshTreeRequests, refreshPoints],
   );
 
   return {

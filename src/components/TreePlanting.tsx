@@ -19,11 +19,12 @@ interface TreeRequest {
 }
 
 interface TreePlantingProps {
-  totalPoints: number;
-  onPointsUpdate: (newPoints: number) => void;
+  // Tree planting is a verified action — it MUST be validated against tree_points.
+  treePoints: number;
+  onPointsUpdate: (newTreePoints: number) => void;
 }
 
-const TreePlanting: React.FC<TreePlantingProps> = ({ totalPoints, onPointsUpdate }) => {
+const TreePlanting: React.FC<TreePlantingProps> = ({ treePoints, onPointsUpdate }) => {
   const [treeRequests, setTreeRequests] = useState<TreeRequest[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -31,7 +32,7 @@ const TreePlanting: React.FC<TreePlantingProps> = ({ totalPoints, onPointsUpdate
   const { toast } = useToast();
 
   const POINTS_REQUIRED = 500;
-  const canPlantTree = totalPoints >= POINTS_REQUIRED;
+  const canPlantTree = treePoints >= POINTS_REQUIRED;
 
   // Mock What3Words locations for demonstration
   const mockWhat3WordsLocations = [
@@ -69,7 +70,15 @@ const TreePlanting: React.FC<TreePlantingProps> = ({ totalPoints, onPointsUpdate
   };
 
   const handleRequestTree = async () => {
-    if (!user || !canPlantTree) return;
+    if (!user) return;
+    if (!canPlantTree) {
+      toast({
+        title: "Not enough Tree Points",
+        description: `You need ${POINTS_REQUIRED} Tree Points to request a tree. You currently have ${treePoints}.`,
+        variant: "destructive",
+      });
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -80,17 +89,17 @@ const TreePlanting: React.FC<TreePlantingProps> = ({ totalPoints, onPointsUpdate
         tree_species: 'Native Oak',
       });
 
-      // Deduct points from user's profile
+      // Deduct tree points from user's profile
       await api.post('/profile/update', {
         user_id: user.id,
-        total_points: totalPoints - POINTS_REQUIRED,
+        tree_points: treePoints - POINTS_REQUIRED,
       });
 
 
-      onPointsUpdate(totalPoints - POINTS_REQUIRED);
+      onPointsUpdate(treePoints - POINTS_REQUIRED);
       setIsDialogOpen(false);
       await loadTreeRequests();
-      
+
       toast({
         title: "Tree Request Submitted! 🌱",
         description: "Your tree planting request has been sent to CCBC. You'll receive updates on the planting progress.",
@@ -172,7 +181,7 @@ const TreePlanting: React.FC<TreePlantingProps> = ({ totalPoints, onPointsUpdate
               Use {POINTS_REQUIRED} points to request CCBC to plant a tree on your behalf
             </p>
             <p className="text-xs text-green-500 mt-2">
-              Your points: {totalPoints} | Required: {POINTS_REQUIRED}
+              Your Tree Points: {treePoints} | Required: {POINTS_REQUIRED}
             </p>
           </div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
