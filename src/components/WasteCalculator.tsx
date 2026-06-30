@@ -40,8 +40,8 @@ import LandingScreen from "./LandingScreen";
 import caerphillyBusinessLogo from "@/assets/caerphilly-business-club-logo.png";
 import caerphillyCouncilLogo from "@/assets/caerphilly-council-logo.png";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
-import { api } from "@/lib/api";
+import { api, fetchMyProfile } from "@/lib/api";
+
 import { useToast } from "@/hooks/use-toast";
 
 type UserMode = "resident" | "business";
@@ -84,15 +84,12 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
     }
   }, [user]);
 
-  // Save category completion states to cloud (per-user)
+  // Save category completion states locally (per-user). Server source of truth is /responses.
   useEffect(() => {
     if (user) {
       try {
         localStorage.setItem(`cloudrow:user_calc_categories:${user.id}`, JSON.stringify(completedCategories));
       } catch {}
-      void supabase
-        .from("user_calc_categories")
-        .upsert({ user_id: user.id, completed: completedCategories as any }, { onConflict: "user_id" });
     }
   }, [completedCategories, user]);
 
@@ -102,31 +99,8 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
       const cached = localStorage.getItem(`cloudrow:user_calc_categories:${user.id}`);
       if (cached) setCompletedCategories(JSON.parse(cached));
     } catch {}
-    const { data } = await supabase
-      .from("user_calc_categories")
-      .select("completed")
-      .eq("user_id", user.id)
-      .maybeSingle();
-    if (data?.completed && Array.isArray(data.completed)) {
-      setCompletedCategories(data.completed as string[]);
-      try {
-        localStorage.setItem(`cloudrow:user_calc_categories:${user.id}`, JSON.stringify(data.completed));
-      } catch {}
-    } else {
-      // legacy migration
-      try {
-        const legacy = localStorage.getItem(`completedCategories_${user.id}`);
-        if (legacy) {
-          const list = JSON.parse(legacy) as string[];
-          await supabase
-            .from("user_calc_categories")
-            .upsert({ user_id: user.id, completed: list as any }, { onConflict: "user_id" });
-          setCompletedCategories(list);
-          localStorage.removeItem(`completedCategories_${user.id}`);
-        }
-      } catch {}
-    }
   };
+
 
   const loadUserData = async () => {
     if (!user) return;
