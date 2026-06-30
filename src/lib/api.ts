@@ -73,6 +73,39 @@ export interface ApiLeaderboardEntry {
   total_points?: number | null;
 }
 
+export interface ApiTreeRequest {
+  id: string;
+  user_id?: string;
+  points_used: number;
+  status: string;
+  what3words_location?: string | null;
+  planting_date?: string | null;
+  tree_species: string;
+  created_at: string;
+}
+
+export interface ApiRenewable {
+  id: string;
+  user_id?: string;
+  technology_type: string;
+  points_cost: number;
+  position_x?: number | null;
+  position_y?: number | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  lat?: number | null;
+  lng?: number | null;
+  created_at?: string;
+}
+
+const unwrapArray = <T,>(data: any): T[] => {
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.data)) return data.data;
+  if (Array.isArray(data?.rows)) return data.rows;
+  if (Array.isArray(data?.items)) return data.items;
+  return [];
+};
+
 // ✅ PROFILE
 export const fetchMyProfile = async (userId: string) => {
   if (!userId) return null;
@@ -114,6 +147,55 @@ export const spendPoints = async (payload: {
   reference_id?: string;
 }) => {
   return api.post("/spend-points", payload);
+};
+
+// ✅ TREE REQUESTS
+export const fetchTreeRequests = async (userId: string): Promise<ApiTreeRequest[]> => {
+  if (!userId) return [];
+  const data = await api.get(`/tree-requests?user_id=${encodeURIComponent(userId)}`);
+  return unwrapArray<ApiTreeRequest>(data);
+};
+
+export const createTreeRequest = async (payload: {
+  user_id: string;
+  points_used: number;
+  status: string;
+  tree_species: string;
+}) => {
+  return api.post("/tree-requests", payload);
+};
+
+export const updateTreeRequest = async (
+  id: string,
+  payload: Partial<ApiTreeRequest> & { user_id?: string }
+) => {
+  return api.patch(`/tree-requests/${encodeURIComponent(id)}`, payload);
+};
+
+// ✅ RENEWABLES
+export const fetchRenewables = async (userId: string): Promise<ApiRenewable[]> => {
+  if (!userId) return [];
+  const data = await api.get(`/renewables?user_id=${encodeURIComponent(userId)}`);
+  return unwrapArray<ApiRenewable>(data);
+};
+
+export const createRenewable = async (payload: {
+  user_id: string;
+  technology_type: string;
+  points_cost: number;
+  position_x?: number | null;
+  position_y?: number | null;
+  latitude?: number | null;
+  longitude?: number | null;
+}) => {
+  return api.post("/renewables", payload);
+};
+
+export const updateRenewable = async (
+  id: string,
+  payload: Partial<ApiRenewable> & { user_id?: string }
+) => {
+  return api.patch(`/renewables/${encodeURIComponent(id)}`, payload);
 };
 
 // ✅ SPRINTS

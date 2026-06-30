@@ -92,8 +92,8 @@ const LeaderboardTreesScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
 
   const heading = mode === "wool" ? t("WOOL POINTS") : t("TREE POINTS");
 
-  const join = () => {
-    if (plantTree(100)) {
+  const join = async () => {
+    if (await plantTree(100)) {
       toast({
         title: t("Joined the Tree Queue!"),
         description: t("A tree will be planted on your behalf."),

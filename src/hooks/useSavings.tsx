@@ -1,6 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { api, fetchMyProfile } from "@/lib/api";
+import {
+  api,
+  createRenewable,
+  createTreeRequest,
+  fetchMyProfile,
+  fetchRenewables,
+  fetchTreeRequests,
+} from "@/lib/api";
 
 // ---------------------------------------------------------------------------
 // Renewable tech catalogue (kept in-app, no backend coupling)
@@ -16,8 +23,14 @@ export const RENEWABLE_COSTS: Record<RenewableType, number> = {
 export type PlacedRenewable = {
   id: string;
   type: RenewableType;
+  technology_type?: string;
+  points_cost?: number;
+  position_x?: number | null;
+  position_y?: number | null;
   lat?: number | null;
   lng?: number | null;
+  latitude?: number | null;
+  longitude?: number | null;
 };
 
 // ---------------------------------------------------------------------------
@@ -173,55 +186,133 @@ export const useSavings = () => {
   );
 
   // -------------------------------------------------------------------------
-  // Renewables (placed on the map)
+  // Renewables (placed on the map) — backend source of truth
   // -------------------------------------------------------------------------
-  const [renewables, setRenewables] = useState<PlacedRenewable[]>(() =>
-    lsGet(`${ns}:renewables`, [] as PlacedRenewable[]),
-  );
+  const [renewables, setRenewables] = useState<PlacedRenewable[]>([]);
+
+  const refreshRenewables = useCallback(async () => {
+    if (!userId) {
+      setRenewables([]);
+      return;
+    }
+
+    try {
+      const rows = await fetchRenewables(userId);
+      setRenewables(
+        rows.map((r) => ({
+          id: r.id,
+          type: (r.technology_type as RenewableType) || "solar",
+          technology_type: r.technology_type,
+          points_cost: r.points_cost,
+          position_x: r.position_x ?? null,
+          position_y: r.position_y ?? null,
+          lat: r.latitude ?? r.lat ?? null,
+          lng: r.longitude ?? r.lng ?? null,
+          latitude: r.latitude ?? r.lat ?? null,
+          longitude: r.longitude ?? r.lng ?? null,
+        })),
+      );
+    } catch (err) {
+      console.error("refreshRenewables error", err);
+      setRenewables([]);
+    }
+  }, [userId]);
+
   useEffect(() => {
-    setRenewables(lsGet(`${ns}:renewables`, [] as PlacedRenewable[]));
-  }, [ns]);
+    refreshRenewables();
+  }, [refreshRenewables]);
 
   const buyRenewable = useCallback(
-    (type: RenewableType, _x?: number, _y?: number, lat?: number, lng?: number) => {
+    async (type: RenewableType, x?: number, y?: number, lat?: number, lng?: number) => {
+      if (!userId) return false;
       const cost = RENEWABLE_COSTS[type];
       if (woolPoints < cost) return false;
-      const item: PlacedRenewable = {
-        id: `${type}-${Date.now()}`,
-        type,
-        lat: lat ?? null,
-        lng: lng ?? null,
-      };
-      const next = [...renewables, item];
-      setRenewables(next);
-      lsSet(`${ns}:renewables`, next);
-      setWoolPoints((p) => p - cost);
-      return true;
+
+      try {
+        const saved = await createRenewable({
+          user_id: userId,
+          technology_type: type,
+          points_cost: cost,
+          position_x: x ?? null,
+          position_y: y ?? null,
+          latitude: lat ?? null,
+          longitude: lng ?? null,
+        });
+        const row = saved?.data ?? saved?.row ?? saved;
+        if (row?.id) {
+          setRenewables((prev) => [
+            ...prev,
+            {
+              id: row.id,
+              type,
+              technology_type: row.technology_type ?? type,
+              points_cost: row.points_cost ?? cost,
+              position_x: row.position_x ?? x ?? null,
+              position_y: row.position_y ?? y ?? null,
+              lat: row.latitude ?? row.lat ?? lat ?? null,
+              lng: row.longitude ?? row.lng ?? lng ?? null,
+              latitude: row.latitude ?? row.lat ?? lat ?? null,
+              longitude: row.longitude ?? row.lng ?? lng ?? null,
+            },
+          ]);
+        } else {
+          await refreshRenewables();
+        }
+        await refreshPoints();
+        return true;
+      } catch (err) {
+        console.error("buyRenewable error", err);
+        return false;
+      }
     },
-    [renewables, woolPoints, ns],
+    [userId, woolPoints, refreshRenewables, refreshPoints],
   );
 
   // -------------------------------------------------------------------------
-  // Trees (verified tree-planting actions)
+  // Trees (verified tree-planting actions) — backend source of truth
   // -------------------------------------------------------------------------
-  const [treesPlanted, setTreesPlanted] = useState<number>(() => lsGet(`${ns}:treesPlanted`, 0));
+  const [treesPlanted, setTreesPlanted] = useState<number>(0);
+
+  const refreshTreeRequests = useCallback(async () => {
+    if (!userId) {
+      setTreesPlanted(0);
+      return;
+    }
+
+    try {
+      const rows = await fetchTreeRequests(userId);
+      setTreesPlanted(rows.length);
+    } catch (err) {
+      console.error("refreshTreeRequests error", err);
+      setTreesPlanted(0);
+    }
+  }, [userId]);
+
   useEffect(() => {
-    setTreesPlanted(lsGet(`${ns}:treesPlanted`, 0));
-  }, [ns]);
+    refreshTreeRequests();
+  }, [refreshTreeRequests]);
 
   const plantTree = useCallback(
-    (cost: number = 0) => {
+    async (cost: number = 0) => {
+      if (!userId) return false;
       if (cost > 0 && woolPoints < cost) return false;
-      setTreesPlanted((n) => {
-        const next = n + 1;
-        lsSet(`${ns}:treesPlanted`, next);
-        return next;
-      });
-      setTreePoints((p) => p + 1);
-      if (cost > 0) setWoolPoints((p) => p - cost);
-      return true;
+
+      try {
+        await createTreeRequest({
+          user_id: userId,
+          points_used: cost,
+          status: "pending",
+          tree_species: "Native Oak",
+        });
+        await refreshTreeRequests();
+        await refreshPoints();
+        return true;
+      } catch (err) {
+        console.error("plantTree error", err);
+        return false;
+      }
     },
-    [ns, woolPoints],
+    [userId, woolPoints, refreshTreeRequests, refreshPoints],
   );
 
   return {
