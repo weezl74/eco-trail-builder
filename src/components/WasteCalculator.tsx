@@ -276,15 +276,7 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
     // Save to database
     if (user) {
       try {
-        const { error } = await supabase
-          .from("profiles")
-          .update({ current_footprint: newFootprint })
-          .eq("user_id", user.id);
-
-        if (error) {
-          console.error("Database error:", error);
-          throw error;
-        }
+        await api.post("/profile/update", { user_id: user.id, current_footprint: newFootprint });
 
         console.log("Footprint successfully updated to:", newFootprint);
         setUserProfile((prev) => ({ ...prev, current_footprint: newFootprint }));
