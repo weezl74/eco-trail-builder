@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 
 export type SheepHead = 'nelson' | 'barb';
@@ -11,8 +11,6 @@ type Prefs = {
 
 const DEFAULT: Prefs = { sheepHead: 'nelson', learningPreferences: null };
 const CACHE_BASE = 'cloudrow:user_preferences';
-const LEGACY_HEAD = 'sheepHead';
-const LEGACY_LEARN = 'learningPreferences';
 const EVT = 'user_prefs_update';
 
 const cacheKey = (uid: string) => `${CACHE_BASE}:${uid}`;
@@ -42,56 +40,26 @@ export const useUserPreferences = () => {
 
   useEffect(() => {
     let cancelled = false;
-    if (!userId) {
-      setPrefs(DEFAULT);
-      return;
-    }
+    if (!userId) { setPrefs(DEFAULT); return; }
     setPrefs(readCache(userId));
     (async () => {
-      const { data } = await supabase
-        .from('user_preferences')
-        .select('sheep_head, learning_preferences')
-        .eq('user_id', userId)
-        .maybeSingle();
-      if (cancelled) return;
-      if (data) {
-        const next: Prefs = {
-          sheepHead: (data.sheep_head as SheepHead) || 'nelson',
-          learningPreferences: data.learning_preferences ?? null,
-        };
-        setPrefs(next);
-        writeCache(userId, next);
-      } else {
-        // legacy migration from device-wide keys
-        try {
-          const head = localStorage.getItem(LEGACY_HEAD) as SheepHead | null;
-          const learn = localStorage.getItem(LEGACY_LEARN);
-          if (head || learn) {
-            const next: Prefs = {
-              sheepHead: head || 'nelson',
-              learningPreferences: learn ? JSON.parse(learn) : null,
-            };
-            await supabase.from('user_preferences').upsert(
-              {
-                user_id: userId,
-                sheep_head: next.sheepHead,
-                learning_preferences: next.learningPreferences,
-              },
-              { onConflict: 'user_id' },
-            );
-            setPrefs(next);
-            writeCache(userId, next);
-            try {
-              localStorage.removeItem(LEGACY_HEAD);
-              localStorage.removeItem(LEGACY_LEARN);
-            } catch {}
-          }
-        } catch {}
+      try {
+        const data = await api.get(`/preferences?user_id=${encodeURIComponent(userId)}`);
+        if (cancelled) return;
+        const row = Array.isArray(data) ? data[0] : data;
+        if (row) {
+          const next: Prefs = {
+            sheepHead: (row.sheep_head as SheepHead) || 'nelson',
+            learningPreferences: row.learning_preferences ?? null,
+          };
+          setPrefs(next);
+          writeCache(userId, next);
+        }
+      } catch (e) {
+        console.error('[useUserPreferences] fetch failed', e);
       }
     })();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [userId]);
 
   useEffect(() => {
@@ -104,32 +72,28 @@ export const useUserPreferences = () => {
     };
   }, [userId]);
 
-  const setSheepHead = useCallback(
-    async (h: SheepHead) => {
-      const next = { ...latest.current, sheepHead: h };
+  const persist = useCallback(
+    (next: Prefs) => {
       setPrefs(next);
       writeCache(userId, next);
       if (!userId) return;
-      await supabase.from('user_preferences').upsert(
-        { user_id: userId, sheep_head: h, learning_preferences: next.learningPreferences },
-        { onConflict: 'user_id' },
-      );
+      void api.post('/preferences', {
+        user_id: userId,
+        sheep_head: next.sheepHead,
+        learning_preferences: next.learningPreferences,
+      }).catch(() => {});
     },
     [userId],
   );
 
+  const setSheepHead = useCallback(
+    async (h: SheepHead) => persist({ ...latest.current, sheepHead: h }),
+    [persist],
+  );
+
   const setLearningPreferences = useCallback(
-    async (value: any) => {
-      const next = { ...latest.current, learningPreferences: value };
-      setPrefs(next);
-      writeCache(userId, next);
-      if (!userId) return;
-      await supabase.from('user_preferences').upsert(
-        { user_id: userId, sheep_head: next.sheepHead, learning_preferences: value },
-        { onConflict: 'user_id' },
-      );
-    },
-    [userId],
+    async (value: any) => persist({ ...latest.current, learningPreferences: value }),
+    [persist],
   );
 
   return {

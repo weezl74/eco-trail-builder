@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 
 export type WalletBusiness = {
@@ -10,7 +10,6 @@ export type WalletBusiness = {
   color: string;
   reason: string;
   addedAt: number;
-  // Optional loyalty card payload (added when a business_card is added from the map)
   businessCardId?: string;
   sectorIcon?: string;
   stampsRequired?: number;
@@ -20,7 +19,7 @@ export type WalletBusiness = {
 export type WalletPhoto = {
   kind: 'photo';
   id: string;
-  image: string; // base64 data URL, already cropped to 1.586:1
+  image: string;
   caption?: string;
   addedAt: number;
 };
@@ -28,8 +27,6 @@ export type WalletPhoto = {
 export type WalletItem = WalletBusiness | WalletPhoto;
 
 const CACHE_BASE = 'cloudrow:user_wallet:items';
-const LEGACY_KEY = 'wallet_items_v2';
-const LEGACY_KEY_V1 = 'wallet_businesses_v1';
 const EVT = 'wallet_update';
 
 const cacheKey = (uid: string) => `${CACHE_BASE}:${uid}`;
@@ -46,9 +43,7 @@ const readCache = (uid: string | null): WalletItem[] => {
 
 const writeCache = (uid: string | null, items: WalletItem[]) => {
   if (!uid) return;
-  try {
-    localStorage.setItem(cacheKey(uid), JSON.stringify(items));
-  } catch {}
+  try { localStorage.setItem(cacheKey(uid), JSON.stringify(items)); } catch {}
   window.dispatchEvent(new Event(EVT));
 };
 
@@ -73,45 +68,17 @@ export const useWallet = () => {
     }
     setItems(readCache(userId));
     (async () => {
-      const { data } = await supabase
-        .from('user_wallet')
-        .select('business_id, data')
-        .eq('user_id', userId);
-      if (cancelled) return;
-      const cloud = rowsToItems((data || []) as any);
-      if (cloud.length > 0) {
+      try {
+        const data = await api.get(`/wallet?user_id=${encodeURIComponent(userId)}`);
+        if (cancelled) return;
+        const cloud = rowsToItems(Array.isArray(data) ? data : []);
         setItems(cloud);
         writeCache(userId, cloud);
-        return;
-      }
-      // One-off migration of legacy device-local wallet → cloud.
-      let legacy: WalletItem[] = [];
-      try {
-        const raw = localStorage.getItem(LEGACY_KEY);
-        if (raw) legacy = JSON.parse(raw) as WalletItem[];
-        else {
-          const v1 = localStorage.getItem(LEGACY_KEY_V1);
-          if (v1) {
-            const list = JSON.parse(v1) as Omit<WalletBusiness, 'kind'>[];
-            legacy = list.map((b) => ({ ...b, kind: 'business' }) as WalletBusiness);
-          }
-        }
-      } catch {}
-      if (legacy.length > 0) {
-        const rows = legacy.map((it) => ({
-          user_id: userId,
-          business_id: it.id,
-          data: it as any,
-        }));
-        await supabase.from('user_wallet').upsert(rows, { onConflict: 'user_id,business_id' });
-        setItems(legacy);
-        writeCache(userId, legacy);
-        try { localStorage.removeItem(LEGACY_KEY); localStorage.removeItem(LEGACY_KEY_V1); } catch {}
+      } catch (e) {
+        console.error('[useWallet] fetch failed', e);
       }
     })();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [userId]);
 
   useEffect(() => {
@@ -133,12 +100,7 @@ export const useWallet = () => {
       setItems(next);
       writeCache(userId, next);
       if (userId) {
-        void supabase
-          .from('user_wallet')
-          .upsert(
-            { user_id: userId, business_id: item.id, data: item as any },
-            { onConflict: 'user_id,business_id' },
-          );
+        void api.post('/wallet', { user_id: userId, business_id: item.id, data: item }).catch(() => {});
       }
       return true;
     },
@@ -158,12 +120,7 @@ export const useWallet = () => {
       setItems(next);
       writeCache(userId, next);
       if (userId) {
-        void supabase
-          .from('user_wallet')
-          .upsert(
-            { user_id: userId, business_id: photo.id, data: photo as any },
-            { onConflict: 'user_id,business_id' },
-          );
+        void api.post('/wallet', { user_id: userId, business_id: photo.id, data: photo }).catch(() => {});
       }
     },
     [userId],
@@ -175,11 +132,7 @@ export const useWallet = () => {
       setItems(next);
       writeCache(userId, next);
       if (userId) {
-        void supabase
-          .from('user_wallet')
-          .delete()
-          .eq('user_id', userId)
-          .eq('business_id', id);
+        void api.delete('/wallet', { user_id: userId, business_id: id }).catch(() => {});
       }
     },
     [userId],
@@ -188,7 +141,6 @@ export const useWallet = () => {
   return { items, addBusiness, addPhoto, removeItem };
 };
 
-// Backward-compat helper for existing callers that destructure businesses/removeBusiness
 export const useWalletBusinesses = () => {
   const { items, addBusiness, removeItem } = useWallet();
   const businesses = items.filter((x): x is WalletBusiness => x.kind === 'business');

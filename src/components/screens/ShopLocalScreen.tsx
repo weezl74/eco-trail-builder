@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, Filter, Sun, Wind, Droplet, Thermometer } from 'lucide-react';
 import { useSavings, RenewableType, RENEWABLE_COSTS } from '@/hooks/useSavings';
 import { toast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/lib/api';
 import { useTranslations } from '@/hooks/useTranslations';
 import WalkMyWarmUpJourney from '@/components/WalkMyWarmUpJourney';
 import ShopLocalLeafletMap, { LeafletPoi, LeafletRenewable } from '@/components/ShopLocalLeafletMap';
@@ -166,14 +166,21 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   useEffect(() => {
     let mounted = true;
     (async () => {
-      const [locRes, bizRes] = await Promise.all([
-        supabase.from('map_locations').select('id, title, latitude, longitude, category, carbon_action'),
-        supabase.from('business_cards_public').select('id, business_name, latitude, longitude, sector_icon, reward_text, stamps_required, offer_to_residents'),
-      ]);
+      let locData: any[] = [];
+      let bizData: any[] = [];
+      try {
+        const [locRes, bizRes] = await Promise.all([
+          api.get('/map-locations'),
+          api.get('/business-cards/public'),
+        ]);
+        locData = Array.isArray(locRes) ? locRes : [];
+        bizData = Array.isArray(bizRes) ? bizRes : [];
+      } catch (e) {
+        console.error('Failed to load map locations', e);
+      }
       if (!mounted) return;
-      if (locRes.error) console.error('Failed to load map locations', locRes.error);
-      const mapped: POI[] = (locRes.data ?? [])
-        .map((r) => {
+      const mapped: POI[] = locData
+        .map((r: any) => {
           const cat = DB_CATEGORY_MAP[r.category ?? ''];
           if (!cat || r.latitude == null || r.longitude == null) return null;
           return {
@@ -186,9 +193,9 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           } as POI;
         })
         .filter((p): p is POI => p !== null);
-      const businessPois: POI[] = (bizRes.data ?? [])
-        .filter((b) => b.latitude != null && b.longitude != null)
-        .map((b) => ({
+      const businessPois: POI[] = bizData
+        .filter((b: any) => b.latitude != null && b.longitude != null)
+        .map((b: any) => ({
           id: b.id,
           name: b.business_name,
           category: 'business' as Category,
@@ -202,9 +209,7 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
         }));
       setPois([...mapped, ...businessPois]);
     })();
-    return () => {
-      mounted = false;
-    };
+    return () => { mounted = false; };
   }, []);
 
   const toggle = (id: Category) =>
