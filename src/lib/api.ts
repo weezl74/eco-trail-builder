@@ -88,6 +88,7 @@ export interface ApiRenewable {
   id: string;
   user_id?: string;
   technology_type: string;
+  tech_type?: string | null;
   points_cost: number;
   position_x?: number | null;
   position_y?: number | null;
