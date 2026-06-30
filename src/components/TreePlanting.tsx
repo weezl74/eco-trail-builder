@@ -70,7 +70,15 @@ const TreePlanting: React.FC<TreePlantingProps> = ({ treePoints, onPointsUpdate 
   };
 
   const handleRequestTree = async () => {
-    if (!user || !canPlantTree) return;
+    if (!user) return;
+    if (!canPlantTree) {
+      toast({
+        title: "Not enough Tree Points",
+        description: `You need ${POINTS_REQUIRED} Tree Points to request a tree. You currently have ${treePoints}.`,
+        variant: "destructive",
+      });
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -81,17 +89,17 @@ const TreePlanting: React.FC<TreePlantingProps> = ({ treePoints, onPointsUpdate 
         tree_species: 'Native Oak',
       });
 
-      // Deduct points from user's profile
+      // Deduct tree points from user's profile
       await api.post('/profile/update', {
         user_id: user.id,
-        total_points: totalPoints - POINTS_REQUIRED,
+        tree_points: treePoints - POINTS_REQUIRED,
       });
 
 
-      onPointsUpdate(totalPoints - POINTS_REQUIRED);
+      onPointsUpdate(treePoints - POINTS_REQUIRED);
       setIsDialogOpen(false);
       await loadTreeRequests();
-      
+
       toast({
         title: "Tree Request Submitted! 🌱",
         description: "Your tree planting request has been sent to CCBC. You'll receive updates on the planting progress.",
