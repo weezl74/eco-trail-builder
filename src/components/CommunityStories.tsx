@@ -40,7 +40,13 @@ export default function CommunityStories() {
   const fetchStories = async () => {
     try {
       const data = await api.get("/stories");
-      setStories(Array.isArray(data) ? data : []);
+      const arr = Array.isArray(data) ? data : [];
+      setStories(
+        arr.map((s: any) => ({
+          ...s,
+          kudos_count: Number(s?.kudos_count) || 0,
+        })),
+      );
     } catch (err) {
       console.error("❌ load stories failed:", err);
       setStories([]);
