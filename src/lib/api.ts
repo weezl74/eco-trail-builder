@@ -183,6 +183,10 @@ const normaliseRenewable = (r: any): ApiRenewable => {
   const tech = r.technology_type ?? r.tech_type ?? null;
   const lat = r.latitude ?? r.lat ?? null;
   const lng = r.longitude ?? r.lng ?? null;
+  // If the backend only persisted lat/lng (legacy schema), fall back to them
+  // for the percent-based map position so icons still render.
+  const px = r.position_x ?? (lat != null && lat !== 0 ? lat : null);
+  const py = r.position_y ?? (lng != null && lng !== 0 ? lng : null);
   return {
     ...r,
     technology_type: tech,
@@ -191,6 +195,8 @@ const normaliseRenewable = (r: any): ApiRenewable => {
     lat,
     longitude: lng,
     lng,
+    position_x: px,
+    position_y: py,
   } as ApiRenewable;
 };
 
