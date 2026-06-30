@@ -125,7 +125,7 @@ export default function CommunityStories() {
 
             <Button variant="ghost" size="sm" onClick={() => toggleKudos(s.id, !!s.user_has_kudos)}>
               <Heart className="h-4 w-4 mr-1" />
-              {s.kudos_count}
+              {Number(s.kudos_count) || 0}
             </Button>
           </div>
         ))
