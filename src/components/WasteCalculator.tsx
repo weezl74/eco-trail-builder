@@ -40,7 +40,7 @@ import LandingScreen from "./LandingScreen";
 import caerphillyBusinessLogo from "@/assets/caerphilly-business-club-logo.png";
 import caerphillyCouncilLogo from "@/assets/caerphilly-council-logo.png";
 import { useAuth } from "@/hooks/useAuth";
-import { api, fetchMyProfile } from "@/lib/api";
+import { api, createRenewable, fetchMyProfile, fetchRenewables, updateRenewable } from "@/lib/api";
 
 import { useToast } from "@/hooks/use-toast";
 
@@ -117,9 +117,7 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
       }
 
       // Load user renewables
-      const renewables = await api
-        .get(`/renewables?user_id=${encodeURIComponent(user.id)}`)
-        .catch(() => [] as any[]);
+      const renewables = await fetchRenewables(user.id).catch(() => [] as any[]);
 
       if (Array.isArray(renewables)) {
         setUserRenewables(renewables);
@@ -433,7 +431,7 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
 
     try {
       // Save renewable via API (position left null — user places it next on the map)
-      const data = await api.post("/renewables", {
+      const data = await createRenewable({
         user_id: user.id,
         technology_type: tech.type,
         points_cost: tech.pointsCost,
@@ -444,7 +442,12 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
       await api.post("/profile/update", { user_id: user.id, total_points: newTotalPoints });
 
       // Update local state
-      setUserRenewables((prev) => [...prev, data]);
+      const savedRenewable = data?.data ?? data?.row ?? data;
+      if (savedRenewable?.id) {
+        setUserRenewables((prev) => [...prev, savedRenewable]);
+      } else {
+        setUserRenewables(await fetchRenewables(user.id));
+      }
       setUserProfile((prev) => ({
         ...prev,
         total_points: newTotalPoints,
@@ -469,7 +472,7 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
   const handlePlaceRenewable = async (renewableId: string, x: number, y: number) => {
     if (!user) return;
     try {
-      await api.patch(`/renewables/${encodeURIComponent(renewableId)}`, {
+      await updateRenewable(renewableId, {
         user_id: user.id,
         position_x: x,
         position_y: y,
