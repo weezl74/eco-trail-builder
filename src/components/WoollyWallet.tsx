@@ -499,8 +499,8 @@ const WoollyWallet: React.FC<Props> = ({ children }) => {
 
       {/* Pending-photo caption sheet */}
       {pendingPhoto && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm p-4 shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl w-full max-w-sm p-4 shadow-2xl my-auto max-h-[85vh] overflow-y-auto mb-24 sm:mb-auto">
             <p className="font-serif font-bold text-lg text-[#1f1f1f] mb-2">{t('Add a caption?')}</p>
             <div className="rounded-xl overflow-hidden mb-3" style={{ aspectRatio: '1.586 / 1' }}>
               <img src={pendingPhoto} alt="preview" className="w-full h-full object-cover" />
