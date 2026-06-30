@@ -181,7 +181,7 @@ const TreePlanting: React.FC<TreePlantingProps> = ({ treePoints, onPointsUpdate 
               Use {POINTS_REQUIRED} points to request CCBC to plant a tree on your behalf
             </p>
             <p className="text-xs text-green-500 mt-2">
-              Your points: {totalPoints} | Required: {POINTS_REQUIRED}
+              Your Tree Points: {treePoints} | Required: {POINTS_REQUIRED}
             </p>
           </div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
