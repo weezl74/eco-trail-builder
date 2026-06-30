@@ -46,6 +46,21 @@ export const api = {
 
     return res.json();
   },
+
+  delete: async (path: string, body?: any) => {
+    const res = await fetch(`${API_BASE}${path}`, {
+      method: "DELETE",
+      headers: body ? { "Content-Type": "application/json" } : undefined,
+      body: body ? JSON.stringify(body) : undefined,
+    });
+
+    if (!res.ok) {
+      console.error(`DELETE failed: ${path}`, res.status);
+      throw new Error(`DELETE ${path} failed`);
+    }
+
+    try { return await res.json(); } catch { return null; }
+  },
 };
 
 // ✅ TYPES

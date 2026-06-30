@@ -3,9 +3,8 @@ import { ArrowLeft, Footprints, Bike, Bus, Car } from 'lucide-react';
 import { useTranslations } from '@/hooks/useTranslations';
 import WalkMyWarmUpJourney from '../WalkMyWarmUpJourney';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/lib/api';
 
-const LEGACY_KEY = (uid: string) => `nurture.warmup.${uid}`;
 const CACHE_KEY = (uid: string) => `cloudrow:user_walk_stamps:${uid}`;
 
 const WalkMyWarmUpScreen: React.FC<{ onBack: () => void }> = ({ onBack }) => {
@@ -25,30 +24,15 @@ const WalkMyWarmUpScreen: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       if (cached != null) setStamps(Number(cached));
     } catch {}
     (async () => {
-      const { data } = await supabase
-        .from('user_walk_stamps')
-        .select('stamps')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      if (cancelled) return;
-      if (data) {
-        setStamps(data.stamps ?? 0);
-        try { localStorage.setItem(CACHE_KEY(user.id), String(data.stamps ?? 0)); } catch {}
-      } else {
-        // legacy migration
-        try {
-          const legacy = localStorage.getItem(LEGACY_KEY(user.id));
-          if (legacy != null) {
-            const n = Number(legacy) || 0;
-            await supabase.from('user_walk_stamps').upsert(
-              { user_id: user.id, stamps: n },
-              { onConflict: 'user_id' },
-            );
-            setStamps(n);
-            try { localStorage.setItem(CACHE_KEY(user.id), String(n)); } catch {}
-            localStorage.removeItem(LEGACY_KEY(user.id));
-          }
-        } catch {}
+      try {
+        const data = await api.get(`/walk-stamps?user_id=${encodeURIComponent(user.id)}`);
+        if (cancelled) return;
+        const row = Array.isArray(data) ? data[0] : data;
+        const n = row?.stamps ?? 0;
+        setStamps(n);
+        try { localStorage.setItem(CACHE_KEY(user.id), String(n)); } catch {}
+      } catch (e) {
+        console.error('[walk-stamps] fetch failed', e);
       }
     })();
     return () => { cancelled = true; };
@@ -59,14 +43,12 @@ const WalkMyWarmUpScreen: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       const next = Math.min(10, n + 1);
       if (user) {
         try { localStorage.setItem(CACHE_KEY(user.id), String(next)); } catch {}
-        void supabase.from('user_walk_stamps').upsert(
-          { user_id: user.id, stamps: next },
-          { onConflict: 'user_id' },
-        );
+        void api.post('/walk-stamps', { user_id: user.id, stamps: next }).catch(() => {});
       }
       return next;
     });
   };
+
 
   return (
     <div className="min-h-screen bg-[#F4971D] pb-24 px-4 pt-6 font-roboto">

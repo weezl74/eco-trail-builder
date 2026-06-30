@@ -40,8 +40,8 @@ import LandingScreen from "./LandingScreen";
 import caerphillyBusinessLogo from "@/assets/caerphilly-business-club-logo.png";
 import caerphillyCouncilLogo from "@/assets/caerphilly-council-logo.png";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
-import { api } from "@/lib/api";
+import { api, fetchMyProfile } from "@/lib/api";
+
 import { useToast } from "@/hooks/use-toast";
 
 type UserMode = "resident" | "business";
@@ -84,15 +84,12 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
     }
   }, [user]);
 
-  // Save category completion states to cloud (per-user)
+  // Save category completion states locally (per-user). Server source of truth is /responses.
   useEffect(() => {
     if (user) {
       try {
         localStorage.setItem(`cloudrow:user_calc_categories:${user.id}`, JSON.stringify(completedCategories));
       } catch {}
-      void supabase
-        .from("user_calc_categories")
-        .upsert({ user_id: user.id, completed: completedCategories as any }, { onConflict: "user_id" });
     }
   }, [completedCategories, user]);
 
@@ -102,38 +99,15 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
       const cached = localStorage.getItem(`cloudrow:user_calc_categories:${user.id}`);
       if (cached) setCompletedCategories(JSON.parse(cached));
     } catch {}
-    const { data } = await supabase
-      .from("user_calc_categories")
-      .select("completed")
-      .eq("user_id", user.id)
-      .maybeSingle();
-    if (data?.completed && Array.isArray(data.completed)) {
-      setCompletedCategories(data.completed as string[]);
-      try {
-        localStorage.setItem(`cloudrow:user_calc_categories:${user.id}`, JSON.stringify(data.completed));
-      } catch {}
-    } else {
-      // legacy migration
-      try {
-        const legacy = localStorage.getItem(`completedCategories_${user.id}`);
-        if (legacy) {
-          const list = JSON.parse(legacy) as string[];
-          await supabase
-            .from("user_calc_categories")
-            .upsert({ user_id: user.id, completed: list as any }, { onConflict: "user_id" });
-          setCompletedCategories(list);
-          localStorage.removeItem(`completedCategories_${user.id}`);
-        }
-      } catch {}
-    }
   };
+
 
   const loadUserData = async () => {
     if (!user) return;
 
     try {
       // Load user profile
-      const { data: profile } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
+      const profile = await fetchMyProfile(user.id).catch(() => null);
 
       if (profile) {
         setUserProfile(profile);
@@ -143,16 +117,21 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
       }
 
       // Load user renewables
-      const { data: renewables } = await supabase.from("user_renewables").select("*").eq("user_id", user.id);
+      const renewables = await api
+        .get(`/renewables?user_id=${encodeURIComponent(user.id)}`)
+        .catch(() => [] as any[]);
 
-      if (renewables) {
+      if (Array.isArray(renewables)) {
         setUserRenewables(renewables);
       }
 
       // Load user pledges to get count
-      const { data: pledges } = await supabase.from("user_pledges").select("*").eq("user_id", user.id);
+      const pledges = await api
+        .get(`/pledges?user_id=${encodeURIComponent(user.id)}`)
+        .catch(() => [] as any[]);
 
-      if (pledges) {
+      if (Array.isArray(pledges)) {
+
         setPledges(
           pledges.map((p) => {
             // Find the matching pledge from categories to get costSaving
@@ -297,15 +276,7 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
     // Save to database
     if (user) {
       try {
-        const { error } = await supabase
-          .from("profiles")
-          .update({ current_footprint: newFootprint })
-          .eq("user_id", user.id);
-
-        if (error) {
-          console.error("Database error:", error);
-          throw error;
-        }
+        await api.post("/profile/update", { user_id: user.id, current_footprint: newFootprint });
 
         console.log("Footprint successfully updated to:", newFootprint);
         setUserProfile((prev) => ({ ...prev, current_footprint: newFootprint }));
@@ -391,19 +362,14 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
     }
 
     try {
-      // Save to database
-      const { data, error } = await supabase
-        .from("user_pledges")
-        .insert({
-          user_id: user.id,
-          category,
-          action,
-          points_earned: impact,
-        })
-        .select()
-        .single();
+      // Save pledge via API
+      const data = await api.post("/pledges", {
+        user_id: user.id,
+        category,
+        action,
+        points_earned: impact,
+      });
 
-      if (error) throw error;
 
       // Calculate points based on difficulty/time/cost
       let points = impact;
@@ -466,22 +432,16 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
     if (!user) return;
 
     try {
-      // Save to database (position left null — user places it next on the map)
-      const { data, error } = await supabase
-        .from("user_renewables")
-        .insert({
-          user_id: user.id,
-          technology_type: tech.type,
-          points_cost: tech.pointsCost,
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
+      // Save renewable via API (position left null — user places it next on the map)
+      const data = await api.post("/renewables", {
+        user_id: user.id,
+        technology_type: tech.type,
+        points_cost: tech.pointsCost,
+      });
 
       // Deduct points from user's total
       const newTotalPoints = (userProfile?.total_points || 0) - tech.pointsCost;
-      await supabase.from("profiles").update({ total_points: newTotalPoints }).eq("user_id", user.id);
+      await api.post("/profile/update", { user_id: user.id, total_points: newTotalPoints });
 
       // Update local state
       setUserRenewables((prev) => [...prev, data]);
@@ -508,17 +468,19 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
 
   const handlePlaceRenewable = async (renewableId: string, x: number, y: number) => {
     if (!user) return;
-    const { error } = await (supabase as any)
-      .from("user_renewables")
-      .update({ position_x: x, position_y: y })
-      .eq("id", renewableId)
-      .eq("user_id", user.id);
-    if (error) {
-      toast({ title: "Could not save placement", description: error.message, variant: "destructive" });
+    try {
+      await api.patch(`/renewables/${encodeURIComponent(renewableId)}`, {
+        user_id: user.id,
+        position_x: x,
+        position_y: y,
+      });
+    } catch (e: any) {
+      toast({ title: "Could not save placement", description: e?.message ?? "Try again", variant: "destructive" });
       return;
     }
     setUserRenewables((prev) => prev.map((r) => (r.id === renewableId ? { ...r, position_x: x, position_y: y } : r)));
   };
+
 
   const addSprint = async (title: string, impact: number, frequency: string, costSaving: number = 0) => {
     if (!user) return;

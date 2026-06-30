@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/lib/api';
 
 export interface BusinessCardRow {
   id: string;
@@ -21,13 +21,14 @@ export const useBusinessSpotlight = () => {
   useEffect(() => {
     let active = true;
     (async () => {
-      const { data } = await (supabase as any)
-        .from('business_cards_public')
-        .select('id,user_id,business_name,tagline,sector,website,logo_url,pen_portrait,climate_goals,offer_to_residents,offer_to_businesses')
-        .order('created_at', { ascending: false })
-        .limit(20);
-      if (!active) return;
-      setCards((data ?? []) as BusinessCardRow[]);
+      try {
+        const data = await api.get('/business-cards/public');
+        if (!active) return;
+        const list = (Array.isArray(data) ? data : []).slice(0, 20) as BusinessCardRow[];
+        setCards(list);
+      } catch (e) {
+        console.error('[useBusinessSpotlight] failed', e);
+      }
       setLoading(false);
     })();
     return () => { active = false; };
