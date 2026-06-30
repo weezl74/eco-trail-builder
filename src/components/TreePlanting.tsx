@@ -19,11 +19,12 @@ interface TreeRequest {
 }
 
 interface TreePlantingProps {
-  totalPoints: number;
-  onPointsUpdate: (newPoints: number) => void;
+  // Tree planting is a verified action — it MUST be validated against tree_points.
+  treePoints: number;
+  onPointsUpdate: (newTreePoints: number) => void;
 }
 
-const TreePlanting: React.FC<TreePlantingProps> = ({ totalPoints, onPointsUpdate }) => {
+const TreePlanting: React.FC<TreePlantingProps> = ({ treePoints, onPointsUpdate }) => {
   const [treeRequests, setTreeRequests] = useState<TreeRequest[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -31,7 +32,7 @@ const TreePlanting: React.FC<TreePlantingProps> = ({ totalPoints, onPointsUpdate
   const { toast } = useToast();
 
   const POINTS_REQUIRED = 500;
-  const canPlantTree = totalPoints >= POINTS_REQUIRED;
+  const canPlantTree = treePoints >= POINTS_REQUIRED;
 
   // Mock What3Words locations for demonstration
   const mockWhat3WordsLocations = [
