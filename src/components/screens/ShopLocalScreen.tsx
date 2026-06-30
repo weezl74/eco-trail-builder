@@ -488,9 +488,9 @@ const ShopLocalScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           className="absolute inset-0 w-full h-full"
           onMapClick={
             mode === 'cool' && placing
-              ? (lat, lng, x, y) => {
+              ? async (lat, lng, x, y) => {
                   const tech = placing;
-                  const ok = buyRenewable(tech, x, y, lat, lng);
+                  const ok = await buyRenewable(tech, x, y, lat, lng);
                   if (ok) {
                     const meta = RENEWABLE_META[tech];
                     toast({
