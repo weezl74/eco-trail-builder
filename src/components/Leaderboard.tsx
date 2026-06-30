@@ -83,3 +83,53 @@ export default function Leaderboard() {
     );
   };
 
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader><CardTitle>Leaderboard</CardTitle></CardHeader>
+        <CardContent>Loading…</CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader><CardTitle>Leaderboard</CardTitle></CardHeader>
+        <CardContent>Unable to load leaderboard right now.</CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Trophy className="h-5 w-5 text-yellow-500" /> Leaderboard
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        {leaderboard.map((entry) => (
+          <div
+            key={entry.user_id}
+            className={`flex items-center justify-between rounded-lg p-2 ${
+              entry.user_id === user?.id ? "bg-primary/5" : ""
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-6 flex justify-center">{getRankIcon(entry.rank)}</div>
+              {getUserAvatar(entry.username)}
+              <span className="font-medium">{entry.username || "Member"}</span>
+            </div>
+            <span className="font-semibold">{entry.total_points} pts</span>
+          </div>
+        ))}
+        {leaderboard.length === 0 && (
+          <p className="text-sm text-muted-foreground">No entries yet.</p>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+
