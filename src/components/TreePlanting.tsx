@@ -4,8 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Trees, MapPin, Calendar, CheckCircle, Clock, ExternalLink } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { api } from '@/lib/api';
+import { api, createTreeRequest, fetchTreeRequests, updateTreeRequest } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 
@@ -54,14 +53,12 @@ const TreePlanting: React.FC<TreePlantingProps> = ({ totalPoints, onPointsUpdate
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
-        .from('tree_requests')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setTreeRequests(data || []);
+      const data = await fetchTreeRequests(user.id);
+      setTreeRequests(
+        data
+          .slice()
+          .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()),
+      );
     } catch (error) {
       console.error('Error loading tree requests:', error);
     }
@@ -76,16 +73,12 @@ const TreePlanting: React.FC<TreePlantingProps> = ({ totalPoints, onPointsUpdate
 
     setIsLoading(true);
     try {
-      const { error } = await supabase
-        .from('tree_requests')
-        .insert({
-          user_id: user.id,
-          points_used: POINTS_REQUIRED,
-          status: 'pending',
-          tree_species: 'Native Oak'
-        });
-
-      if (error) throw error;
+      await createTreeRequest({
+        user_id: user.id,
+        points_used: POINTS_REQUIRED,
+        status: 'pending',
+        tree_species: 'Native Oak',
+      });
 
       // Deduct points from user's profile
       await api.post('/profile/update', {
@@ -96,7 +89,7 @@ const TreePlanting: React.FC<TreePlantingProps> = ({ totalPoints, onPointsUpdate
 
       onPointsUpdate(totalPoints - POINTS_REQUIRED);
       setIsDialogOpen(false);
-      loadTreeRequests();
+      await loadTreeRequests();
       
       toast({
         title: "Tree Request Submitted! 🌱",
@@ -119,18 +112,14 @@ const TreePlanting: React.FC<TreePlantingProps> = ({ totalPoints, onPointsUpdate
       const plantingDate = new Date();
       plantingDate.setDate(plantingDate.getDate() + Math.floor(Math.random() * 30) + 14); // 14-44 days from now
       
-      const { error } = await supabase
-        .from('tree_requests')
-        .update({
-          status: 'planted',
-          what3words_location: generateMockLocation(),
-          planting_date: plantingDate.toISOString().split('T')[0]
-        })
-        .eq('id', requestId);
-
-      if (error) throw error;
+      await updateTreeRequest(requestId, {
+        user_id: user?.id,
+        status: 'planted',
+        what3words_location: generateMockLocation(),
+        planting_date: plantingDate.toISOString().split('T')[0],
+      });
       
-      loadTreeRequests();
+      await loadTreeRequests();
       toast({
         title: "Tree Planted! 🌳",
         description: "Your tree has been planted by CCBC. Check the What3Words location to find it!",
