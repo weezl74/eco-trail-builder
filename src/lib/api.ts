@@ -88,6 +88,7 @@ export interface ApiRenewable {
   id: string;
   user_id?: string;
   technology_type: string;
+  tech_type?: string | null;
   points_cost: number;
   position_x?: number | null;
   position_y?: number | null;
@@ -173,10 +174,36 @@ export const updateTreeRequest = async (
 };
 
 // ✅ RENEWABLES
+// Backend (Azure SQL) stores columns as `tech_type`, `lat`, `lng`.
+// The legacy code uses `technology_type` / `latitude` / `longitude`.
+// We send BOTH naming conventions on writes and normalise BOTH on reads
+// so neither side ends up with nulls / zeroes.
+const normaliseRenewable = (r: any): ApiRenewable => {
+  if (!r) return r;
+  const tech = r.technology_type ?? r.tech_type ?? null;
+  const lat = r.latitude ?? r.lat ?? null;
+  const lng = r.longitude ?? r.lng ?? null;
+  // If the backend only persisted lat/lng (legacy schema), fall back to them
+  // for the percent-based map position so icons still render.
+  const px = r.position_x ?? (lat != null && lat !== 0 ? lat : null);
+  const py = r.position_y ?? (lng != null && lng !== 0 ? lng : null);
+  return {
+    ...r,
+    technology_type: tech,
+    tech_type: tech,
+    latitude: lat,
+    lat,
+    longitude: lng,
+    lng,
+    position_x: px,
+    position_y: py,
+  } as ApiRenewable;
+};
+
 export const fetchRenewables = async (userId: string): Promise<ApiRenewable[]> => {
   if (!userId) return [];
   const data = await api.get(`/renewables?user_id=${encodeURIComponent(userId)}`);
-  return unwrapArray<ApiRenewable>(data);
+  return unwrapArray<ApiRenewable>(data).map(normaliseRenewable);
 };
 
 export const createRenewable = async (payload: {
@@ -188,14 +215,27 @@ export const createRenewable = async (payload: {
   latitude?: number | null;
   longitude?: number | null;
 }) => {
-  return api.post("/renewables", payload);
+  const body = {
+    ...payload,
+    // Backend-compatible aliases
+    tech_type: payload.technology_type,
+    lat: payload.latitude ?? null,
+    lng: payload.longitude ?? null,
+  };
+  const res = await api.post("/renewables", body);
+  const row = res?.data ?? res?.row ?? res;
+  return { ...(res || {}), data: normaliseRenewable(row), row: normaliseRenewable(row) };
 };
 
 export const updateRenewable = async (
   id: string,
   payload: Partial<ApiRenewable> & { user_id?: string }
 ) => {
-  return api.patch(`/renewables/${encodeURIComponent(id)}`, payload);
+  const body: any = { ...payload };
+  if (payload.technology_type != null) body.tech_type = payload.technology_type;
+  if (payload.latitude != null) body.lat = payload.latitude;
+  if (payload.longitude != null) body.lng = payload.longitude;
+  return api.patch(`/renewables/${encodeURIComponent(id)}`, body);
 };
 
 // ✅ SPRINTS

@@ -476,6 +476,10 @@ const WasteCalculator: React.FC<WasteCalculatorProps> = ({ mode: externalMode, o
         user_id: user.id,
         position_x: x,
         position_y: y,
+        // Also mirror onto lat/lng so the backend persists coords even if
+        // it only knows the legacy lat/lng columns.
+        latitude: x,
+        longitude: y,
       });
     } catch (e: any) {
       toast({ title: "Could not save placement", description: e?.message ?? "Try again", variant: "destructive" });
