@@ -1,4 +1,5 @@
 import React from "react";
+import raincoatLayer from "@/assets/accessories/raincoat-layer.svg.asset.json";
 
 interface Props {
   woolColor: string;
@@ -71,6 +72,9 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [], head, clas
 
         {/* Z3 LIMBS */}
         <Layer src="/body-limbs.svg" z={3} />
+
+        {/* Z3.5 RAINCOAT — over body, under head */}
+        {has("raincoat") && <Layer src={(raincoatLayer as { url: string }).url} z={3} />}
 
         {/* Z4 HEAD (variant baked-in) */}
         <Layer src={getHeadFile(accessories, head)} z={4} />
