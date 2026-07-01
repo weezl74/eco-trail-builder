@@ -165,6 +165,7 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
     { id: "caramel", label: "Caramel", value: "#b07a3a" },
     { id: "rose", label: "Rose", value: "#e6a4a4" },
     { id: "mint", label: "Mint", value: "#a8d8b9" },
+    { id: "lavender", label: "Lavender", value: "#c4b5d4" },
   ];
 
   const handleBuy = (a: Accessory) => {
