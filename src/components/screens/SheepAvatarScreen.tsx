@@ -233,7 +233,7 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
             </button>
           </div>
           */}
-          flex items-center justify-center mb-3
+        <div className="flex items-center justify-center mb-3">
           <div className="bg-[#3a3a3a] rounded-2xl p-3">
             <p className="text-white font-serif font-bold text-sm mb-2">
               {t("Accessories")} <span className="opacity-60 text-xs">{t("(tap to see climate fact)")}</span>
