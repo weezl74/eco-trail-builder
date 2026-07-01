@@ -34,8 +34,9 @@ const layerStyle: React.CSSProperties = {
 };
 
 const Layer: React.FC<{ src: string; alt?: string; z: number }> = ({ src, alt = "", z }) => (
-  <img src={src} alt={alt} draggable={false} style={{ ...layerStyle, zIndex: z }} />
+  <img key={src} src={src} alt={alt} draggable={false} style={{ ...layerStyle, zIndex: z }} />
 );
+
 
 const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [], head, className, shiftPercent = 0 }) => {
   const has = (id: string) => accessories.includes(id);
