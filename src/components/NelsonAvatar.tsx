@@ -41,20 +41,25 @@ const Layer: React.FC<{ src: string; alt?: string; z: number }> = ({ src, alt = 
 const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [], head, className, shiftPercent = 0 }) => {
   const has = (id: string) => accessories.includes(id);
 
+  // The sheep artwork in the SVGs sits ~13% right of centre in a 500x500 viewBox.
+  // Compensate here so Nelson APPEARS centred in his container by default.
+  const INTRINSIC_OFFSET = -13;
+  const totalShift = INTRINSIC_OFFSET + shiftPercent;
+
   return (
     <div className={className} style={{ position: "relative", aspectRatio: "1 / 1" }}>
       <div
         style={{
           position: "absolute",
           inset: 0,
-          transform: `translateX(${shiftPercent}%)`,
+          transform: `translateX(${totalShift}%)`,
         }}
       >
 
         {/* Z1 BODY BASE (headless so the head layer fully swaps) */}
         <Layer src="/profile/body-base-nohead.svg" z={1} />
 
-        {/* Z2 WOOL COLOUR (masked) — nudged very slightly down + in to fully cover body */}
+        {/* Z2 WOOL COLOUR — mask shares the body-base viewBox, so use full-frame alignment. */}
         <div
           style={{
             ...layerStyle,
@@ -62,14 +67,15 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [], head, clas
             backgroundColor: woolColor,
             WebkitMaskImage: "url(/body-mask.svg)",
             WebkitMaskRepeat: "no-repeat",
-            WebkitMaskPosition: "center 51.5%",
-            WebkitMaskSize: "97% auto",
+            WebkitMaskPosition: "0 0",
+            WebkitMaskSize: "100% 100%",
             maskImage: "url(/body-mask.svg)",
             maskRepeat: "no-repeat",
-            maskPosition: "center 51.5%",
-            maskSize: "97% auto",
+            maskPosition: "0 0",
+            maskSize: "100% 100%",
           }}
         />
+
 
 
         {/* Z3 LIMBS */}
