@@ -34,8 +34,9 @@ const layerStyle: React.CSSProperties = {
 };
 
 const Layer: React.FC<{ src: string; alt?: string; z: number }> = ({ src, alt = "", z }) => (
-  <img src={src} alt={alt} draggable={false} style={{ ...layerStyle, zIndex: z }} />
+  <img key={src} src={src} alt={alt} draggable={false} style={{ ...layerStyle, zIndex: z }} />
 );
+
 
 const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [], head, className, shiftPercent = 0 }) => {
   const has = (id: string) => accessories.includes(id);
@@ -53,7 +54,7 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [], head, clas
         {/* Z1 BODY BASE (headless so the head layer fully swaps) */}
         <Layer src="/profile/body-base-nohead.svg" z={1} />
 
-        {/* Z2 WOOL COLOUR (masked) */}
+        {/* Z2 WOOL COLOUR (masked) — nudged very slightly down + in to fully cover body */}
         <div
           style={{
             ...layerStyle,
@@ -61,14 +62,15 @@ const NelsonAvatar: React.FC<Props> = ({ woolColor, accessories = [], head, clas
             backgroundColor: woolColor,
             WebkitMaskImage: "url(/body-mask.svg)",
             WebkitMaskRepeat: "no-repeat",
-            WebkitMaskPosition: "center",
-            WebkitMaskSize: "contain",
+            WebkitMaskPosition: "center 51.5%",
+            WebkitMaskSize: "97% auto",
             maskImage: "url(/body-mask.svg)",
             maskRepeat: "no-repeat",
-            maskPosition: "center",
-            maskSize: "contain",
+            maskPosition: "center 51.5%",
+            maskSize: "97% auto",
           }}
         />
+
 
         {/* Z3 LIMBS */}
         <Layer src="/body-limbs.svg" z={3} />

@@ -233,14 +233,16 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           </div>
           */}
 
-          <div className="flex items-center justify-center mb-3">
+          <div className="flex items-center justify-center -mt-2 mb-1">
             <NelsonAvatar
               woolColor={woolColor}
               accessories={accessories}
               head={head}
-              className="w-64 h-64 select-none"
+              shiftPercent={0}
+              className="w-72 h-72 select-none"
             />
           </div>
+
 
           <div className="bg-[#3a3a3a] rounded-2xl p-3 mb-3">
             <p className="text-white font-serif font-bold text-sm mb-2">{t("Wool colour")}</p>
