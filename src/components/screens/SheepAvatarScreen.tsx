@@ -165,7 +165,6 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
     { id: "caramel", label: "Caramel", value: "#b07a3a" },
     { id: "rose", label: "Rose", value: "#e6a4a4" },
     { id: "mint", label: "Mint", value: "#a8d8b9" },
-    { id: "lavender", label: "Lavender", value: "#c4b5d4" },
   ];
 
   const handleBuy = (a: Accessory) => {
@@ -234,38 +233,33 @@ const SheepAvatarScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           </div>
           */}
 
-          <div className="bg-[#3a3a3a] rounded-2xl p-3 mb-3 relative overflow-visible min-h-[310px]">
-            <div className="grid grid-cols-[35fr_65fr] gap-3 h-full items-start">
-              <div className="relative z-10">
-                <p className="text-white font-serif font-bold text-sm mb-2">{t("Wool colour")}</p>
-              <div className="grid grid-cols-3 gap-3">
-                {WOOL_COLOURS.map((c) => {
-                  const selected = c.value.toLowerCase() === woolColor.toLowerCase();
-                  return (
-                    <button
-                      key={c.id}
-                      onClick={() => setWoolColor(c.value)}
-                      aria-label={c.label}
-                      title={c.label}
-                      className={`w-full h-full min-w-12 min-h-12 rounded-full border-2 transition ${
-                        selected ? "border-[#F4971D] scale-110" : "border-white/30"
-                      }`}
-                      style={{ background: c.value }}
-                    />
-                  );
-                })}
-              </div>
-              </div>
-              <div className="relative z-0 flex items-start justify-end">
-                <div className="pointer-events-none w-[295px] h-[295px] -mt-4 -mr-4">
-                  <NelsonAvatar
-                    woolColor={woolColor}
-                    accessories={accessories}
-                    head={head}
-                    className="w-full h-full select-none"
+          <div className="flex items-center justify-center mb-3">
+            <NelsonAvatar
+              woolColor={woolColor}
+              accessories={accessories}
+              head={head}
+              className="w-64 h-64 select-none"
+            />
+          </div>
+
+          <div className="bg-[#3a3a3a] rounded-2xl p-3 mb-3">
+            <p className="text-white font-serif font-bold text-sm mb-2">{t("Wool colour")}</p>
+            <div className="grid grid-cols-8 gap-2">
+              {WOOL_COLOURS.map((c) => {
+                const selected = c.value.toLowerCase() === woolColor.toLowerCase();
+                return (
+                  <button
+                    key={c.id}
+                    onClick={() => setWoolColor(c.value)}
+                    aria-label={c.label}
+                    title={c.label}
+                    className={`aspect-square rounded-full border-2 transition ${
+                      selected ? "border-[#F4971D] scale-110" : "border-white/30"
+                    }`}
+                    style={{ background: c.value }}
                   />
-                </div>
-              </div>
+                );
+              })}
             </div>
           </div>
 
