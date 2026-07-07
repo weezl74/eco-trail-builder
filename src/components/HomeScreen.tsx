@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Mail, Gift, Calendar, Shirt, Users } from "lucide-react";
+import { Mail, Gift, Calendar, Shirt, Users, Tv } from "lucide-react";
 import SheepAvatarScreen from "./screens/SheepAvatarScreen";
 import EventsCalendarScreen from "./screens/EventsCalendarScreen";
 import RewardsScreen from "./screens/RewardsScreen";
