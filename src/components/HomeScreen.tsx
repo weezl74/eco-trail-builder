@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Mail, Gift, Calendar, Shirt, Users } from "lucide-react";
+import { Mail, Gift, Calendar, Shirt, Users, Tv } from "lucide-react";
 import SheepAvatarScreen from "./screens/SheepAvatarScreen";
 import EventsCalendarScreen from "./screens/EventsCalendarScreen";
 import RewardsScreen from "./screens/RewardsScreen";
@@ -44,6 +44,12 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
           </button>
           <button onClick={() => setScreen("groups")} aria-label="Groups">
             <Users className="h-6 w-6 text-white" strokeWidth={2.5} />
+          </button>
+          <button
+            onClick={() => window.open("https://www.youtube.com/@NelsonTheNetZeroSheep", "_blank", "noopener,noreferrer")}
+            aria-label="Nelson on YouTube"
+          >
+            <Tv className="h-6 w-6 text-white" strokeWidth={2.5} />
           </button>
         </div>
       </div>
