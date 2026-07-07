@@ -45,6 +45,12 @@ const HomeScreen: React.FC<{ onGoToPledges?: () => void }> = ({ onGoToPledges })
           <button onClick={() => setScreen("groups")} aria-label="Groups">
             <Users className="h-6 w-6 text-white" strokeWidth={2.5} />
           </button>
+          <button
+            onClick={() => window.open("https://www.youtube.com/@NelsonTheNetZeroSheep", "_blank", "noopener,noreferrer")}
+            aria-label="Nelson on YouTube"
+          >
+            <Tv className="h-6 w-6 text-white" strokeWidth={2.5} />
+          </button>
         </div>
       </div>
 
